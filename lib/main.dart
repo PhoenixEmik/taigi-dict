@@ -1504,7 +1504,11 @@ class DictionaryAboutDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('About Dictionary'),
-      content: const Text('搜尋結果現在採扁平列表，不再分組。畫面預設不顯示任何詞條，使用者輸入後才會看到結果。'),
+      content: const Text(
+        '搜尋結果現在採扁平列表，不再分組。畫面預設不顯示任何詞條，使用者輸入後才會看到結果。\n\n'
+        '詞典資料來源：教育部《臺灣台語常用詞辭典》\n'
+        '參考頁面：https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
+      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
@@ -1522,7 +1526,11 @@ class AudioAboutDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('About Audio Downloads'),
-      content: const Text('音檔下載會保存到裝置本地端。下載完成後，詞目與例句音檔都可以在沒有網路的情況下播放。'),
+      content: const Text(
+        '音檔下載會保存到裝置本地端。下載完成後，詞目與例句音檔都可以在沒有網路的情況下播放。\n\n'
+        '詞目與例句音檔來源：教育部《臺灣台語常用詞辭典》\n'
+        '參考頁面：https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
+      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),

@@ -3,7 +3,9 @@
 Flutter dictionary app for iOS and Android, built from the Ministry of Education
 Taiwanese Hokkien dataset:
 
+- Canonical reference: `https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/`
 - Source ODS: `https://sutian.moe.edu.tw/media/senn/ods/kautian.ods`
+- Audio source page: `https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/`
 - App behavior: offline Hokkien → Mandarin and Mandarin → Hokkien lookup
 - Bundled asset: `assets/data/dictionary.json.gz`
 
@@ -11,6 +13,7 @@ Taiwanese Hokkien dataset:
 
 - App code: MIT. See `LICENSE`.
 - Dictionary data: `CC BY-NC-ND 2.5 TW`. See `DATA_LICENSE.md`.
+- Dictionary audio: sourced from the same ministry reference page above.
 
 ## Project Structure
 
