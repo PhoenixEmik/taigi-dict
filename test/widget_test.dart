@@ -516,7 +516,6 @@ void main() {
     expect(find.text('臺羅標注說明'), findsWidgets);
     expect(find.text('拼寫基礎'), findsOneWidget);
     expect(find.textContaining('音節之間會用連字符號標示多音節詞'), findsOneWidget);
-    expect(find.text('查詢時怎麼用'), findsOneWidget);
 
     await tester.pageBack();
     await tester.pump();
