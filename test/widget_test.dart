@@ -508,7 +508,6 @@ void main() {
 
     expect(find.text('臺羅標注說明'), findsOneWidget);
     expect(find.text('漢字用字原則'), findsOneWidget);
-    expect(find.text('辭典附錄'), findsOneWidget);
 
     await tester.tap(find.text('臺羅標注說明'));
     await tester.pump();
@@ -519,18 +518,6 @@ void main() {
     expect(find.textContaining('音節之間會用連字符號標示多音節詞'), findsOneWidget);
     expect(find.text('聲調舉例'), findsOneWidget);
     expect(find.text('tong1'), findsOneWidget);
-
-    await tester.pageBack();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
-
-    await tester.tap(find.text('辭典附錄'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
-
-    expect(find.text('辭典附錄'), findsWidgets);
-    expect(find.text('姓名查詢'), findsOneWidget);
-    expect(find.textContaining('百家姓'), findsOneWidget);
 
     await tester.pageBack();
     await tester.pump();
@@ -563,7 +550,7 @@ void main() {
     );
     expect(find.textContaining('tailo-phiautsu-suatbing'), findsOneWidget);
     expect(find.textContaining('hanji-iongji-guantsik'), findsOneWidget);
-    expect(find.textContaining('sutian-huliok'), findsOneWidget);
+    expect(find.textContaining('sutian-huliok'), findsNothing);
   });
 
   testWidgets('shows, applies, and clears search history', (

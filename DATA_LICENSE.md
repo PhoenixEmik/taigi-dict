@@ -27,7 +27,6 @@ Reference pages:
 
 - `https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/`
 - `https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/`
-- `https://sutian.moe.edu.tw/zh-hant/piantsip/sutian-huliok/`
 
 Primary dataset file:
 
