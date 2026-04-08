@@ -293,6 +293,22 @@ void main() {
     expect(restoredPreferences.readingTextScale, 1.3);
   });
 
+  test('app preferences stores theme preference', () async {
+    final preferences = AppPreferences();
+    await preferences.initialize();
+
+    expect(preferences.themePreference, AppThemePreference.system);
+
+    await preferences.setThemePreference(AppThemePreference.amoled);
+
+    final restoredPreferences = AppPreferences();
+    await restoredPreferences.initialize();
+
+    expect(restoredPreferences.themePreference, AppThemePreference.amoled);
+    expect(restoredPreferences.materialThemeMode, ThemeMode.dark);
+    expect(restoredPreferences.useAmoledTheme, isTrue);
+  });
+
   testWidgets('dictionary screen only renders filtered matches', (
     WidgetTester tester,
   ) async {
@@ -477,7 +493,8 @@ void main() {
 
     expect(find.text('設定'), findsOneWidget);
     expect(find.text('離線資源'), findsOneWidget);
-    expect(find.text('閱讀文字'), findsOneWidget);
+    expect(find.text('外觀'), findsOneWidget);
+    expect(find.text('主題'), findsOneWidget);
     expect(find.byType(Slider), findsOneWidget);
     expect(find.text('Search Bar Position'), findsNothing);
     expect(find.text('Top'), findsNothing);

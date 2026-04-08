@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hokkien_dictionary/core/preferences/app_preferences.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/widgets/audio_resource_tile.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/widgets/settings_section_header.dart';
+import 'package:hokkien_dictionary/features/settings/presentation/widgets/settings_theme_mode_tile.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/widgets/settings_text_scale_tile.dart';
 import 'package:hokkien_dictionary/offline_audio.dart';
 
@@ -51,7 +52,13 @@ class SettingsScreen extends StatelessWidget {
                           onDownload: onDownloadArchive,
                         ),
                         const Divider(height: 32),
-                        const SettingsSectionHeader(title: '閱讀文字'),
+                        const SettingsSectionHeader(title: '外觀'),
+                        SettingsThemeModeTile(
+                          value: appPreferences.themePreference,
+                          onSelected: (value) {
+                            unawaited(appPreferences.setThemePreference(value));
+                          },
+                        ),
                         SettingsTextScaleTile(
                           value: appPreferences.readingTextScale,
                           onChanged: (value) {

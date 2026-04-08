@@ -31,11 +31,21 @@ class _HokkienDictionaryAppState extends State<HokkienDictionaryApp> {
   Widget build(BuildContext context) {
     return AppPreferencesScope(
       notifier: _appPreferences,
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: '台語辭典',
-        theme: buildAppTheme(),
-        home: const MainScreen(),
+      child: ListenableBuilder(
+        listenable: _appPreferences,
+        builder: (context, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: '台語辭典',
+            theme: buildLightAppTheme(),
+            darkTheme: _appPreferences.useAmoledTheme
+                ? buildAmoledAppTheme()
+                : buildDarkAppTheme(),
+            themeMode: _appPreferences.materialThemeMode,
+            home: child,
+          );
+        },
+        child: const MainScreen(),
       ),
     );
   }
