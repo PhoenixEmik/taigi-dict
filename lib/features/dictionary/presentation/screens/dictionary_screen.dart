@@ -7,9 +7,9 @@ import '../../../../offline_audio.dart';
 import '../../application/dictionary_search_controller.dart';
 import '../../data/dictionary_repository.dart';
 import '../../domain/dictionary_models.dart';
+import '../coordinators/word_detail_coordinator.dart';
 import '../widgets/entry_list_item.dart';
 import '../widgets/search_panel.dart';
-import 'word_detail_screen.dart';
 
 class DictionaryScreen extends StatefulWidget {
   const DictionaryScreen({
@@ -46,25 +46,17 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
     super.dispose();
   }
 
-  Future<void> _playClip(AudioArchiveType type, String clipId) async {
-    final result = await widget.audioLibrary.playClip(type, clipId);
-    widget.onActionResult(result);
-  }
-
   Future<void> _showEntryDetails(DictionaryEntry entry) async {
     await _searchController.saveCurrentQueryIfNeeded();
     if (!mounted) {
       return;
     }
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => WordDetailScreen(
-          entry: entry,
-          audioLibrary: widget.audioLibrary,
-          bookmarkStore: widget.bookmarkStore,
-          onPlayClip: _playClip,
-        ),
-      ),
+    await WordDetailCoordinator.showWordDetail(
+      context: context,
+      entry: entry,
+      audioLibrary: widget.audioLibrary,
+      bookmarkStore: widget.bookmarkStore,
+      onActionResult: widget.onActionResult,
     );
   }
 

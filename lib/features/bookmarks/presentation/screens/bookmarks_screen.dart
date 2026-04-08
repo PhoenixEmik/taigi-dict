@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../offline_audio.dart';
 import '../../../dictionary/data/dictionary_repository.dart';
 import '../../../dictionary/domain/dictionary_models.dart';
-import '../../../dictionary/presentation/screens/word_detail_screen.dart';
+import '../../../dictionary/presentation/coordinators/word_detail_coordinator.dart';
 import '../../../dictionary/presentation/widgets/entry_list_item.dart';
 import '../../application/bookmark_store.dart';
 import '../widgets/bookmark_empty_state.dart';
@@ -35,21 +35,13 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
     _bundleFuture = widget.repository.loadBundle();
   }
 
-  Future<void> _playClip(AudioArchiveType type, String clipId) async {
-    final result = await widget.audioLibrary.playClip(type, clipId);
-    widget.onActionResult(result);
-  }
-
   Future<void> _showEntryDetails(DictionaryEntry entry) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => WordDetailScreen(
-          entry: entry,
-          audioLibrary: widget.audioLibrary,
-          bookmarkStore: widget.bookmarkStore,
-          onPlayClip: _playClip,
-        ),
-      ),
+    await WordDetailCoordinator.showWordDetail(
+      context: context,
+      entry: entry,
+      audioLibrary: widget.audioLibrary,
+      bookmarkStore: widget.bookmarkStore,
+      onActionResult: widget.onActionResult,
     );
   }
 
