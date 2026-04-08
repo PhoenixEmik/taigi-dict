@@ -89,34 +89,36 @@ class WordDetailBody extends StatelessWidget {
               constraints: BoxConstraints(
                 maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
               ),
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-                children: [
-                  WordDetailHeader(
-                    entry: entry,
-                    audioLibrary: audioLibrary,
-                    onPlayClip: onPlayClip,
-                  ),
-                  const SizedBox(height: 20),
-                  ...entry.senses.map((sense) {
-                    return SenseSection(
-                      sense: sense,
+              child: SelectionArea(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                  children: [
+                    WordDetailHeader(
+                      entry: entry,
                       audioLibrary: audioLibrary,
                       onPlayClip: onPlayClip,
-                      onWordTapped: onWordTapped,
-                      textScale: readingTextScale,
-                    );
-                  }),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      '顯示符合查詢的台語詞目與華語義項',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: const Color(0xFF617176),
+                    ),
+                    const SizedBox(height: 20),
+                    ...entry.senses.map((sense) {
+                      return SenseSection(
+                        sense: sense,
+                        audioLibrary: audioLibrary,
+                        onPlayClip: onPlayClip,
+                        onWordTapped: onWordTapped,
+                        textScale: readingTextScale,
+                      );
+                    }),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        '顯示符合查詢的台語詞目與華語義項',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: const Color(0xFF617176),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

@@ -99,25 +99,27 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                       constraints: BoxConstraints(
                         maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
                       ),
-                      child: ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-                        itemCount: bookmarkedEntries.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              bottom: index == bookmarkedEntries.length - 1
-                                  ? 0
-                                  : 10,
-                            ),
-                            child: EntryListItem(
-                              entry: bookmarkedEntries[index],
-                              onTap: () => _showEntryDetails(
-                                snapshot.data!,
-                                bookmarkedEntries[index],
+                      child: SelectionArea(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
+                          itemCount: bookmarkedEntries.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                bottom: index == bookmarkedEntries.length - 1
+                                    ? 0
+                                    : 10,
                               ),
-                            ),
-                          );
-                        },
+                              child: EntryListItem(
+                                entry: bookmarkedEntries[index],
+                                onTap: () => _showEntryDetails(
+                                  snapshot.data!,
+                                  bookmarkedEntries[index],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   );
