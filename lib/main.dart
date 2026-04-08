@@ -386,30 +386,29 @@ class SettingsScreen extends StatelessWidget {
                       const Divider(height: 32),
                       const SettingsSectionHeader(
                         title: '關於',
-                        subtitle: '查看應用程式資訊與開源授權。',
+                        subtitle: '查看應用程式資訊與授權。',
                       ),
-                      SettingsNavigationTile(
-                        icon: Icons.info_outline,
-                        title: '關於',
-                        subtitle: '了解台語辭典的用途、資料來源與授權。',
-                        onTap: () => showDialog<void>(
-                          context: context,
-                          builder: (context) => const AppAboutDialog(),
+                      AboutListTile(
+                        icon: const Icon(
+                          Icons.info_outline,
+                          color: Color(0xFF17454C),
                         ),
-                      ),
-                      const Divider(height: 1, indent: 72),
-                      SettingsNavigationTile(
-                        icon: Icons.code_outlined,
-                        title: '開源授權',
-                        subtitle: '查看應用程式與相依套件的授權資訊。',
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (context) =>
-                                  const OpenSourceCreditsPage(),
-                            ),
-                          );
-                        },
+                        applicationName: '台語辭典',
+                        applicationLegalese:
+                            'App code: MIT\nDictionary data and audio: 教育部《臺灣台語常用詞辭典》衍生內容，採 CC BY-NC-ND 2.5 TW。',
+                        aboutBoxChildren: const [
+                          SizedBox(height: 12),
+                          Text('台語辭典提供離線的台語與華語雙向查詢，並支援下載教育部詞目與例句音檔。'),
+                          SizedBox(height: 12),
+                          Text(
+                            '參考頁面：https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
+                          ),
+                        ],
+                        applicationIcon: const Icon(
+                          Icons.menu_book_outlined,
+                          color: Color(0xFF17454C),
+                        ),
+                        child: const Text('關於台語辭典'),
                       ),
                     ],
                   ),
@@ -435,34 +434,29 @@ class SearchWorkspaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: TextField(
-          controller: controller,
-          onChanged: onQueryChanged,
-          textInputAction: TextInputAction.search,
-          decoration: InputDecoration(
-            isDense: true,
-            hintText: '輸入台語漢字、白話字或華語詞義',
-            prefixIcon: const Icon(Icons.search),
-            suffixIcon: controller.text.isEmpty
-                ? null
-                : IconButton(
-                    onPressed: () {
-                      controller.clear();
-                      onQueryChanged('');
-                    },
-                    icon: const Icon(Icons.close),
-                  ),
-            filled: true,
-            fillColor: const Color(0xFFF6F2EA),
-            border: OutlineInputBorder(
-              borderSide: BorderSide.none,
-              borderRadius: BorderRadius.circular(18),
-            ),
-          ),
-        ),
+    return SearchBar(
+      controller: controller,
+      hintText: '輸入台語漢字、白話字或華語詞義',
+      leading: const Icon(Icons.search),
+      trailing: controller.text.isEmpty
+          ? null
+          : [
+              IconButton(
+                onPressed: () {
+                  controller.clear();
+                  onQueryChanged('');
+                },
+                icon: const Icon(Icons.close),
+              ),
+            ],
+      onChanged: onQueryChanged,
+      elevation: const WidgetStatePropertyAll(0),
+      backgroundColor: const WidgetStatePropertyAll(Color(0xFFF6F2EA)),
+      padding: const WidgetStatePropertyAll(
+        EdgeInsets.symmetric(horizontal: 16),
+      ),
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       ),
     );
   }
@@ -502,45 +496,6 @@ class SettingsSectionHeader extends StatelessWidget {
           ],
         ],
       ),
-    );
-  }
-}
-
-class SettingsNavigationTile extends StatelessWidget {
-  const SettingsNavigationTile({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-      leading: Icon(icon, color: const Color(0xFF17454C)),
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w700,
-          color: const Color(0xFF18363C),
-        ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: const Color(0xFF5A6D71),
-          height: 1.4,
-        ),
-      ),
-      onTap: onTap,
-      trailing: const Icon(Icons.chevron_right, color: Color(0xFF708286)),
     );
   }
 }
@@ -698,70 +653,46 @@ class EntryListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(18),
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFF8F4ED),
-          borderRadius: BorderRadius.circular(18),
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        titleAlignment: ListTileTitleAlignment.top,
+        title: Text(
+          entry.hanji.isEmpty ? '未標記漢字' : entry.hanji,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFF18363C),
+          ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        child: Row(
+        subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              width: 6,
-              height: 6,
-              decoration: const BoxDecoration(
-                color: Color(0xFFC9752D),
-                shape: BoxShape.circle,
+            if (entry.romanization.isNotEmpty)
+              Text(
+                entry.romanization,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: const Color(0xFFC9752D),
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    entry.hanji.isEmpty ? '未標記漢字' : entry.hanji,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF18363C),
-                    ),
-                  ),
-                  if (entry.romanization.isNotEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      entry.romanization,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: const Color(0xFFC9752D),
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                  if (entry.briefSummary.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      entry.briefSummary,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFF5A6D71),
-                        height: 1.45,
-                      ),
-                    ),
-                  ],
-                ],
+            if (entry.briefSummary.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                entry.briefSummary,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFF5A6D71),
+                  height: 1.45,
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(Icons.chevron_right, color: Color(0xFF708286)),
+            ],
           ],
         ),
+        trailing: const Icon(Icons.chevron_right, color: Color(0xFF708286)),
+        onTap: onTap,
       ),
     );
   }
@@ -826,185 +757,168 @@ class WordDetailBody extends StatelessWidget {
               constraints: BoxConstraints(
                 maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
               ),
-              child: SingleChildScrollView(
+              child: ListView(
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                children: [
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      entry.hanji.isEmpty ? '未標記漢字' : entry.hanji,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF0E2F35),
+                      ),
+                    ),
+                    subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        if (entry.romanization.isNotEmpty)
+                          Text(
+                            entry.romanization,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: const Color(0xFFC9752D),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        if (subtitle.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            subtitle,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: const Color(0xFF54696D),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    trailing: entry.audioId.isEmpty
+                        ? null
+                        : AudioButton(
+                            type: AudioArchiveType.word,
+                            audioId: entry.audioId,
+                            audioLibrary: audioLibrary,
+                            onPressed: onPlayClip,
+                          ),
+                  ),
+                  const SizedBox(height: 20),
+                  ...entry.senses.map((sense) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
-                              Text(
-                                entry.hanji.isEmpty ? '未標記漢字' : entry.hanji,
-                                style: theme.textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: const Color(0xFF0E2F35),
-                                ),
-                              ),
-                              if (entry.romanization.isNotEmpty) ...[
-                                const SizedBox(height: 6),
+                              if (sense.partOfSpeech.isNotEmpty)
+                                Chip(label: Text(sense.partOfSpeech)),
+                              if (sense.definition.isNotEmpty)
                                 Text(
-                                  entry.romanization,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    color: const Color(0xFFC9752D),
+                                  sense.definition,
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    height: 1.55,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                              ],
-                              if (subtitle.isNotEmpty) ...[
-                                const SizedBox(height: 8),
-                                Text(
-                                  subtitle,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: const Color(0xFF54696D),
-                                  ),
-                                ),
-                              ],
                             ],
                           ),
-                        ),
-                        if (entry.audioId.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 12),
-                            child: AudioButton(
-                              type: AudioArchiveType.word,
-                              audioId: entry.audioId,
-                              audioLibrary: audioLibrary,
-                              onPressed: onPlayClip,
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    ...entry.senses.map((sense) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                if (sense.partOfSpeech.isNotEmpty)
-                                  Chip(label: Text(sense.partOfSpeech)),
-                                if (sense.definition.isNotEmpty)
-                                  Text(
-                                    sense.definition,
-                                    style: theme.textTheme.bodyLarge?.copyWith(
-                                      height: 1.55,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            if (sense.examples.isNotEmpty) ...[
-                              const SizedBox(height: 10),
-                              ...sense.examples.take(3).map((example) {
-                                return Container(
-                                  width: double.infinity,
-                                  margin: const EdgeInsets.only(bottom: 8),
-                                  padding: const EdgeInsets.all(14),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFF7F2E8),
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            if (example.hanji.isNotEmpty)
-                                              Text(
-                                                example.hanji,
-                                                style: theme.textTheme.bodyLarge
-                                                    ?.copyWith(
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                    ),
-                                              ),
-                                            if (example
-                                                .romanization
-                                                .isNotEmpty) ...[
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                example.romanization,
-                                                style: theme
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                      color: const Color(
-                                                        0xFF6B5C3A,
-                                                      ),
-                                                    ),
-                                              ),
-                                            ],
-                                            if (example
-                                                .mandarin
-                                                .isNotEmpty) ...[
-                                              const SizedBox(height: 8),
-                                              Text(
-                                                example.mandarin,
-                                                style: theme
-                                                    .textTheme
-                                                    .bodyMedium
-                                                    ?.copyWith(
-                                                      color: const Color(
-                                                        0xFF35545B,
-                                                      ),
-                                                      height: 1.5,
-                                                    ),
-                                              ),
-                                            ],
-                                          ],
-                                        ),
-                                      ),
-                                      if (example.audioId.isNotEmpty)
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            left: 10,
-                                          ),
-                                          child: AudioButton(
-                                            type: AudioArchiveType.sentence,
-                                            audioId: example.audioId,
-                                            audioLibrary: audioLibrary,
-                                            onPressed: onPlayClip,
-                                            compact: true,
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                );
-                              }),
-                            ],
+                          if (sense.examples.isNotEmpty) ...[
+                            const SizedBox(height: 10),
+                            ...sense.examples.take(3).map((example) {
+                              return ExampleListTile(
+                                example: example,
+                                audioLibrary: audioLibrary,
+                                onPlayClip: onPlayClip,
+                              );
+                            }),
                           ],
-                        ),
-                      );
-                    }),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        '顯示符合查詢的台語詞目與華語義項',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: const Color(0xFF617176),
-                        ),
+                        ],
+                      ),
+                    );
+                  }),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      '顯示符合查詢的台語詞目與華語義項',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: const Color(0xFF617176),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class ExampleListTile extends StatelessWidget {
+  const ExampleListTile({
+    super.key,
+    required this.example,
+    required this.audioLibrary,
+    required this.onPlayClip,
+  });
+
+  final DictionaryExample example;
+  final OfflineAudioLibrary audioLibrary;
+  final Future<void> Function(AudioArchiveType type, String clipId) onPlayClip;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Card.outlined(
+      margin: const EdgeInsets.only(bottom: 8),
+      color: const Color(0xFFF7F2E8),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        title: example.hanji.isEmpty
+            ? null
+            : Text(
+                example.hanji,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (example.romanization.isNotEmpty)
+              Text(
+                example.romanization,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFF6B5C3A),
+                ),
+              ),
+            if (example.mandarin.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                example.mandarin,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFF35545B),
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ],
+        ),
+        trailing: example.audioId.isEmpty
+            ? null
+            : AudioButton(
+                type: AudioArchiveType.sentence,
+                audioId: example.audioId,
+                audioLibrary: audioLibrary,
+                onPressed: onPlayClip,
+                compact: true,
+              ),
       ),
     );
   }
@@ -1058,147 +972,6 @@ class AudioButton extends StatelessWidget {
                 size: compact ? 20 : 22,
               ),
       ),
-    );
-  }
-}
-
-class AppAboutDialog extends StatelessWidget {
-  const AppAboutDialog({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('關於台語辭典'),
-      content: const Text(
-        '台語辭典提供離線的台語與華語雙向查詢，並支援下載教育部詞目與例句音檔。\n\n'
-        'App code: MIT\n'
-        'Dictionary data and audio: 教育部《臺灣台語常用詞辭典》衍生內容，採 CC BY-NC-ND 2.5 TW。\n\n'
-        '參考頁面：https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('關閉'),
-        ),
-      ],
-    );
-  }
-}
-
-class OpenSourceCreditsPage extends StatelessWidget {
-  const OpenSourceCreditsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('開源授權')),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Align(
-              alignment: Alignment.topCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
-                ),
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-                  children: [
-                    const CreditSectionCard(
-                      title: 'Application',
-                      body:
-                          '台語辭典 app code is distributed under the MIT license.',
-                    ),
-                    const SizedBox(height: 12),
-                    const CreditSectionCard(
-                      title: 'Dictionary data and audio',
-                      body:
-                          'Bundled dictionary data and downloaded audio are derived from the Ministry of Education 臺灣台語常用詞辭典 dataset and remain separately licensed under CC BY-NC-ND 2.5 TW.',
-                    ),
-                    const SizedBox(height: 12),
-                    Card(
-                      child: SettingsNavigationTile(
-                        icon: Icons.description_outlined,
-                        title: '套件授權',
-                        subtitle: '查看 Flutter 與相依套件附帶的授權聲明。',
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (context) => const LicensePage(
-                                applicationName: '台語辭典',
-                                applicationLegalese:
-                                    'App code: MIT. Dictionary data and audio are separately licensed.',
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class CreditSectionCard extends StatelessWidget {
-  const CreditSectionCard({super.key, required this.title, required this.body});
-
-  final String title;
-  final String body;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFF18363C),
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              body,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF5A6D71),
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class AudioAboutDialog extends StatelessWidget {
-  const AudioAboutDialog({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('About Audio Downloads'),
-      content: const Text(
-        '音檔下載會保存到裝置本地端。下載完成後，詞目與例句音檔都可以在沒有網路的情況下播放。\n\n'
-        '詞目與例句音檔來源：教育部《臺灣台語常用詞辭典》\n'
-        '參考頁面：https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('關閉'),
-        ),
-      ],
     );
   }
 }

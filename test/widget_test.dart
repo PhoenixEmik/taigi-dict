@@ -5,6 +5,8 @@ import 'package:hokkien_dictionary/main.dart';
 import 'package:hokkien_dictionary/offline_audio.dart';
 
 void main() {
+  final searchField = find.byType(EditableText);
+
   test('dictionary repository filters and ranks by headword only', () {
     const bundle = DictionaryBundle(
       entryCount: 5,
@@ -152,14 +154,14 @@ void main() {
     expect(find.text('一'), findsNothing);
     expect(find.text('狗'), findsNothing);
 
-    await tester.enterText(find.byType(TextField), '一');
+    await tester.enterText(searchField, '一');
     await tester.pumpAndSettle();
 
     expect(find.text('一'), findsWidgets);
     expect(find.text('狗'), findsNothing);
     expect(find.byType(EntryListItem), findsOneWidget);
 
-    await tester.enterText(find.byType(TextField), '狗');
+    await tester.enterText(searchField, '狗');
     await tester.pumpAndSettle();
 
     expect(find.text('一'), findsNothing);
@@ -223,7 +225,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField), 'zzzz-not-found');
+    await tester.enterText(searchField, 'zzzz-not-found');
     await tester.pumpAndSettle();
     await tester.drag(find.byType(CustomScrollView), const Offset(0, -500));
     await tester.pumpAndSettle();
@@ -250,7 +252,9 @@ void main() {
     expect(find.text('台語 → 華語'), findsNothing);
     expect(find.text('華語 → 台語'), findsNothing);
 
-    await tester.enterText(find.byType(TextField), 'tsit');
+    expect(find.byType(SearchBar), findsOneWidget);
+
+    await tester.enterText(searchField, 'tsit');
     await tester.pump();
     await tester.pumpAndSettle();
     await tester.drag(find.byType(CustomScrollView), const Offset(0, -800));
@@ -278,29 +282,20 @@ void main() {
     expect(find.text('Search Bar Position'), findsNothing);
     expect(find.text('Top'), findsNothing);
     expect(find.text('Bottom'), findsNothing);
-    expect(find.text('關於'), findsWidgets);
-    expect(find.text('開源授權'), findsOneWidget);
-
-    await tester.ensureVisible(find.text('關於').last);
-    await tester.tap(find.text('關於').last);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
+    expect(find.text('關於'), findsOneWidget);
     expect(find.text('關於台語辭典'), findsOneWidget);
+    expect(find.text('開源授權'), findsNothing);
+
+    await tester.ensureVisible(find.text('關於台語辭典'));
+    await tester.tap(find.text('關於台語辭典'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+
+    expect(find.text('台語辭典'), findsOneWidget);
+    expect(find.text('台語辭典提供離線的台語與華語雙向查詢，並支援下載教育部詞目與例句音檔。'), findsOneWidget);
+    expect(find.textContaining('CC BY-NC-ND 2.5 TW'), findsOneWidget);
     expect(find.textContaining('App code: MIT'), findsOneWidget);
-
-    await tester.tap(find.text('關閉'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
-    await tester.ensureVisible(find.text('開源授權'));
-    await tester.tap(find.text('開源授權'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-
-    expect(find.text('開源授權'), findsWidgets);
-    expect(find.text('Application'), findsOneWidget);
-    expect(find.text('套件授權'), findsOneWidget);
+    expect(find.textContaining('sutian.moe.edu.tw'), findsOneWidget);
   });
 }
 
