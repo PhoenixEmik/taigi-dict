@@ -45,7 +45,10 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
     super.dispose();
   }
 
-  Future<void> _showEntryDetails(DictionaryEntry entry) async {
+  Future<void> _showEntryDetails(
+    DictionaryBundle bundle,
+    DictionaryEntry entry,
+  ) async {
     await _searchController.saveCurrentQueryIfNeeded();
     if (!mounted) {
       return;
@@ -53,6 +56,8 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
     await WordDetailCoordinator.showWordDetail(
       context: context,
       entry: entry,
+      repository: widget.repository,
+      bundle: bundle,
       audioLibrary: widget.audioLibrary,
       bookmarkStore: widget.bookmarkStore,
       onActionResult: widget.onActionResult,
@@ -155,6 +160,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
                                       return EntryListItem(
                                         entry: filteredResults[index],
                                         onTap: () => _showEntryDetails(
+                                          snapshot.data!,
                                           filteredResults[index],
                                         ),
                                       );

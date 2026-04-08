@@ -34,10 +34,15 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
     _bundleFuture = widget.repository.loadBundle();
   }
 
-  Future<void> _showEntryDetails(DictionaryEntry entry) async {
+  Future<void> _showEntryDetails(
+    DictionaryBundle bundle,
+    DictionaryEntry entry,
+  ) async {
     await WordDetailCoordinator.showWordDetail(
       context: context,
       entry: entry,
+      repository: widget.repository,
+      bundle: bundle,
       audioLibrary: widget.audioLibrary,
       bookmarkStore: widget.bookmarkStore,
       onActionResult: widget.onActionResult,
@@ -106,8 +111,10 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                             ),
                             child: EntryListItem(
                               entry: bookmarkedEntries[index],
-                              onTap: () =>
-                                  _showEntryDetails(bookmarkedEntries[index]),
+                              onTap: () => _showEntryDetails(
+                                snapshot.data!,
+                                bookmarkedEntries[index],
+                              ),
                             ),
                           );
                         },

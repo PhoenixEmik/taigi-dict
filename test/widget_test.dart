@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hokkien_dictionary/features/dictionary/presentation/widgets/interactive_definition_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:hokkien_dictionary/main.dart';
@@ -208,6 +209,74 @@ void main() {
 
     expect(results.map((entry) => entry.hanji).toList(), ['一', '一項', '七一']);
     expect(results.any((entry) => entry.hanji == '政權'), isFalse);
+  });
+
+  test('dictionary repository resolves linked words by exact headword', () {
+    const bundle = DictionaryBundle(
+      entryCount: 3,
+      senseCount: 3,
+      exampleCount: 0,
+      entries: [
+        DictionaryEntry(
+          id: 1,
+          type: '',
+          hanji: '母',
+          romanization: 'bo',
+          category: '',
+          audioId: '',
+          hokkienSearch: '母 bo',
+          mandarinSearch: '母親',
+          senses: [
+            DictionarySense(partOfSpeech: '', definition: '母親。', examples: []),
+          ],
+        ),
+        DictionaryEntry(
+          id: 2,
+          type: '',
+          hanji: '母仔',
+          romanization: 'bo-a',
+          category: '',
+          audioId: '',
+          hokkienSearch: '母仔 bo-a',
+          mandarinSearch: '雌性',
+          senses: [
+            DictionarySense(partOfSpeech: '', definition: '雌性的。', examples: []),
+          ],
+        ),
+        DictionaryEntry(
+          id: 3,
+          type: '',
+          hanji: '無',
+          romanization: 'bo',
+          category: '',
+          audioId: '',
+          hokkienSearch: '無 bo',
+          mandarinSearch: '沒有',
+          senses: [
+            DictionarySense(partOfSpeech: '', definition: '沒有。', examples: []),
+          ],
+        ),
+      ],
+    );
+
+    final repository = DictionaryRepository();
+
+    expect(repository.findLinkedEntry(bundle, '母')?.id, 1);
+    expect(repository.findLinkedEntry(bundle, 'bo')?.id, 1);
+    expect(repository.findLinkedEntry(bundle, '母仔')?.id, 2);
+    expect(repository.findLinkedEntry(bundle, '母親'), isNull);
+  });
+
+  test('interactive definition parser marks bracketed words as actionable', () {
+    final segments = parseDefinitionSegments('釋義參見【母】bó 條。');
+
+    expect(segments, hasLength(3));
+    expect(segments[0].displayText, '釋義參見');
+    expect(segments[0].isActionable, isFalse);
+    expect(segments[1].displayText, '【母】');
+    expect(segments[1].actionWord, '母');
+    expect(segments[1].isActionable, isTrue);
+    expect(segments[2].displayText, 'bó 條。');
   });
 
   test('app preferences stores reading text scale', () async {

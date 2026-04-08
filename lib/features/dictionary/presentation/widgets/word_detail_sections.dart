@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
 import 'package:hokkien_dictionary/offline_audio.dart';
 import 'audio_button.dart';
+import 'interactive_definition_text.dart';
 
 class WordDetailHeader extends StatelessWidget {
   const WordDetailHeader({
@@ -73,12 +74,14 @@ class SenseSection extends StatelessWidget {
     required this.sense,
     required this.audioLibrary,
     required this.onPlayClip,
+    required this.onWordTapped,
     required this.textScale,
   });
 
   final DictionarySense sense;
   final OfflineAudioLibrary audioLibrary;
   final Future<void> Function(AudioArchiveType type, String clipId) onPlayClip;
+  final Future<void> Function(String word) onWordTapped;
   final double textScale;
 
   @override
@@ -98,8 +101,9 @@ class SenseSection extends StatelessWidget {
               if (sense.partOfSpeech.isNotEmpty)
                 Chip(label: Text(sense.partOfSpeech)),
               if (sense.definition.isNotEmpty)
-                Text(
-                  sense.definition,
+                InteractiveDefinitionText(
+                  text: sense.definition,
+                  onWordTapped: onWordTapped,
                   style: scaledTextStyle(
                     theme.textTheme.bodyLarge?.copyWith(
                       height: 1.55,

@@ -14,12 +14,14 @@ class WordDetailScreen extends StatelessWidget {
     required this.audioLibrary,
     required this.bookmarkStore,
     required this.onPlayClip,
+    required this.onWordTapped,
   });
 
   final DictionaryEntry entry;
   final OfflineAudioLibrary audioLibrary;
   final BookmarkStore bookmarkStore;
   final Future<void> Function(AudioArchiveType type, String clipId) onPlayClip;
+  final Future<void> Function(String word) onWordTapped;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +51,7 @@ class WordDetailScreen extends StatelessWidget {
                 entry: entry,
                 audioLibrary: audioLibrary,
                 onPlayClip: onPlayClip,
+                onWordTapped: onWordTapped,
               );
             },
           ),
@@ -64,11 +67,13 @@ class WordDetailBody extends StatelessWidget {
     required this.entry,
     required this.audioLibrary,
     required this.onPlayClip,
+    required this.onWordTapped,
   });
 
   final DictionaryEntry entry;
   final OfflineAudioLibrary audioLibrary;
   final Future<void> Function(AudioArchiveType type, String clipId) onPlayClip;
+  final Future<void> Function(String word) onWordTapped;
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +103,7 @@ class WordDetailBody extends StatelessWidget {
                       sense: sense,
                       audioLibrary: audioLibrary,
                       onPlayClip: onPlayClip,
+                      onWordTapped: onWordTapped,
                       textScale: readingTextScale,
                     );
                   }),

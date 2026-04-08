@@ -67,6 +67,26 @@ class DictionaryRepository {
     }
   }
 
+  DictionaryEntry? findLinkedEntry(DictionaryBundle bundle, String rawWord) {
+    final query = normalizeQuery(rawWord);
+    if (query.isEmpty) {
+      return null;
+    }
+
+    DictionaryEntry? romanizationMatch;
+    for (final entry in bundle.entries) {
+      if (normalizeQuery(entry.hanji) == query) {
+        return entry;
+      }
+      if (romanizationMatch == null &&
+          normalizeQuery(entry.romanization) == query) {
+        romanizationMatch = entry;
+      }
+    }
+
+    return romanizationMatch;
+  }
+
   List<DictionaryEntry> _resolveSearchResults(
     DictionaryBundle bundle,
     List<int> matchedIds,
