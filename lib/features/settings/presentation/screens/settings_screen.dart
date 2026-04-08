@@ -76,13 +76,25 @@ class SettingsScreen extends StatelessWidget {
                           ),
                           applicationName: '台語辭典',
                           applicationLegalese:
-                              'App code: MIT\nDictionary data and audio: 教育部《臺灣台語常用詞辭典》衍生內容，採 CC BY-NC-ND 2.5 TW。',
+                              'App code: MIT\nDictionary data and audio: 教育部《臺灣台語常用詞辭典》衍生內容，採 CC BY-ND 3.0 TW。',
                           aboutBoxChildren: const [
                             SizedBox(height: 12),
                             Text('台語辭典提供離線的台語與華語雙向查詢，並支援下載教育部詞目與例句音檔。'),
                             SizedBox(height: 12),
                             Text(
                               '參考頁面：https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              '臺羅標注說明：https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/',
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              '漢字用字原則：https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/',
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              '辭典附錄：https://sutian.moe.edu.tw/zh-hant/piantsip/sutian-huliok/',
                             ),
                           ],
                           applicationIcon: const Icon(

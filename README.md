@@ -9,6 +9,9 @@ Android.
 - Canonical reference: `https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/`
 - Source spreadsheet: `https://sutian.moe.edu.tw/media/senn/ods/kautian.ods`
 - Audio source page: `https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/`
+- 臺羅標注說明: `https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/`
+- 漢字用字原則: `https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/`
+- 辭典附錄: `https://sutian.moe.edu.tw/zh-hant/piantsip/sutian-huliok/`
 - Bundled dictionary asset: `assets/data/dictionary.json.gz`
 
 ## Current Features
@@ -82,7 +85,7 @@ Generated artifact:
 ## License
 
 - App code: MIT. See `LICENSE`.
-- Dictionary data: CC BY-NC-ND 2.5 TW. See `DATA_LICENSE.md`.
+- Dictionary data: CC BY-ND 3.0 TW. See `DATA_LICENSE.md`.
 - Dictionary audio: sourced from the same ministry reference above and remains separately licensed.
 
 ## Delivery Notes

@@ -10,14 +10,24 @@ Hokkien dictionary dataset and should be treated as separate content:
 
 Requested data license:
 
-- `CC BY-NC-ND 2.5 TW`
+- `CC BY-ND 3.0 TW`
 
-Please keep the original attribution and comply with the non-commercial and
-no-derivatives restrictions when redistributing or reusing the dataset.
+License deed:
+
+- `https://creativecommons.org/licenses/by-nd/3.0/tw/`
+
+Please keep the original attribution and comply with the no-derivatives
+restriction when redistributing or reusing the dataset.
 
 Canonical reference:
 
 - `https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/`
+
+Reference pages:
+
+- `https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/`
+- `https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/`
+- `https://sutian.moe.edu.tw/zh-hant/piantsip/sutian-huliok/`
 
 Primary dataset file:
 

@@ -516,9 +516,17 @@ void main() {
 
     expect(find.text('台語辭典'), findsOneWidget);
     expect(find.text('台語辭典提供離線的台語與華語雙向查詢，並支援下載教育部詞目與例句音檔。'), findsOneWidget);
-    expect(find.textContaining('CC BY-NC-ND 2.5 TW'), findsOneWidget);
+    expect(find.textContaining('CC BY-ND 3.0 TW'), findsOneWidget);
     expect(find.textContaining('App code: MIT'), findsOneWidget);
-    expect(find.textContaining('sutian.moe.edu.tw'), findsOneWidget);
+    expect(
+      find.textContaining(
+        'https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
+      ),
+      findsOneWidget,
+    );
+    expect(find.textContaining('tailo-phiautsu-suatbing'), findsOneWidget);
+    expect(find.textContaining('hanji-iongji-guantsik'), findsOneWidget);
+    expect(find.textContaining('sutian-huliok'), findsOneWidget);
   });
 
   testWidgets('shows, applies, and clears search history', (
