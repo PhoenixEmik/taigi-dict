@@ -2,13 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:hokkien_dictionary/features/audio/data/audio_archive_index.dart';
+import 'package:hokkien_dictionary/features/audio/data/audio_archive_storage.dart';
+import 'package:hokkien_dictionary/features/audio/data/audio_playback_diagnostics.dart';
+import 'package:hokkien_dictionary/features/audio/domain/audio_archive.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
-
-import '../domain/audio_archive.dart';
-import 'audio_archive_index.dart';
-import 'audio_archive_storage.dart';
-import 'audio_playback_diagnostics.dart';
 
 class OfflineAudioLibrary extends ChangeNotifier {
   OfflineAudioLibrary();

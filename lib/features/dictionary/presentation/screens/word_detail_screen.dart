@@ -1,12 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
-import '../../../../core/preferences/app_preferences.dart';
-import '../../../../features/bookmarks/application/bookmark_store.dart';
-import '../../../../offline_audio.dart';
-import '../../domain/dictionary_models.dart';
-import '../widgets/word_detail_sections.dart';
+import 'package:hokkien_dictionary/core/preferences/app_preferences.dart';
+import 'package:hokkien_dictionary/features/bookmarks/application/bookmark_store.dart';
+import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
+import 'package:hokkien_dictionary/features/dictionary/presentation/widgets/word_detail_sections.dart';
+import 'package:hokkien_dictionary/offline_audio.dart';
 
 class WordDetailScreen extends StatelessWidget {
   const WordDetailScreen({

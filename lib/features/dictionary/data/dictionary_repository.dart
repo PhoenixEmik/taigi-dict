@@ -3,9 +3,8 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:flutter/services.dart';
-
-import '../domain/dictionary_models.dart';
-import '../domain/dictionary_search_service.dart';
+import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
+import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_search_service.dart';
 
 class DictionaryRepository {
   static Future<DictionaryBundle>? _bundleFuture;

@@ -1,15 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
-import '../../../../features/bookmarks/application/bookmark_store.dart';
-import '../../../../offline_audio.dart';
-import '../../application/dictionary_search_controller.dart';
-import '../../data/dictionary_repository.dart';
-import '../../domain/dictionary_models.dart';
-import '../coordinators/word_detail_coordinator.dart';
-import '../widgets/entry_list_item.dart';
-import '../widgets/search_panel.dart';
+import 'package:hokkien_dictionary/features/bookmarks/application/bookmark_store.dart';
+import 'package:hokkien_dictionary/features/dictionary/application/dictionary_search_controller.dart';
+import 'package:hokkien_dictionary/features/dictionary/data/dictionary_repository.dart';
+import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
+import 'package:hokkien_dictionary/features/dictionary/presentation/coordinators/word_detail_coordinator.dart';
+import 'package:hokkien_dictionary/features/dictionary/presentation/widgets/entry_list_item.dart';
+import 'package:hokkien_dictionary/features/dictionary/presentation/widgets/search_panel.dart';
+import 'package:hokkien_dictionary/offline_audio.dart';
 
 class DictionaryScreen extends StatefulWidget {
   const DictionaryScreen({

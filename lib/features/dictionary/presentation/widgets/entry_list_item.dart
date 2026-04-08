@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../domain/dictionary_models.dart';
+import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
 
 class EntryListItem extends StatelessWidget {
   const EntryListItem({super.key, required this.entry, required this.onTap});

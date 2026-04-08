@@ -1,13 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
-import '../../features/bookmarks/application/bookmark_store.dart';
-import '../../features/bookmarks/presentation/screens/bookmarks_screen.dart';
-import '../../features/dictionary/data/dictionary_repository.dart';
-import '../../features/dictionary/presentation/screens/dictionary_screen.dart';
-import '../../features/settings/presentation/screens/settings_screen.dart';
-import '../../offline_audio.dart';
+import 'package:hokkien_dictionary/features/bookmarks/application/bookmark_store.dart';
+import 'package:hokkien_dictionary/features/bookmarks/presentation/screens/bookmarks_screen.dart';
+import 'package:hokkien_dictionary/features/dictionary/data/dictionary_repository.dart';
+import 'package:hokkien_dictionary/features/dictionary/presentation/screens/dictionary_screen.dart';
+import 'package:hokkien_dictionary/features/settings/presentation/screens/settings_screen.dart';
+import 'package:hokkien_dictionary/offline_audio.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});

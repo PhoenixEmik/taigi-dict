@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../../../../offline_audio.dart';
-import '../../domain/dictionary_models.dart';
+import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
+import 'package:hokkien_dictionary/offline_audio.dart';
 import 'audio_button.dart';
 
 class WordDetailHeader extends StatelessWidget {

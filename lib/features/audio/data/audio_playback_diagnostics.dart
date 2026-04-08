@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import '../domain/audio_archive.dart';
+import 'package:hokkien_dictionary/features/audio/domain/audio_archive.dart';
 
 Future<String> describeAudioClipFile(File file) async {
   final exists = await file.exists();

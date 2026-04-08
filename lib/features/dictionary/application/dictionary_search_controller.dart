@@ -1,11 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:hokkien_dictionary/features/dictionary/data/dictionary_repository.dart';
+import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
+import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_search_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../data/dictionary_repository.dart';
-import '../domain/dictionary_models.dart';
-import '../domain/dictionary_search_service.dart';
 
 class DictionarySearchController extends ChangeNotifier {
   DictionarySearchController({required DictionaryRepository repository})

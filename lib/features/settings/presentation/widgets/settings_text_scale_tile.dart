@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../../../core/preferences/app_preferences.dart';
+import 'package:hokkien_dictionary/core/preferences/app_preferences.dart';
 
 class SettingsTextScaleTile extends StatelessWidget {
   const SettingsTextScaleTile({

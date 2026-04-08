@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-
-import '../../../../features/bookmarks/application/bookmark_store.dart';
-import '../../../../offline_audio.dart';
-import '../../domain/dictionary_models.dart';
-import '../screens/word_detail_screen.dart';
+import 'package:hokkien_dictionary/features/bookmarks/application/bookmark_store.dart';
+import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
+import 'package:hokkien_dictionary/features/dictionary/presentation/screens/word_detail_screen.dart';
+import 'package:hokkien_dictionary/offline_audio.dart';
 
 class WordDetailCoordinator {
   const WordDetailCoordinator._();

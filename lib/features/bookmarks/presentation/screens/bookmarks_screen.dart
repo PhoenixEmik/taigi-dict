@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-
-import '../../../../offline_audio.dart';
-import '../../../dictionary/data/dictionary_repository.dart';
-import '../../../dictionary/domain/dictionary_models.dart';
-import '../../../dictionary/presentation/coordinators/word_detail_coordinator.dart';
-import '../../../dictionary/presentation/widgets/entry_list_item.dart';
-import '../../application/bookmark_store.dart';
-import '../widgets/bookmark_empty_state.dart';
+import 'package:hokkien_dictionary/features/bookmarks/application/bookmark_store.dart';
+import 'package:hokkien_dictionary/features/bookmarks/presentation/widgets/bookmark_empty_state.dart';
+import 'package:hokkien_dictionary/features/dictionary/data/dictionary_repository.dart';
+import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
+import 'package:hokkien_dictionary/features/dictionary/presentation/coordinators/word_detail_coordinator.dart';
+import 'package:hokkien_dictionary/features/dictionary/presentation/widgets/entry_list_item.dart';
+import 'package:hokkien_dictionary/offline_audio.dart';
 
 class BookmarksScreen extends StatefulWidget {
   const BookmarksScreen({

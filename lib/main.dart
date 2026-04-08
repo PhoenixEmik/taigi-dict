@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'app/app.dart';
+import 'package:hokkien_dictionary/app/app.dart';
 
 export 'app/app.dart';
 export 'core/preferences/app_preferences.dart';

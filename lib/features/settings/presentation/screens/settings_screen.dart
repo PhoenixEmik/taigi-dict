@@ -1,12 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
-import '../../../../core/preferences/app_preferences.dart';
-import '../../../../offline_audio.dart';
-import '../widgets/audio_resource_tile.dart';
-import '../widgets/settings_section_header.dart';
-import '../widgets/settings_text_scale_tile.dart';
+import 'package:hokkien_dictionary/core/preferences/app_preferences.dart';
+import 'package:hokkien_dictionary/features/settings/presentation/widgets/audio_resource_tile.dart';
+import 'package:hokkien_dictionary/features/settings/presentation/widgets/settings_section_header.dart';
+import 'package:hokkien_dictionary/features/settings/presentation/widgets/settings_text_scale_tile.dart';
+import 'package:hokkien_dictionary/offline_audio.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({

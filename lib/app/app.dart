@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
-import '../core/preferences/app_preferences.dart';
-import 'shell/main_shell.dart';
-import 'theme/app_theme.dart';
+import 'package:hokkien_dictionary/app/shell/main_shell.dart';
+import 'package:hokkien_dictionary/app/theme/app_theme.dart';
+import 'package:hokkien_dictionary/core/preferences/app_preferences.dart';
 
 class HokkienDictionaryApp extends StatefulWidget {
   const HokkienDictionaryApp({super.key});

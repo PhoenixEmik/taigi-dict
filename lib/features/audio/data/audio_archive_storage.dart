@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:math';
 
-import '../domain/audio_archive.dart';
-import 'audio_archive_index.dart';
+import 'package:hokkien_dictionary/features/audio/data/audio_archive_index.dart';
+import 'package:hokkien_dictionary/features/audio/domain/audio_archive.dart';
 
 class AudioArchiveStorage {
   const AudioArchiveStorage(this.supportDirectory);

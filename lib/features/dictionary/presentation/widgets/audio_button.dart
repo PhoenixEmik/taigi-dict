@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../../../offline_audio.dart';
+import 'package:hokkien_dictionary/offline_audio.dart';
 
 class AudioButton extends StatelessWidget {
   const AudioButton({
