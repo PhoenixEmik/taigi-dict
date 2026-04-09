@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:hokkien_dictionary/core/localization/app_localizations.dart';
 import 'package:hokkien_dictionary/core/localization/locale_provider.dart';
 import 'package:hokkien_dictionary/core/preferences/app_preferences.dart';
-import 'package:hokkien_dictionary/features/dictionary/data/dictionary_database_builder_service.dart';
 import 'package:hokkien_dictionary/features/dictionary/data/offline_dictionary_library.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/content/reference_articles.dart';
+import 'package:hokkien_dictionary/features/settings/presentation/screens/advanced_settings_screen.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/screens/reference_article_screen.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/widgets/audio_resource_tile.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/widgets/dictionary_source_resource_tile.dart';
@@ -46,66 +46,6 @@ class SettingsScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _handleRebuildDictionaryDatabase(BuildContext context) async {
-    final l10n = AppLocalizations.of(context);
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return PopScope(
-          canPop: false,
-          child: AlertDialog(
-            content: Row(
-              children: [
-                const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2.5),
-                ),
-                const SizedBox(width: 16),
-                Expanded(child: Text(l10n.rebuildingDictionaryDatabase)),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-
-    Object? error;
-    try {
-      await onRebuildDictionaryDatabase();
-    } catch (caught) {
-      error = caught;
-    }
-
-    if (!context.mounted) {
-      return;
-    }
-
-    Navigator.of(context, rootNavigator: true).pop();
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            error == null
-                ? l10n.rebuildDictionaryDatabaseSuccess
-                : error is MissingDictionarySourceException
-                ? l10n.downloadDictionarySourceFirst
-                : error is CorruptedDictionarySourceException
-                ? l10n.dictionarySourceCorrupted
-                : error is MissingDictionarySheetException
-                ? l10n.dictionarySourceSheetMissing(error.sheetName)
-                : l10n.dictionaryDatabaseRebuildFailed('$error'),
-          ),
-          backgroundColor: error == null
-              ? const Color(0xFF0E2F35)
-              : const Color(0xFF8A3B1F),
-        ),
-      );
   }
 
   @override
@@ -155,22 +95,6 @@ class SettingsScreen extends StatelessWidget {
                           audioLibrary: audioLibrary,
                           onDownload: onDownloadArchive,
                         ),
-                        ListTile(
-                          leading: const Icon(
-                            Icons.storage_outlined,
-                            color: Color(0xFF17454C),
-                          ),
-                          title: Text(l10n.rebuildDictionaryDatabase),
-                          subtitle: Text(
-                            l10n.rebuildDictionaryDatabaseSubtitle,
-                          ),
-                          trailing: const Icon(Icons.chevron_right),
-                          onTap: () {
-                            unawaited(
-                              _handleRebuildDictionaryDatabase(context),
-                            );
-                          },
-                        ),
                         const Divider(height: 32),
                         SettingsSectionHeader(title: l10n.appearance),
                         SettingsLocaleTile(
@@ -195,6 +119,25 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         const Divider(height: 32),
                         SettingsSectionHeader(title: l10n.about),
+                        ListTile(
+                          leading: const Icon(
+                            Icons.tune_outlined,
+                            color: Color(0xFF17454C),
+                          ),
+                          title: Text(l10n.advancedSettings),
+                          subtitle: Text(l10n.advancedSettingsSubtitle),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (context) => AdvancedSettingsScreen(
+                                  onRebuildDictionaryDatabase:
+                                      onRebuildDictionaryDatabase,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                         ListTile(
                           leading: const Icon(
                             Icons.translate_outlined,

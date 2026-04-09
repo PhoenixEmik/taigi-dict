@@ -109,6 +109,9 @@ class AppLocalizations {
       'offlineResources': 'Offline Resources',
       'appearance': 'Appearance',
       'about': 'About',
+      'advancedSettings': 'Advanced Settings',
+      'advancedSettingsSubtitle':
+          'Manage maintenance and database rebuild actions.',
       'languageSetting': 'Language / 語言',
       'theme': 'Theme',
       'displayMode': 'Display mode',
@@ -152,6 +155,11 @@ class AppLocalizations {
       'initializationRetryHint':
           'Fix the issue and try again. The app will stay locked until the local dictionary is ready.',
       'retryInitialization': 'Retry initialization',
+      'confirmRebuildDictionaryTitle': 'Confirm Rebuild?',
+      'confirmRebuildDictionaryBody':
+          'This will take some time and overwrite the current dictionary data with the downloaded raw file. Are you sure you want to proceed?',
+      'cancelAction': 'Cancel',
+      'confirmAction': 'Confirm',
       'loadingAudioPrefix': 'Loading',
       'playAudioPrefix': 'Play',
       'stopAudioPrefix': 'Stop',
@@ -201,6 +209,8 @@ class AppLocalizations {
       'offlineResources': '离线资源',
       'appearance': '外观',
       'about': '关于',
+      'advancedSettings': '进阶设置',
+      'advancedSettingsSubtitle': '管理维护动作与词典资料库重建。',
       'languageSetting': 'Language / 語言',
       'theme': '主题',
       'displayMode': '显示模式',
@@ -237,6 +247,10 @@ class AppLocalizations {
       'initializationFailed': '初始化失败',
       'initializationRetryHint': '请排除问题后再重试，完成前 app 会维持锁定状态。',
       'retryInitialization': '重新尝试初始化',
+      'confirmRebuildDictionaryTitle': '确认重新构建资料库？',
+      'confirmRebuildDictionaryBody': '这将会花费一些时间，并以目前下载的原始档覆盖现有的词典资料。您确定要继续吗？',
+      'cancelAction': '取消',
+      'confirmAction': '确定',
       'loadingAudioPrefix': '正在载入',
       'playAudioPrefix': '播放',
       'stopAudioPrefix': '停止播放',
@@ -283,6 +297,8 @@ class AppLocalizations {
       'offlineResources': '離線資源',
       'appearance': '外觀',
       'about': '關於',
+      'advancedSettings': '進階設定',
+      'advancedSettingsSubtitle': '管理維護動作與詞典資料庫重建。',
       'languageSetting': 'Language / 語言',
       'theme': '主題',
       'displayMode': '顯示模式',
@@ -319,6 +335,10 @@ class AppLocalizations {
       'initializationFailed': '初始化失敗',
       'initializationRetryHint': '請排除問題後再重試，完成前 app 會維持鎖定狀態。',
       'retryInitialization': '重新嘗試初始化',
+      'confirmRebuildDictionaryTitle': '確認重新構建資料庫？',
+      'confirmRebuildDictionaryBody': '這將會花費一些時間，並以目前下載的原始檔覆蓋現有的詞典資料。您確定要繼續嗎？',
+      'cancelAction': '取消',
+      'confirmAction': '確定',
       'loadingAudioPrefix': '正在載入',
       'playAudioPrefix': '播放',
       'stopAudioPrefix': '停止播放',
@@ -381,6 +401,8 @@ class AppLocalizations {
   String get offlineResources => _text('offlineResources');
   String get appearance => _text('appearance');
   String get about => _text('about');
+  String get advancedSettings => _text('advancedSettings');
+  String get advancedSettingsSubtitle => _text('advancedSettingsSubtitle');
   String get languageSetting => _text('languageSetting');
   String get theme => _text('theme');
   String get displayMode => _text('displayMode');
@@ -418,6 +440,12 @@ class AppLocalizations {
   String get initializationFailed => _text('initializationFailed');
   String get initializationRetryHint => _text('initializationRetryHint');
   String get retryInitialization => _text('retryInitialization');
+  String get confirmRebuildDictionaryTitle =>
+      _text('confirmRebuildDictionaryTitle');
+  String get confirmRebuildDictionaryBody =>
+      _text('confirmRebuildDictionaryBody');
+  String get cancelAction => _text('cancelAction');
+  String get confirmAction => _text('confirmAction');
   String get loadingAudioPrefix => _text('loadingAudioPrefix');
   String get playAudioPrefix => _text('playAudioPrefix');
   String get stopAudioPrefix => _text('stopAudioPrefix');
