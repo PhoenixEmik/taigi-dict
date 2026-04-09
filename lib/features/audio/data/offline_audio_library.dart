@@ -148,11 +148,16 @@ class OfflineAudioLibrary extends ChangeNotifier {
     final tempFile = storage.downloadTempFile(type);
 
     try {
-      await service.download(
+      final outcome = await service.download(
         url: type.sourceUrl,
         targetFile: tempFile,
         fallbackTotalBytes: type.archiveBytes,
       );
+
+      if (outcome != DownloadOutcome.completed ||
+          !_isDownloadFinalized(service.snapshot.value, type.archiveBytes)) {
+        return const AudioActionResult();
+      }
 
       final index = await buildStoredZipIndex(tempFile);
       if (!index.containsKey(type.sampleClipId)) {
@@ -396,5 +401,14 @@ class OfflineAudioLibrary extends ChangeNotifier {
     return type == AudioArchiveType.word
         ? l10n.audioWordArchive
         : l10n.audioSentenceArchive;
+  }
+
+  bool _isDownloadFinalized(DownloadSnapshot snapshot, int fallbackTotalBytes) {
+    final resolvedTotal = snapshot.totalBytes > 0
+        ? snapshot.totalBytes
+        : fallbackTotalBytes;
+    return snapshot.state == DownloadState.completed &&
+        resolvedTotal > 0 &&
+        snapshot.downloadedBytes == resolvedTotal;
   }
 }

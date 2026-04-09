@@ -6,6 +6,8 @@ import 'package:dio/dio.dart';
 
 enum DownloadState { idle, downloading, paused, completed, error }
 
+enum DownloadOutcome { completed, paused }
+
 class DownloadSnapshot {
   const DownloadSnapshot({
     required this.state,
@@ -78,14 +80,14 @@ class DownloadService {
     snapshot.value = value;
   }
 
-  Future<void> download({
+  Future<DownloadOutcome> download({
     required String url,
     required File targetFile,
     required int fallbackTotalBytes,
     bool restart = false,
   }) async {
     if (isDownloading) {
-      return;
+      return DownloadOutcome.paused;
     }
 
     if (restart && targetFile.existsSync()) {
@@ -151,7 +153,7 @@ class DownloadService {
           ),
           sessionId: sessionId,
         );
-        return;
+        return DownloadOutcome.completed;
       }
 
       if (statusCode == HttpStatus.ok && downloadedLength > 0) {
@@ -214,8 +216,10 @@ class DownloadService {
         ),
         sessionId: sessionId,
       );
+      return DownloadOutcome.completed;
     } on DioException catch (error) {
-      if (CancelToken.isCancel(error)) {
+      if (error.type == DioExceptionType.cancel ||
+          CancelToken.isCancel(error)) {
         _emit(
           snapshot.value.copyWith(
             state: DownloadState.paused,
@@ -224,7 +228,7 @@ class DownloadService {
           ),
           sessionId: sessionId,
         );
-        return;
+        return DownloadOutcome.paused;
       }
 
       _emit(

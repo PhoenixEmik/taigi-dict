@@ -95,11 +95,18 @@ class OfflineDictionaryLibrary extends ChangeNotifier {
         await _restoreDownloadSnapshot(sourceFile);
       }
 
-      await _downloadService.download(
+      final outcome = await _downloadService.download(
         url: AppConstants.dictionaryOdsUrl,
         targetFile: tempFile,
         fallbackTotalBytes: 0,
       );
+
+      if (outcome != DownloadOutcome.completed ||
+          !_isDownloadFinalized(_downloadService.snapshot.value)) {
+        _sourceReady = false;
+        notifyListeners();
+        return const AudioActionResult();
+      }
 
       if (await sourceFile.exists()) {
         await sourceFile.delete();
@@ -204,5 +211,11 @@ class OfflineDictionaryLibrary extends ChangeNotifier {
   void dispose() {
     _downloadService.dispose();
     super.dispose();
+  }
+
+  bool _isDownloadFinalized(DownloadSnapshot snapshot) {
+    return snapshot.state == DownloadState.completed &&
+        snapshot.totalBytes > 0 &&
+        snapshot.downloadedBytes == snapshot.totalBytes;
   }
 }

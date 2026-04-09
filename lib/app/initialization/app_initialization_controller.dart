@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:hokkien_dictionary/core/constants/app_constants.dart';
 import 'package:hokkien_dictionary/core/localization/app_localizations.dart';
+import 'package:hokkien_dictionary/features/audio/data/download_service.dart';
 import 'package:hokkien_dictionary/features/dictionary/data/dictionary_database_builder_service.dart';
 import 'package:hokkien_dictionary/features/dictionary/data/dictionary_repository.dart';
 import 'package:hokkien_dictionary/features/dictionary/data/offline_dictionary_library.dart';
@@ -186,6 +188,11 @@ class AppInitializationController extends ChangeNotifier {
             l10n.dictionarySourceDownloadFailed(l10n.downloadFailed),
       );
     }
+    if (!_isDictionarySourceFullyDownloaded()) {
+      throw _InitializationException(
+        l10n.dictionarySourcePaused(AppConstants.dictionaryOdsFileName),
+      );
+    }
   }
 
   Future<void> _buildDatabaseWithRecovery(AppLocalizations l10n) async {
@@ -199,6 +206,11 @@ class AppInitializationController extends ChangeNotifier {
         throw _InitializationException(
           result.message ??
               l10n.dictionarySourceDownloadFailed(l10n.downloadFailed),
+        );
+      }
+      if (!_isDictionarySourceFullyDownloaded()) {
+        throw _InitializationException(
+          l10n.dictionarySourcePaused(AppConstants.dictionaryOdsFileName),
         );
       }
       await _buildDatabase();
@@ -235,6 +247,14 @@ class AppInitializationController extends ChangeNotifier {
     if (notify) {
       notifyListeners();
     }
+  }
+
+  bool _isDictionarySourceFullyDownloaded() {
+    final snapshot = _dictionaryLibrary.downloadSnapshot;
+    return _dictionaryLibrary.isSourceReady &&
+        snapshot.state == DownloadState.completed &&
+        snapshot.totalBytes > 0 &&
+        snapshot.downloadedBytes == snapshot.totalBytes;
   }
 
   @override

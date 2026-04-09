@@ -91,8 +91,12 @@ class _MainScreenState extends State<MainScreen> {
     final result = await _dictionaryLibrary.handleDownloadAction(l10n);
     _showResult(result);
 
+    final snapshot = _dictionaryLibrary.downloadSnapshot;
     if (result.isError ||
-        _dictionaryLibrary.downloadState != DownloadState.completed) {
+        _dictionaryLibrary.downloadState != DownloadState.completed ||
+        !_dictionaryLibrary.isSourceReady ||
+        snapshot.totalBytes <= 0 ||
+        snapshot.downloadedBytes != snapshot.totalBytes) {
       return;
     }
 
