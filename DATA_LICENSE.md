@@ -5,7 +5,6 @@ The following files are derived from the Ministry of Education Taiwanese
 Hokkien dictionary dataset and should be treated as separate content:
 
 - `data/source/kautian.ods`
-- `assets/data/dictionary.json.gz`
 - audio archives downloaded in-app from the Ministry of Education source URLs
 
 Requested data license:
