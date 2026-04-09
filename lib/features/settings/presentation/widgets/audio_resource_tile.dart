@@ -67,9 +67,7 @@ class AudioResourceTile extends StatelessWidget {
       ),
       trailing: FilledButton.tonal(
         style: FilledButton.styleFrom(
-          visualDensity: VisualDensity.compact,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          minimumSize: const Size(0, 34),
+          minimumSize: const Size(72, 48),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           textStyle: Theme.of(
             context,

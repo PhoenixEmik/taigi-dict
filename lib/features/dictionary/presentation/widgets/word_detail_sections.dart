@@ -26,35 +26,38 @@ class WordDetailHeader extends StatelessWidget {
 
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      title: Text(
-        entry.hanji.isEmpty ? '未標記漢字' : entry.hanji,
-        style: theme.textTheme.headlineSmall?.copyWith(
-          fontWeight: FontWeight.w800,
-          color: const Color(0xFF0E2F35),
-        ),
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (entry.romanization.isNotEmpty)
+      titleAlignment: ListTileTitleAlignment.top,
+      title: MergeSemantics(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
             Text(
-              entry.romanization,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: const Color(0xFFC9752D),
-                fontWeight: FontWeight.w700,
+              entry.hanji.isEmpty ? '未標記漢字' : entry.hanji,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF0E2F35),
               ),
             ),
-          if (subtitle.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF54696D),
+            if (entry.romanization.isNotEmpty)
+              Text(
+                entry.romanization,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: const Color(0xFFC9752D),
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
+            if (subtitle.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                subtitle,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFF54696D),
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
       trailing: entry.audioId.isEmpty
           ? null
@@ -148,51 +151,66 @@ class ExampleListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final mergedSemanticsLabel = [
+      if (example.hanji.isNotEmpty) example.hanji,
+      if (example.romanization.isNotEmpty) '白話字 ${example.romanization}',
+      if (example.mandarin.isNotEmpty) '華語 ${example.mandarin}',
+    ].join('。');
 
     return Card.outlined(
       margin: const EdgeInsets.only(bottom: 8),
       color: const Color(0xFFF7F2E8),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        title: example.hanji.isEmpty
-            ? null
-            : Text(
-                example.hanji,
-                style: scaledTextStyle(
-                  theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
+        title: MergeSemantics(
+          child: Semantics(
+            label: mergedSemanticsLabel.isEmpty ? null : mergedSemanticsLabel,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (example.hanji.isNotEmpty)
+                  ExcludeSemantics(
+                    child: Text(
+                      example.hanji,
+                      style: scaledTextStyle(
+                        theme.textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                        textScale,
+                      ),
+                    ),
                   ),
-                  textScale,
-                ),
-              ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (example.romanization.isNotEmpty)
-              Text(
-                example.romanization,
-                style: scaledTextStyle(
-                  theme.textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF6B5C3A),
+                if (example.romanization.isNotEmpty)
+                  ExcludeSemantics(
+                    child: Text(
+                      example.romanization,
+                      style: scaledTextStyle(
+                        theme.textTheme.bodyMedium?.copyWith(
+                          color: const Color(0xFF6B5C3A),
+                        ),
+                        textScale,
+                      ),
+                    ),
                   ),
-                  textScale,
-                ),
-              ),
-            if (example.mandarin.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(
-                example.mandarin,
-                style: scaledTextStyle(
-                  theme.textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF35545B),
-                    height: 1.5,
+                if (example.mandarin.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  ExcludeSemantics(
+                    child: Text(
+                      example.mandarin,
+                      style: scaledTextStyle(
+                        theme.textTheme.bodyMedium?.copyWith(
+                          color: const Color(0xFF35545B),
+                          height: 1.5,
+                        ),
+                        textScale,
+                      ),
+                    ),
                   ),
-                  textScale,
-                ),
-              ),
-            ],
-          ],
+                ],
+              ],
+            ),
+          ),
         ),
         trailing: example.audioId.isEmpty
             ? null

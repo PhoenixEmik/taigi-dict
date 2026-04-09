@@ -20,6 +20,7 @@ class SearchWorkspaceCard extends StatelessWidget {
           ? null
           : [
               IconButton(
+                tooltip: '清除搜尋內容',
                 onPressed: () {
                   controller.clear();
                 },
@@ -75,10 +76,15 @@ class SearchHistorySection extends StatelessWidget {
               runSpacing: 8,
               children: history
                   .map((query) {
-                    return ActionChip(
-                      label: Text(query),
-                      avatar: const Icon(Icons.history, size: 18),
-                      onPressed: () => onHistoryTap(query),
+                    return Semantics(
+                      button: true,
+                      label: '搜尋紀錄 $query',
+                      hint: '點兩下重新搜尋',
+                      child: ActionChip(
+                        label: Text(query),
+                        avatar: const Icon(Icons.history, size: 18),
+                        onPressed: () => onHistoryTap(query),
+                      ),
                     );
                   })
                   .toList(growable: false),
