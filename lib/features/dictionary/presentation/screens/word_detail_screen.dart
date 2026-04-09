@@ -6,6 +6,7 @@ import 'package:hokkien_dictionary/features/bookmarks/application/bookmark_store
 import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
 import 'package:hokkien_dictionary/features/dictionary/presentation/widgets/word_detail_sections.dart';
 import 'package:hokkien_dictionary/offline_audio.dart';
+import 'package:share_plus/share_plus.dart';
 
 class WordDetailScreen extends StatelessWidget {
   const WordDetailScreen({
@@ -23,6 +24,17 @@ class WordDetailScreen extends StatelessWidget {
   final Future<void> Function(AudioArchiveType type, String clipId) onPlayClip;
   final Future<void> Function(String word) onWordTapped;
 
+  Future<void> _shareEntry() async {
+    final shareText = _buildShareText(entry);
+    await SharePlus.instance.share(
+      ShareParams(
+        text: shareText,
+        title: entry.hanji.isEmpty ? '台語辭典詞條' : entry.hanji,
+        subject: entry.hanji.isEmpty ? '台語辭典詞條' : entry.hanji,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -33,6 +45,13 @@ class WordDetailScreen extends StatelessWidget {
           appBar: AppBar(
             title: Text(entry.hanji.isEmpty ? '詞條詳細資料' : entry.hanji),
             actions: [
+              IconButton(
+                tooltip: '分享詞條',
+                onPressed: () {
+                  unawaited(_shareEntry());
+                },
+                icon: const Icon(Icons.share),
+              ),
               IconButton(
                 tooltip: isBookmarked ? '移除書籤' : '加入書籤',
                 onPressed: () {
@@ -59,6 +78,35 @@ class WordDetailScreen extends StatelessWidget {
       },
     );
   }
+}
+
+String _buildShareText(DictionaryEntry entry) {
+  final word = entry.hanji.trim().isEmpty ? '未標記漢字' : entry.hanji.trim();
+  final romanization = entry.romanization.trim();
+  final definitions = entry.senses
+      .map((sense) => sense.definition.trim())
+      .where((definition) => definition.isNotEmpty)
+      .toList(growable: false);
+
+  final buffer = StringBuffer()..write('【$word】');
+  if (romanization.isNotEmpty) {
+    buffer.write('($romanization)');
+  }
+
+  if (definitions.isNotEmpty) {
+    buffer
+      ..writeln()
+      ..writeln(definitions.join('\n'));
+  } else if (entry.briefSummary.trim().isNotEmpty) {
+    buffer
+      ..writeln()
+      ..writeln(entry.briefSummary.trim());
+  }
+
+  buffer
+    ..writeln()
+    ..write('-- 來自台語辭典 App');
+  return buffer.toString().trim();
 }
 
 class WordDetailBody extends StatelessWidget {
