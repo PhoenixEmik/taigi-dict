@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hokkien_dictionary/features/dictionary/presentation/widgets/audio_button.dart';
 import 'package:hokkien_dictionary/features/dictionary/presentation/widgets/interactive_definition_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -691,6 +692,82 @@ void main() {
 
     expect(find.text('書籤'), findsOneWidget);
     expect(find.text('一'), findsOneWidget);
+  });
+
+  testWidgets('entry list item exposes a merged semantics label', (
+    WidgetTester tester,
+  ) async {
+    final semanticsHandle = tester.ensureSemantics();
+    try {
+      const entry = DictionaryEntry(
+        id: 1,
+        type: '',
+        hanji: '狗',
+        romanization: 'kau',
+        category: '',
+        audioId: '',
+        hokkienSearch: '狗 kau',
+        mandarinSearch: '狗',
+        senses: [
+          DictionarySense(partOfSpeech: '', definition: '狗', examples: []),
+        ],
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: EntryListItem(
+              entry: entry,
+              onTap: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('狗。白話字 kau。釋義 狗')),
+        matchesSemantics(
+          label: '狗。白話字 kau。釋義 狗',
+          hint: '雙擊開啟詞條詳細資料',
+          isButton: true,
+        ),
+      );
+    } finally {
+      semanticsHandle.dispose();
+    }
+  });
+
+  testWidgets('audio button exposes descriptive semantics', (
+    WidgetTester tester,
+  ) async {
+    final semanticsHandle = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AudioButton(
+              type: AudioArchiveType.word,
+              audioId: 'sample-audio',
+              audioLibrary: OfflineAudioLibrary(),
+              onPressed: (_, _) async {},
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('下載詞目音檔')),
+        matchesSemantics(
+          label: '下載詞目音檔',
+          tooltip: '下載詞目音檔',
+          isButton: true,
+          hasEnabledState: true,
+          isEnabled: true,
+        ),
+      );
+    } finally {
+      semanticsHandle.dispose();
+    }
   });
 }
 
