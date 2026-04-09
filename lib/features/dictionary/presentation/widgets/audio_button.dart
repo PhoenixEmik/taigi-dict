@@ -21,6 +21,7 @@ class AudioButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
     final isLoading = audioLibrary.isClipLoading(type, audioId);
     final isPlaying = audioLibrary.isClipPlaying(type, audioId);
     final archiveReady = audioLibrary.isArchiveReady(type);
@@ -46,8 +47,8 @@ class AudioButton extends StatelessWidget {
           height: buttonSize,
           child: FilledButton.tonal(
             style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF0E2F35).withValues(alpha: 0.08),
-              foregroundColor: const Color(0xFF0E2F35),
+              backgroundColor: colorScheme.secondaryContainer,
+              foregroundColor: colorScheme.onSecondaryContainer,
               padding: EdgeInsets.zero,
               minimumSize: const Size(48, 48),
             ),

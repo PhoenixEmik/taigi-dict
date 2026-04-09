@@ -20,6 +20,7 @@ class WordDetailHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final l10n = AppLocalizations.of(context);
     final subtitle = [
       if (entry.type.isNotEmpty) entry.type,
@@ -38,14 +39,14 @@ class WordDetailHeader extends StatelessWidget {
               entry.hanji.isEmpty ? l10n.unlabeledHanji : entry.hanji,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFF0E2F35),
+                color: colorScheme.primary,
               ),
             ),
             if (entry.romanization.isNotEmpty)
               Text(
                 entry.romanization,
                 style: theme.textTheme.titleMedium?.copyWith(
-                  color: const Color(0xFFC9752D),
+                  color: colorScheme.tertiary,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -54,7 +55,7 @@ class WordDetailHeader extends StatelessWidget {
               Text(
                 subtitle,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: const Color(0xFF54696D),
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -153,6 +154,7 @@ class ExampleListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final l10n = AppLocalizations.of(context);
     final mergedSemanticsLabel = [
       if (example.hanji.isNotEmpty) example.hanji,
@@ -163,7 +165,7 @@ class ExampleListTile extends StatelessWidget {
 
     return Card.outlined(
       margin: const EdgeInsets.only(bottom: 8),
-      color: const Color(0xFFF7F2E8),
+      color: colorScheme.surfaceContainerLow,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         title: MergeSemantics(
@@ -182,6 +184,7 @@ class ExampleListTile extends StatelessWidget {
                       style: scaledTextStyle(
                         theme.textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w700,
+                          color: colorScheme.onSurface,
                         ),
                         textScale,
                       ),
@@ -193,7 +196,7 @@ class ExampleListTile extends StatelessWidget {
                       example.romanization,
                       style: scaledTextStyle(
                         theme.textTheme.bodyMedium?.copyWith(
-                          color: const Color(0xFF6B5C3A),
+                          color: colorScheme.tertiary,
                         ),
                         textScale,
                       ),
@@ -206,7 +209,7 @@ class ExampleListTile extends StatelessWidget {
                       example.mandarin,
                       style: scaledTextStyle(
                         theme.textTheme.bodyMedium?.copyWith(
-                          color: const Color(0xFF35545B),
+                          color: colorScheme.onSurfaceVariant,
                           height: 1.5,
                         ),
                         textScale,
