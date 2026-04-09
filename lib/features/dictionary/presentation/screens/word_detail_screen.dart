@@ -195,6 +195,11 @@ class WordDetailBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final readingTextScale = AppPreferencesScope.of(context).readingTextScale;
     final applePlatform = isApplePlatform(context);
+    final topInset = applePlatform
+        ? MediaQuery.paddingOf(context).top +
+              kMinInteractiveDimensionCupertino +
+              12
+        : 12.0;
 
     return SafeArea(
       top: !applePlatform,
@@ -209,7 +214,7 @@ class WordDetailBody extends StatelessWidget {
               child: ListView(
                 padding: EdgeInsets.fromLTRB(
                   applePlatform ? 16 : 20,
-                  applePlatform ? 72 : 12,
+                  topInset,
                   applePlatform ? 16 : 20,
                   applePlatform ? 34 : 24,
                 ),
