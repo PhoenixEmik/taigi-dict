@@ -14,9 +14,10 @@ class SettingsLocaleTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return ListTile(
-      leading: const Icon(Icons.language, color: Color(0xFF17454C)),
+      leading: Icon(Icons.language, color: colorScheme.primary),
       title: Text(l10n.languageSetting),
       trailing: DropdownButtonHideUnderline(
         child: DropdownButton<Locale>(

@@ -108,6 +108,7 @@ class AdvancedSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.advancedSettings)),
@@ -121,9 +122,9 @@ class AdvancedSettingsScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(0, 8, 0, 28),
               children: [
                 ListTile(
-                  leading: const Icon(
+                  leading: Icon(
                     Icons.storage_outlined,
-                    color: Color(0xFF17454C),
+                    color: colorScheme.primary,
                   ),
                   title: Text(l10n.rebuildDictionaryDatabase),
                   subtitle: Text(l10n.rebuildDictionaryDatabaseSubtitle),

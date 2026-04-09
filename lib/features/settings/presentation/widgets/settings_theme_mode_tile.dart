@@ -15,9 +15,10 @@ class SettingsThemeModeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return ListTile(
-      leading: const Icon(Icons.palette, color: Color(0xFF17454C)),
+      leading: Icon(Icons.palette, color: colorScheme.primary),
       title: Text(l10n.theme),
       trailing: DropdownButtonHideUnderline(
         child: DropdownButton<AppThemePreference>(

@@ -53,6 +53,7 @@ class SettingsScreen extends StatelessWidget {
     final appPreferences = AppPreferencesScope.of(context);
     final localeProvider = LocaleProviderScope.of(context);
     final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
     final selectedLocale =
         localeProvider.locale ??
         AppLocalizations.resolveLocale(Localizations.localeOf(context));
@@ -120,9 +121,9 @@ class SettingsScreen extends StatelessWidget {
                         const Divider(height: 32),
                         SettingsSectionHeader(title: l10n.about),
                         ListTile(
-                          leading: const Icon(
+                          leading: Icon(
                             Icons.tune_outlined,
-                            color: Color(0xFF17454C),
+                            color: colorScheme.primary,
                           ),
                           title: Text(l10n.advancedSettings),
                           subtitle: Text(l10n.advancedSettingsSubtitle),
@@ -139,9 +140,9 @@ class SettingsScreen extends StatelessWidget {
                           },
                         ),
                         ListTile(
-                          leading: const Icon(
+                          leading: Icon(
                             Icons.translate_outlined,
-                            color: Color(0xFF17454C),
+                            color: colorScheme.primary,
                           ),
                           title: Text(l10n.tailoGuide),
                           subtitle: Text(l10n.tailoGuideSubtitle),
@@ -154,9 +155,9 @@ class SettingsScreen extends StatelessWidget {
                           },
                         ),
                         ListTile(
-                          leading: const Icon(
+                          leading: Icon(
                             Icons.edit_note_outlined,
-                            color: Color(0xFF17454C),
+                            color: colorScheme.primary,
                           ),
                           title: Text(l10n.hanjiGuide),
                           subtitle: Text(l10n.hanjiGuideSubtitle),
@@ -169,9 +170,9 @@ class SettingsScreen extends StatelessWidget {
                           },
                         ),
                         AboutListTile(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.info_outline,
-                            color: Color(0xFF17454C),
+                            color: colorScheme.primary,
                           ),
                           applicationName: l10n.appTitle,
                           applicationLegalese: l10n.aboutLegalese,
@@ -191,9 +192,9 @@ class SettingsScreen extends StatelessWidget {
                               '${l10n.hanjiGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/',
                             ),
                           ],
-                          applicationIcon: const Icon(
+                          applicationIcon: Icon(
                             Icons.menu_book_outlined,
-                            color: Color(0xFF17454C),
+                            color: colorScheme.primary,
                           ),
                           child: Text(l10n.aboutApp),
                         ),

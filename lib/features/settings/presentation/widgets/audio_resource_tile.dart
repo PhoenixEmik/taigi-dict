@@ -17,6 +17,8 @@ class AudioResourceTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return ValueListenableBuilder<DownloadSnapshot>(
       valueListenable: audioLibrary.downloadListenable(type),
       builder: (context, snapshot, child) {
@@ -81,13 +83,12 @@ class AudioResourceTile extends StatelessWidget {
                 type == AudioArchiveType.word
                     ? Icons.record_voice_over_outlined
                     : Icons.chat_bubble_outline,
-                color: const Color(0xFF17454C),
+                color: colorScheme.primary,
               ),
               title: Text(
                 titleText,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF18363C),
                 ),
               ),
               subtitle: Padding(
@@ -98,15 +99,15 @@ class AudioResourceTile extends StatelessWidget {
                   children: [
                     Text(
                       '${type.archiveFileName} • ${formatBytes(type.archiveBytes)}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: const Color(0xFF66797D),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       statusText,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: const Color(0xFF5A6D71),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                     if (progress != null &&
