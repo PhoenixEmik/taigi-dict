@@ -1,8 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
 import 'dart:isolate';
 
-import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hokkien_dictionary/features/dictionary/data/dictionary_database_builder_service.dart';
 import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
 import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_search_service.dart';
@@ -11,6 +9,8 @@ class DictionaryRepository {
   static Future<DictionaryBundle>? _bundleFuture;
   static bool useBackgroundSearchIsolate = true;
   static bool preferLocalDatabase = true;
+  @visibleForTesting
+  static DictionaryBundle? debugFallbackBundle;
   static final Expando<Map<int, DictionaryEntry>> _entriesByIdCache =
       Expando<Map<int, DictionaryEntry>>('dictionaryEntriesById');
   static final Expando<List<Map<String, Object>>> _searchIndexCache =
@@ -34,14 +34,17 @@ class DictionaryRepository {
       }
     }
 
-    final data = await rootBundle.load('assets/data/dictionary.json.gz');
-    final bytes = data.buffer.asUint8List(
-      data.offsetInBytes,
-      data.lengthInBytes,
+    final fallbackBundle = debugFallbackBundle;
+    if (fallbackBundle != null) {
+      return fallbackBundle;
+    }
+
+    return const DictionaryBundle(
+      entryCount: 0,
+      senseCount: 0,
+      exampleCount: 0,
+      entries: [],
     );
-    final jsonString = utf8.decode(GZipCodec().decode(bytes));
-    final decoded = jsonDecode(jsonString) as Map<String, dynamic>;
-    return DictionaryBundle.fromJson(decoded);
   }
 
   List<DictionaryEntry> search(DictionaryBundle bundle, String rawQuery) {

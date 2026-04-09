@@ -123,6 +123,11 @@ class AppLocalizations {
       'themeLight': 'Light',
       'themeDark': 'Dark',
       'themeAmoled': 'AMOLED Black',
+      'dictionarySourceArchive': 'Dictionary Source File',
+      'dictionarySourceSubtitle':
+          'Download kautian.ods before rebuilding the local SQLite dictionary.',
+      'dictionarySourceReady':
+          'Downloaded and ready to rebuild the local dictionary database',
       'audioWordArchive': 'Word Audio',
       'audioSentenceArchive': 'Example Audio',
       'rebuildDictionaryDatabase': 'Rebuild Dictionary Database',
@@ -131,6 +136,8 @@ class AppLocalizations {
       'rebuildingDictionaryDatabase': 'Rebuilding dictionary database...',
       'rebuildDictionaryDatabaseSuccess':
           'Dictionary database rebuilt successfully.',
+      'downloadDictionarySourceFirst':
+          'Please download the dictionary source file (kautian.ods) first.',
       'loadingAudioPrefix': 'Loading',
       'playAudioPrefix': 'Play',
       'stopAudioPrefix': 'Stop',
@@ -194,6 +201,9 @@ class AppLocalizations {
       'themeLight': '浅色',
       'themeDark': '深色',
       'themeAmoled': 'AMOLED 黑',
+      'dictionarySourceArchive': '词典原始档',
+      'dictionarySourceSubtitle': '先下载 kautian.ods，再重新建立本机 SQLite 词典资料库。',
+      'dictionarySourceReady': '已下载，可用于重新构建本机词典资料库',
       'audioWordArchive': '词目音档',
       'audioSentenceArchive': '例句音档',
       'rebuildDictionaryDatabase': '重新构建词典资料库',
@@ -201,6 +211,7 @@ class AppLocalizations {
           '从已下载的 kautian.ods 重新建立本机 SQLite 词典资料库。',
       'rebuildingDictionaryDatabase': '正在重新构建词典资料库…',
       'rebuildDictionaryDatabaseSuccess': '词典资料库已重新构建完成。',
+      'downloadDictionarySourceFirst': '请先下载词典原始档 (kautian.ods)',
       'loadingAudioPrefix': '正在载入',
       'playAudioPrefix': '播放',
       'stopAudioPrefix': '停止播放',
@@ -261,6 +272,9 @@ class AppLocalizations {
       'themeLight': '淺色',
       'themeDark': '深色',
       'themeAmoled': 'AMOLED 黑',
+      'dictionarySourceArchive': '詞典原始檔',
+      'dictionarySourceSubtitle': '先下載 kautian.ods，再重新建立本機 SQLite 詞典資料庫。',
+      'dictionarySourceReady': '已下載，可用於重新構建本機詞典資料庫',
       'audioWordArchive': '詞目音檔',
       'audioSentenceArchive': '例句音檔',
       'rebuildDictionaryDatabase': '重新構建詞典資料庫',
@@ -268,6 +282,7 @@ class AppLocalizations {
           '從已下載的 kautian.ods 重新建立本機 SQLite 詞典資料庫。',
       'rebuildingDictionaryDatabase': '正在重新構建詞典資料庫…',
       'rebuildDictionaryDatabaseSuccess': '詞典資料庫已重新構建完成。',
+      'downloadDictionarySourceFirst': '請先下載詞典原始檔 (kautian.ods)',
       'loadingAudioPrefix': '正在載入',
       'playAudioPrefix': '播放',
       'stopAudioPrefix': '停止播放',
@@ -324,6 +339,9 @@ class AppLocalizations {
   String get fontSize => _text('fontSize');
   String get small => _text('small');
   String get extraLarge => _text('extraLarge');
+  String get dictionarySourceArchive => _text('dictionarySourceArchive');
+  String get dictionarySourceSubtitle => _text('dictionarySourceSubtitle');
+  String get dictionarySourceReady => _text('dictionarySourceReady');
   String get audioWordArchive => _text('audioWordArchive');
   String get audioSentenceArchive => _text('audioSentenceArchive');
   String get rebuildDictionaryDatabase => _text('rebuildDictionaryDatabase');
@@ -333,6 +351,8 @@ class AppLocalizations {
       _text('rebuildingDictionaryDatabase');
   String get rebuildDictionaryDatabaseSuccess =>
       _text('rebuildDictionaryDatabaseSuccess');
+  String get downloadDictionarySourceFirst =>
+      _text('downloadDictionarySourceFirst');
   String get loadingAudioPrefix => _text('loadingAudioPrefix');
   String get playAudioPrefix => _text('playAudioPrefix');
   String get stopAudioPrefix => _text('stopAudioPrefix');

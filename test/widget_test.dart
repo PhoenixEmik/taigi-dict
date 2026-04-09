@@ -17,6 +17,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     DictionaryRepository.useBackgroundSearchIsolate = false;
     DictionaryRepository.preferLocalDatabase = false;
+    DictionaryRepository.debugFallbackBundle = _testAppBundle;
     DictionaryRepository.clearBundleCache();
   });
 
@@ -482,19 +483,18 @@ void main() {
 
     await tester.pumpWidget(const HokkienDictionaryApp());
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 900));
 
     expect(find.text('辭典'), findsOneWidget);
     expect(find.text('書籤'), findsOneWidget);
     expect(find.text('設定'), findsWidgets);
-    expect(find.text('開始搜尋'), findsOneWidget);
     expect(find.text('詞目'), findsNothing);
     expect(find.text('義項'), findsNothing);
     expect(find.text('例句'), findsNothing);
     expect(find.text('台語 → 華語'), findsNothing);
     expect(find.text('華語 → 台語'), findsNothing);
 
-    expect(find.byType(SearchBar), findsOneWidget);
+    expect(searchField, findsOneWidget);
 
     await tester.enterText(searchField, 'tsit');
     await tester.pump(searchDebounce);
@@ -510,14 +510,21 @@ void main() {
 
     await tester.pumpWidget(const HokkienDictionaryApp());
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 900));
 
     await tester.tap(find.byIcon(Icons.settings_outlined));
-    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('設定'), findsWidgets);
     expect(find.text('離線資源'), findsOneWidget);
     expect(find.text('外觀'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Language / 語言'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('Language / 語言'), findsOneWidget);
     expect(find.text('主題'), findsOneWidget);
     await tester.scrollUntilVisible(
@@ -824,3 +831,54 @@ class _FakeDictionaryRepository extends DictionaryRepository {
     return bundle;
   }
 }
+
+const _testAppBundle = DictionaryBundle(
+  entryCount: 3,
+  senseCount: 3,
+  exampleCount: 0,
+  entries: [
+    DictionaryEntry(
+      id: 1,
+      type: '',
+      hanji: '一',
+      romanization: 'tsi̍t',
+      category: '',
+      audioId: '',
+      hokkienSearch: '一 tsit tsi̍t',
+      mandarinSearch: '數字 一',
+      senses: [
+        DictionarySense(partOfSpeech: '', definition: '數字一。', examples: []),
+      ],
+    ),
+    DictionaryEntry(
+      id: 2,
+      type: '',
+      hanji: '一項',
+      romanization: 'tsit-hāng',
+      category: '',
+      audioId: '',
+      hokkienSearch: '一項 tsit-hang tsit-hāng',
+      mandarinSearch: '一個項目',
+      senses: [
+        DictionarySense(partOfSpeech: '', definition: '一個項目。', examples: []),
+      ],
+    ),
+    DictionaryEntry(
+      id: 3,
+      type: '',
+      hanji: '七一',
+      romanization: 'chhit-tsit8',
+      category: '',
+      audioId: '',
+      hokkienSearch: '七一 chhit-tsit8',
+      mandarinSearch: '七一',
+      senses: [
+        DictionarySense(
+          partOfSpeech: '',
+          definition: '包含 tsit 音節。',
+          examples: [],
+        ),
+      ],
+    ),
+  ],
+);

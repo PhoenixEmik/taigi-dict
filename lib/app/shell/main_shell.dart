@@ -5,6 +5,7 @@ import 'package:hokkien_dictionary/core/localization/app_localizations.dart';
 import 'package:hokkien_dictionary/features/bookmarks/application/bookmark_store.dart';
 import 'package:hokkien_dictionary/features/bookmarks/presentation/screens/bookmarks_screen.dart';
 import 'package:hokkien_dictionary/features/dictionary/data/dictionary_database_builder_service.dart';
+import 'package:hokkien_dictionary/features/dictionary/data/offline_dictionary_library.dart';
 import 'package:hokkien_dictionary/features/dictionary/data/dictionary_repository.dart';
 import 'package:hokkien_dictionary/features/dictionary/presentation/screens/dictionary_screen.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/screens/settings_screen.dart';
@@ -21,6 +22,8 @@ class _MainScreenState extends State<MainScreen> {
   final DictionaryRepository _repository = DictionaryRepository();
   final DictionaryDatabaseBuilderService _dictionaryDatabaseBuilderService =
       const DictionaryDatabaseBuilderService();
+  final OfflineDictionaryLibrary _dictionaryLibrary =
+      OfflineDictionaryLibrary();
   final OfflineAudioLibrary _audioLibrary = OfflineAudioLibrary();
   final BookmarkStore _bookmarkStore = BookmarkStore();
 
@@ -30,6 +33,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    unawaited(_initializeDictionaryResources());
     unawaited(_audioLibrary.initialize());
     unawaited(_bookmarkStore.initialize());
   }
@@ -37,8 +41,23 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void dispose() {
     _bookmarkStore.dispose();
+    _dictionaryLibrary.dispose();
     _audioLibrary.dispose();
     super.dispose();
+  }
+
+  Future<void> _initializeDictionaryResources() async {
+    await _dictionaryLibrary.initialize();
+    final needsRebuild = await _dictionaryDatabaseBuilderService.needsRebuild();
+    if (!needsRebuild) {
+      return;
+    }
+
+    try {
+      await _rebuildDictionaryDatabaseInternal();
+    } catch (_) {
+      // Leave the explicit rebuild action in Settings as the recovery path.
+    }
   }
 
   Future<void> _handleArchiveDownloadAction(AudioArchiveType type) async {
@@ -46,7 +65,28 @@ class _MainScreenState extends State<MainScreen> {
     _showResult(result);
   }
 
+  Future<void> _handleDictionarySourceDownloadAction() async {
+    final result = await _dictionaryLibrary.handleDownloadAction();
+    _showResult(result);
+
+    if (result.isError ||
+        _dictionaryLibrary.downloadState != DownloadState.completed) {
+      return;
+    }
+
+    try {
+      await _rebuildDictionaryDatabaseInternal();
+      _showResult(const AudioActionResult(message: '詞典資料庫已重新構建完成。'));
+    } catch (error) {
+      _showResult(AudioActionResult(message: '$error', isError: true));
+    }
+  }
+
   Future<void> _rebuildDictionaryDatabase() async {
+    await _rebuildDictionaryDatabaseInternal();
+  }
+
+  Future<void> _rebuildDictionaryDatabaseInternal() async {
     await _dictionaryDatabaseBuilderService.rebuildFromDownloadedOds();
     DictionaryRepository.clearBundleCache();
     if (!mounted) {
@@ -95,7 +135,9 @@ class _MainScreenState extends State<MainScreen> {
       ),
       SettingsScreen(
         audioLibrary: _audioLibrary,
+        dictionaryLibrary: _dictionaryLibrary,
         onDownloadArchive: _handleArchiveDownloadAction,
+        onDownloadDictionarySource: _handleDictionarySourceDownloadAction,
         onRebuildDictionaryDatabase: _rebuildDictionaryDatabase,
       ),
     ];

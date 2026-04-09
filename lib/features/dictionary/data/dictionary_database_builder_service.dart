@@ -8,6 +8,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 import 'package:sqflite/sqflite.dart';
 
+class MissingDictionarySourceException implements Exception {
+  const MissingDictionarySourceException({required this.path});
+
+  final String path;
+
+  @override
+  String toString() => '請先下載詞典原始檔 (kautian.ods)';
+}
+
 class DictionaryDatabaseBuildResult {
   const DictionaryDatabaseBuildResult({
     required this.entryCount,
@@ -67,7 +76,7 @@ class DictionaryDatabaseBuilderService {
   Future<DictionaryDatabaseBuildResult> rebuildFromDownloadedOds() async {
     final odsFile = await locateDownloadedOdsFile();
     if (!await odsFile.exists()) {
-      throw FileSystemException('找不到已下載的 kautian.ods', odsFile.path);
+      throw MissingDictionarySourceException(path: odsFile.path);
     }
 
     final databaseFile = await locateDatabaseFile();

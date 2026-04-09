@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:hokkien_dictionary/core/localization/app_localizations.dart';
 import 'package:hokkien_dictionary/core/localization/locale_provider.dart';
 import 'package:hokkien_dictionary/core/preferences/app_preferences.dart';
+import 'package:hokkien_dictionary/features/dictionary/data/dictionary_database_builder_service.dart';
+import 'package:hokkien_dictionary/features/dictionary/data/offline_dictionary_library.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/screens/reference_article_screen.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/widgets/audio_resource_tile.dart';
+import 'package:hokkien_dictionary/features/settings/presentation/widgets/dictionary_source_resource_tile.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/widgets/settings_locale_tile.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/widgets/settings_section_header.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/widgets/settings_theme_mode_tile.dart';
@@ -16,12 +19,16 @@ class SettingsScreen extends StatelessWidget {
   const SettingsScreen({
     super.key,
     required this.audioLibrary,
+    required this.dictionaryLibrary,
     required this.onDownloadArchive,
+    required this.onDownloadDictionarySource,
     required this.onRebuildDictionaryDatabase,
   });
 
   final OfflineAudioLibrary audioLibrary;
+  final OfflineDictionaryLibrary dictionaryLibrary;
   final Future<void> Function(AudioArchiveType type) onDownloadArchive;
+  final Future<void> Function() onDownloadDictionarySource;
   final Future<void> Function() onRebuildDictionaryDatabase;
 
   void _showReferenceArticle(
@@ -88,6 +95,8 @@ class SettingsScreen extends StatelessWidget {
           content: Text(
             error == null
                 ? l10n.rebuildDictionaryDatabaseSuccess
+                : error is MissingDictionarySourceException
+                ? l10n.downloadDictionarySourceFirst
                 : '重新構建失敗：$error',
           ),
           backgroundColor: error == null
@@ -109,6 +118,7 @@ class SettingsScreen extends StatelessWidget {
     return AnimatedBuilder(
       animation: Listenable.merge([
         audioLibrary,
+        dictionaryLibrary,
         appPreferences,
         localeProvider,
       ]),
@@ -129,6 +139,10 @@ class SettingsScreen extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(0, 8, 0, 28),
                       children: [
                         SettingsSectionHeader(title: l10n.offlineResources),
+                        DictionarySourceResourceTile(
+                          dictionaryLibrary: dictionaryLibrary,
+                          onDownload: onDownloadDictionarySource,
+                        ),
                         AudioResourceTile(
                           type: AudioArchiveType.word,
                           audioLibrary: audioLibrary,
