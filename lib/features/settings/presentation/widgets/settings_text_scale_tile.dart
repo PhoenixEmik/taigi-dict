@@ -31,7 +31,7 @@ class SettingsTextScaleTile extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Slider(
+            Slider.adaptive(
               value: value,
               min: AppPreferences.minReadingTextScale,
               max: AppPreferences.maxReadingTextScale,

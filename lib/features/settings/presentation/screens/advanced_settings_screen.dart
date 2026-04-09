@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:hokkien_dictionary/core/localization/app_localizations.dart';
+import 'package:hokkien_dictionary/core/utils/dialog_utils.dart';
 import 'package:hokkien_dictionary/features/dictionary/data/dictionary_database_builder_service.dart';
 
 class AdvancedSettingsScreen extends StatelessWidget {
@@ -14,28 +15,12 @@ class AdvancedSettingsScreen extends StatelessWidget {
 
   Future<void> _confirmAndRebuild(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAdaptiveConfirmationDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(l10n.confirmRebuildDictionaryTitle),
-          content: Text(l10n.confirmRebuildDictionaryBody),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: Text(l10n.cancelAction),
-            ),
-            FilledButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: Text(l10n.confirmAction),
-            ),
-          ],
-        );
-      },
+      title: l10n.confirmRebuildDictionaryTitle,
+      content: l10n.confirmRebuildDictionaryBody,
+      cancelLabel: l10n.cancelAction,
+      confirmLabel: l10n.confirmAction,
     );
 
     if (confirmed != true || !context.mounted) {
@@ -59,7 +44,7 @@ class AdvancedSettingsScreen extends StatelessWidget {
                 const SizedBox(
                   width: 24,
                   height: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2.5),
+                  child: CircularProgressIndicator.adaptive(strokeWidth: 2.5),
                 ),
                 const SizedBox(width: 16),
                 Expanded(child: Text(l10n.rebuildingDictionaryDatabase)),
