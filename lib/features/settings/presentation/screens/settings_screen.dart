@@ -16,6 +16,7 @@ import 'package:hokkien_dictionary/features/settings/presentation/widgets/settin
 import 'package:hokkien_dictionary/features/settings/presentation/widgets/settings_theme_mode_tile.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/widgets/settings_text_scale_tile.dart';
 import 'package:hokkien_dictionary/offline_audio.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as glass;
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({
@@ -46,6 +47,23 @@ class SettingsScreen extends StatelessWidget {
           sourceUrl: article.sourceUrl,
         ),
       ),
+    );
+  }
+
+  glass.LiquidGlassSettings _sectionSettings(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    return glass.LiquidGlassSettings(
+      blur: 28,
+      thickness: 34,
+      glassColor: brightness == Brightness.dark
+          ? Colors.black.withValues(alpha: 0.06)
+          : Colors.white.withValues(alpha: 0.12),
+      lightIntensity: brightness == Brightness.dark ? 0.44 : 0.62,
+      ambientStrength: brightness == Brightness.dark ? 0.08 : 0.03,
+      refractiveIndex: 1.16,
+      saturation: brightness == Brightness.dark ? 1.2 : 1.06,
+      chromaticAberration: 0.008,
+      specularSharpness: glass.GlassSpecularSharpness.medium,
     );
   }
 
@@ -173,7 +191,21 @@ class SettingsScreen extends StatelessWidget {
         ];
 
         return Scaffold(
-          appBar: AppBar(title: Text(l10n.settingsTitle)),
+          backgroundColor: Colors.transparent,
+          appBar: applePlatform
+              ? glass.GlassAppBar(
+                  useOwnLayer: true,
+                  quality: glass.GlassQuality.premium,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  title: Text(
+                    l10n.settingsTitle,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: resolveLiquidGlassForeground(context),
+                    ),
+                  ),
+                )
+              : AppBar(title: Text(l10n.settingsTitle)),
           body: LiquidGlassBackground(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -190,24 +222,33 @@ class SettingsScreen extends StatelessWidget {
                       child: ListView(
                         padding: EdgeInsets.fromLTRB(
                           16,
-                          applePlatform ? 16 : 8,
+                          applePlatform ? 12 : 8,
                           16,
-                          28,
+                          applePlatform ? 120 : 28,
                         ),
                         children: [
                           SettingsSectionHeader(title: l10n.offlineResources),
                           applePlatform
-                              ? LiquidGlassSection(children: offlineSection)
+                              ? _GlassSettingsGroup(
+                                  settings: _sectionSettings(context),
+                                  children: offlineSection,
+                                )
                               : Column(children: offlineSection),
                           if (!applePlatform) const Divider(height: 32),
                           SettingsSectionHeader(title: l10n.appearance),
                           applePlatform
-                              ? LiquidGlassSection(children: appearanceSection)
+                              ? _GlassSettingsGroup(
+                                  settings: _sectionSettings(context),
+                                  children: appearanceSection,
+                                )
                               : Column(children: appearanceSection),
                           if (!applePlatform) const Divider(height: 32),
                           SettingsSectionHeader(title: l10n.about),
                           applePlatform
-                              ? LiquidGlassSection(children: aboutSection)
+                              ? _GlassSettingsGroup(
+                                  settings: _sectionSettings(context),
+                                  children: aboutSection,
+                                )
                               : Column(children: aboutSection),
                         ],
                       ),
@@ -219,6 +260,43 @@ class SettingsScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _GlassSettingsGroup extends StatelessWidget {
+  const _GlassSettingsGroup({required this.settings, required this.children});
+
+  final glass.LiquidGlassSettings settings;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return glass.GlassCard(
+      useOwnLayer: true,
+      quality: glass.GlassQuality.standard,
+      settings: settings,
+      padding: EdgeInsets.zero,
+      margin: const EdgeInsets.only(bottom: 4),
+      shape: const glass.LiquidRoundedSuperellipse(borderRadius: 24),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          for (var index = 0; index < children.length; index++) ...[
+            children[index],
+            if (index < children.length - 1)
+              Divider(
+                height: 1,
+                thickness: 0.5,
+                indent: 72,
+                endIndent: 16,
+                color: Theme.of(
+                  context,
+                ).colorScheme.outlineVariant.withValues(alpha: 0.35),
+              ),
+          ],
+        ],
+      ),
     );
   }
 }
