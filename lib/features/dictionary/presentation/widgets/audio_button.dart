@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hokkien_dictionary/core/localization/app_localizations.dart';
+import 'package:hokkien_dictionary/features/settings/presentation/widgets/liquid_glass.dart';
 import 'package:hokkien_dictionary/offline_audio.dart';
 
 class AudioButton extends StatelessWidget {
@@ -22,6 +24,7 @@ class AudioButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
+    final applePlatform = isApplePlatform(context);
     final isLoading = audioLibrary.isClipLoading(type, audioId);
     final isPlaying = audioLibrary.isClipPlaying(type, audioId);
     final archiveReady = audioLibrary.isArchiveReady(type);
@@ -45,29 +48,67 @@ class AudioButton extends StatelessWidget {
         child: SizedBox(
           width: buttonSize,
           height: buttonSize,
-          child: FilledButton.tonal(
-            style: FilledButton.styleFrom(
-              backgroundColor: colorScheme.secondaryContainer,
-              foregroundColor: colorScheme.onSecondaryContainer,
-              padding: EdgeInsets.zero,
-              minimumSize: const Size(48, 48),
-            ),
-            onPressed: isLoading ? null : () => onPressed(type, audioId),
-            child: isLoading
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : Icon(
-                    isPlaying
-                        ? Icons.stop_circle_outlined
-                        : archiveReady
-                        ? Icons.volume_up_outlined
-                        : Icons.download_outlined,
-                    size: compact ? 20 : 22,
+          child: applePlatform
+              ? CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  minimumSize: const Size(48, 48),
+                  onPressed: isLoading ? null : () => onPressed(type, audioId),
+                  child: Container(
+                    width: buttonSize,
+                    height: buttonSize,
+                    decoration: BoxDecoration(
+                      color: resolveLiquidGlassSecondaryTint(
+                        context,
+                      ).withValues(alpha: 0.82),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.10),
+                      ),
+                    ),
+                    child: Center(
+                      child: isLoading
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator.adaptive(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Icon(
+                              isPlaying
+                                  ? CupertinoIcons.stop_circle
+                                  : archiveReady
+                                  ? CupertinoIcons.speaker_2_fill
+                                  : CupertinoIcons.arrow_down_circle,
+                              size: compact ? 20 : 22,
+                              color: resolveLiquidGlassTint(context),
+                            ),
+                    ),
                   ),
-          ),
+                )
+              : FilledButton.tonal(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.secondaryContainer,
+                    foregroundColor: colorScheme.onSecondaryContainer,
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(48, 48),
+                  ),
+                  onPressed: isLoading ? null : () => onPressed(type, audioId),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Icon(
+                          isPlaying
+                              ? Icons.stop_circle_outlined
+                              : archiveReady
+                              ? Icons.volume_up_outlined
+                              : Icons.download_outlined,
+                          size: compact ? 20 : 22,
+                        ),
+                ),
         ),
       ),
     );

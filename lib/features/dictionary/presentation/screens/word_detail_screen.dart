@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hokkien_dictionary/core/localization/app_localizations.dart';
 import 'package:hokkien_dictionary/core/preferences/app_preferences.dart';
 import 'package:hokkien_dictionary/features/bookmarks/application/bookmark_store.dart';
 import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
 import 'package:hokkien_dictionary/features/dictionary/presentation/widgets/word_detail_sections.dart';
+import 'package:hokkien_dictionary/features/settings/presentation/widgets/liquid_glass.dart';
 import 'package:hokkien_dictionary/offline_audio.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -45,6 +47,74 @@ class WordDetailScreen extends StatelessWidget {
       builder: (context, child) {
         final l10n = AppLocalizations.of(context);
         final isBookmarked = bookmarkStore.isBookmarked(entry.id);
+        final body = AnimatedBuilder(
+          animation: audioLibrary,
+          builder: (context, child) {
+            return WordDetailBody(
+              entry: entry,
+              audioLibrary: audioLibrary,
+              onPlayClip: onPlayClip,
+              onWordTapped: onWordTapped,
+            );
+          },
+        );
+
+        if (isApplePlatform(context)) {
+          final title = entry.hanji.isEmpty
+              ? l10n.wordDetailFallbackTitle
+              : entry.hanji;
+          final secondaryTint = resolveLiquidGlassSecondaryTint(
+            context,
+          ).withValues(alpha: 0.72);
+          final tint = resolveLiquidGlassTint(context);
+          return CupertinoPageScaffold(
+            navigationBar: CupertinoNavigationBar(
+              backgroundColor: secondaryTint,
+              border: null,
+              middle: Text(
+                title,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: resolveLiquidGlassForeground(context),
+                ),
+              ),
+              leading: CupertinoNavigationBarBackButton(
+                color: tint,
+                onPressed: () => Navigator.of(context).maybePop(),
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(28, 28),
+                    onPressed: () {
+                      unawaited(_shareEntry(l10n));
+                    },
+                    child: Icon(CupertinoIcons.share, color: tint, size: 21),
+                  ),
+                  const SizedBox(width: 8),
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(28, 28),
+                    onPressed: () {
+                      unawaited(bookmarkStore.toggleBookmark(entry.id));
+                    },
+                    child: Icon(
+                      isBookmarked
+                          ? CupertinoIcons.bookmark_fill
+                          : CupertinoIcons.bookmark,
+                      color: tint,
+                      size: 21,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            child: LiquidGlassBackground(child: body),
+          );
+        }
+
         return Scaffold(
           appBar: AppBar(
             title: Text(
@@ -69,17 +139,7 @@ class WordDetailScreen extends StatelessWidget {
               ),
             ],
           ),
-          body: AnimatedBuilder(
-            animation: audioLibrary,
-            builder: (context, child) {
-              return WordDetailBody(
-                entry: entry,
-                audioLibrary: audioLibrary,
-                onPlayClip: onPlayClip,
-                onWordTapped: onWordTapped,
-              );
-            },
-          ),
+          body: body,
         );
       },
     );
@@ -134,8 +194,10 @@ class WordDetailBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final readingTextScale = AppPreferencesScope.of(context).readingTextScale;
+    final applePlatform = isApplePlatform(context);
 
     return SafeArea(
+      top: !applePlatform,
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Align(
@@ -145,7 +207,12 @@ class WordDetailBody extends StatelessWidget {
                 maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
               ),
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                padding: EdgeInsets.fromLTRB(
+                  applePlatform ? 16 : 20,
+                  applePlatform ? 12 : 12,
+                  applePlatform ? 16 : 20,
+                  applePlatform ? 34 : 24,
+                ),
                 children: [
                   SelectionArea(
                     child: Column(
