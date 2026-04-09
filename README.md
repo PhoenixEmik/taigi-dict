@@ -1,61 +1,76 @@
 # 台語辭典
 
-Offline Flutter dictionary app for Taiwanese Hokkien and Mandarin, built from
-the Ministry of Education dataset and designed for local lookup on iOS and
-Android.
+Flutter dictionary app for Taiwanese Hokkien and Mandarin on Android and iOS.
+The app is built around the Ministry of Education dataset, supports offline
+lookup, and downloads large offline resources directly to the user's device.
 
-## Data Source
+## App Identity
 
-- Canonical reference: `https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/`
-- Source spreadsheet: `https://sutian.moe.edu.tw/media/senn/ods/kautian.ods`
-- Audio source page: `https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/`
-- 臺羅標注說明: `https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/`
-- 漢字用字原則: `https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/`
-- Bundled dictionary asset: `assets/data/dictionary.json.gz`
+- App display name: `台語辭典`
+- Android application ID: `org.taigidict.app`
+- iOS bundle identifier: `org.taigidict.app`
+- Official project domain: `https://taigidict.org`
+- Production asset host: `https://app.taigidict.org/assets/`
 
 ## Current Features
 
-- Offline dictionary lookup for Taiwanese headwords, romanization, and Mandarin definitions
-- Tone-insensitive pinyin search
-- Weighted result ranking with background-isolate search execution
-- Search history stored locally with `shared_preferences`
+- Offline dictionary lookup for Taiwanese headwords, Tailo romanization, and Mandarin definitions
+- Weighted search ranking with optional background-isolate execution
 - Bookmark tab for saved entries
-- Dedicated word detail screen with audio playback
-- Interactive linked definitions: bracketed references such as `【母】` can open another entry
-- Offline audio archive download and playback for word and sentence clips
-- Reading text size adjustment
-- Theme selector with `System`, `Light`, `Dark`, and strict `AMOLED Black` modes
-- Standard Material 3 settings/about flow
+- Search history stored locally with `shared_preferences`
+- Dedicated word detail screen with native share support
+- Interactive linked definitions that can open referenced entries inline
+- Offline audio archive downloads for 詞目音檔 and 例句音檔
+- Pause / resume / breakpoint-resume downloads for large ZIP files using `dio` + HTTP range requests
+- Offline dictionary source download for `kautian.ods`
+- On-device SQLite database build from the downloaded ODS file using `spreadsheet_decoder` and `sqflite`
+- Localized UI for Traditional Chinese, Simplified Chinese, and English
+- Accessibility improvements for semantics labels, merged semantics on complex settings tiles, and localized tooltips
+- Reading text size adjustment and Material 3 theme selection
+
+## Data And Licensing
+
+Canonical ministry references:
+
+- Dictionary reference: `https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/`
+- Source spreadsheet: `https://sutian.moe.edu.tw/media/senn/ods/kautian.ods`
+- Tailo guide: `https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/`
+- Hanji usage guide: `https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/`
+
+Production offline resource endpoints used by the app:
+
+- Dictionary audio archive: `https://app.taigidict.org/assets/sutiau-mp3.zip`
+- Example audio archive: `https://app.taigidict.org/assets/leku-mp3.zip`
+- Raw dictionary source: `https://app.taigidict.org/assets/kautian.ods`
+
+Important distribution note:
+
+- Because the upstream raw data is under `CC BY-ND 3.0 TW`, the app does not ship a preconverted SQLite database.
+- Instead, the app downloads the raw `kautian.ods` file and builds the local SQLite database on the user's device.
+- Runtime dictionary loading now prefers the locally built SQLite database in the app support directory. The old packaged dictionary asset is no longer used by the production app runtime.
 
 ## Tech Stack
 
 - Flutter
-- `shared_preferences` for user preferences, search history, bookmarks, and theme persistence
-- `just_audio` for local audio playback
-- `path_provider` for offline archive storage
+- `dio` for resumable downloads
+- `just_audio` for offline audio playback
+- `path` and `path_provider` for local file management
+- `shared_preferences` for user settings, bookmarks, and search history
+- `share_plus` for native sharing
+- `spreadsheet_decoder` for parsing `kautian.ods`
+- `sqflite` for the local SQLite dictionary database
 
 ## Project Structure
 
-The app is no longer a single large `main.dart`. It is split by responsibility:
-
-- `lib/main.dart`: app entry point and exports used by tests
-- `lib/app/`: app bootstrap, shell, and theme configuration
-- `lib/core/`: shared app-wide state such as persisted preferences
-- `lib/features/dictionary/`: dictionary models, search logic, screens, and widgets
-- `lib/features/bookmarks/`: bookmark persistence and bookmarks screen
-- `lib/features/settings/`: settings screen and settings widgets
-- `lib/features/audio/`: offline audio archive storage, playback, and diagnostics
-- `lib/offline_audio.dart`: compatibility export for audio types/services
-- `tool/build_dictionary_asset.py`: converts the upstream ODS into the bundled gzip JSON asset
-- `data/source/kautian.ods`: local copy of the ministry source spreadsheet
-
-## Regenerate Dictionary Data
-
-If the upstream ODS changes, rebuild the packaged dictionary asset:
-
-```bash
-python3 tool/build_dictionary_asset.py
-```
+- `lib/main.dart`: app entry point
+- `lib/app/`: app shell, navigation, and theme bootstrap
+- `lib/core/`: constants, localization, and shared preferences
+- `lib/features/dictionary/`: dictionary models, search, SQLite build/load logic, and UI
+- `lib/features/audio/`: offline audio archive download, indexing, and playback
+- `lib/features/bookmarks/`: bookmark persistence and screens
+- `lib/features/settings/`: settings UI, offline resource controls, and localized reference articles
+- `lib/features/settings/presentation/content/reference_articles.dart`: localized Tailo and Hanji reference article content
+- `tool/build_dictionary_asset.py`: Python conversion script kept as a reference for the Dart-side ODS-to-SQLite mapping logic
 
 ## Run
 
@@ -71,6 +86,22 @@ flutter analyze
 flutter test
 ```
 
+## iOS Setup
+
+The iOS project is configured with:
+
+- deployment target `iOS 13.0`
+- localized app metadata for `zh-Hant`, `zh-Hans`, and `en`
+
+After dependency or Pod changes:
+
+```bash
+flutter pub get
+cd ios
+pod install
+cd ..
+```
+
 ## Build Release APK
 
 ```bash
@@ -81,14 +112,13 @@ Generated artifact:
 
 - `build/app/outputs/flutter-apk/app-release.apk`
 
+Current release-build caveat:
+
+- Android `release` still uses the debug signing config so local release APKs can be installed for testing.
+- Configure your own Android keystore and Apple signing settings before store distribution.
+
 ## License
 
 - App code: MIT. See `LICENSE`.
-- Dictionary data: CC BY-ND 3.0 TW. See `DATA_LICENSE.md`.
-- Dictionary audio: sourced from the same ministry reference above and remains separately licensed.
-
-## Delivery Notes
-
-- Android and iOS app display names are set to `台語辭典`.
-- The project still needs production application identifiers before store release.
-- Release signing is not configured in this repository. Add your own Android keystore and Apple signing settings before publishing.
+- Dictionary data: `CC BY-ND 3.0 TW`. See `DATA_LICENSE.md`.
+- Dictionary audio: derived from the same ministry source and remains separately licensed under the upstream terms.
