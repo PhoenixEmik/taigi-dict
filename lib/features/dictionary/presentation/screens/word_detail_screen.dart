@@ -196,7 +196,7 @@ class WordDetailBody extends StatelessWidget {
     final readingTextScale = AppPreferencesScope.of(context).readingTextScale;
     final applePlatform = isApplePlatform(context);
     final topInset = applePlatform
-        ? MediaQuery.paddingOf(context).top +
+        ? MediaQuery.viewPaddingOf(context).top +
               kMinInteractiveDimensionCupertino +
               12
         : 12.0;
