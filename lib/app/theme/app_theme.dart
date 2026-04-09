@@ -31,11 +31,11 @@ ThemeData buildLightAppTheme() {
 ThemeData buildDarkAppTheme() {
   const canvas = Color(0xFF101417);
   const surface = Color(0xFF171C1F);
-  const primary = Color(0xFFA8D3DC);
-  const tertiary = Color(0xFFFFB74D);
+  const primary = Color(0xFFBFE4EC);
+  const tertiary = Color(0xFFFFC56B);
   const onSurface = Color(0xFFF3F7F8);
   const outline = Color(0xFF314046);
-  const mutedText = Color(0xFFC4D0D4);
+  const mutedText = Color(0xFFD2DDE0);
 
   return _buildAppTheme(
     brightness: Brightness.dark,
@@ -58,11 +58,11 @@ ThemeData buildDarkAppTheme() {
 
 ThemeData buildAmoledAppTheme() {
   const black = Color(0xFF000000);
-  const primary = Color(0xFF8CC8FF);
-  const tertiary = Color(0xFFFFB866);
+  const primary = Color(0xFFA9D8FF);
+  const tertiary = Color(0xFFFFC777);
   const onSurface = Color(0xFFF9F9F9);
   const outline = Color(0xFF2C2C2C);
-  const mutedText = Color(0xFFB8B8B8);
+  const mutedText = Color(0xFFD0D0D0);
 
   return _buildAppTheme(
     brightness: Brightness.dark,
@@ -117,11 +117,36 @@ ThemeData _buildAppTheme({
         surfaceContainerLow: surfaceContainerLow,
       );
 
+  final baseTheme = ThemeData(
+    useMaterial3: true,
+    brightness: brightness,
+    colorScheme: colorScheme,
+  );
+  final textTheme = baseTheme.textTheme.copyWith(
+    titleLarge: baseTheme.textTheme.titleLarge?.copyWith(
+      color: onSurfaceColor,
+      fontWeight: FontWeight.w700,
+    ),
+    titleMedium: baseTheme.textTheme.titleMedium?.copyWith(
+      color: onSurfaceColor,
+      fontWeight: FontWeight.w700,
+    ),
+    bodyLarge: baseTheme.textTheme.bodyLarge?.copyWith(color: onSurfaceColor),
+    bodyMedium: baseTheme.textTheme.bodyMedium?.copyWith(
+      color: onSurfaceVariantColor,
+    ),
+    bodySmall: baseTheme.textTheme.bodySmall?.copyWith(
+      color: onSurfaceVariantColor,
+    ),
+  );
+
   return ThemeData(
     useMaterial3: true,
     brightness: brightness,
     scaffoldBackgroundColor: scaffoldBackgroundColor,
     colorScheme: colorScheme,
+    textTheme: textTheme,
+    primaryTextTheme: textTheme,
     appBarTheme: AppBarTheme(
       backgroundColor: appBarBackgroundColor,
       foregroundColor: appBarForegroundColor,
@@ -142,6 +167,12 @@ ThemeData _buildAppTheme({
     ),
     dividerTheme: DividerThemeData(color: outlineColor),
     iconTheme: IconThemeData(color: onSurfaceColor),
+    listTileTheme: ListTileThemeData(
+      iconColor: onSurfaceVariantColor,
+      textColor: onSurfaceColor,
+      titleTextStyle: textTheme.titleMedium,
+      subtitleTextStyle: textTheme.bodyMedium,
+    ),
     searchBarTheme: SearchBarThemeData(
       elevation: WidgetStatePropertyAll(brightness == Brightness.light ? 3 : 0),
       backgroundColor: WidgetStatePropertyAll(surfaceColor),

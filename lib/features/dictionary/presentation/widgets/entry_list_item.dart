@@ -32,8 +32,7 @@ class EntryListItem extends StatelessWidget {
                 entry.hanji.isEmpty ? l10n.unlabeledHanji : entry.hanji,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color:
-                      theme.textTheme.titleLarge?.color ?? colorScheme.primary,
+                  color: colorScheme.primary,
                 ),
               ),
               subtitle: Column(
@@ -64,7 +63,7 @@ class EntryListItem extends StatelessWidget {
               ),
               trailing: Icon(
                 Icons.chevron_right,
-                color: theme.iconTheme.color ?? colorScheme.onSurfaceVariant,
+                color: colorScheme.onSurfaceVariant,
               ),
               onTap: onTap,
             ),
