@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hokkien_dictionary/core/localization/app_localizations.dart';
 import 'package:hokkien_dictionary/features/bookmarks/application/bookmark_store.dart';
@@ -9,6 +8,7 @@ import 'package:hokkien_dictionary/features/dictionary/presentation/coordinators
 import 'package:hokkien_dictionary/features/dictionary/presentation/widgets/entry_list_item.dart';
 import 'package:hokkien_dictionary/features/settings/presentation/widgets/liquid_glass.dart';
 import 'package:hokkien_dictionary/offline_audio.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as glass;
 
 class BookmarksScreen extends StatefulWidget {
   const BookmarksScreen({
@@ -95,10 +95,6 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
             }
 
             final bookmarkedEntries = _buildBookmarkedEntries(snapshot.data!);
-            if (bookmarkedEntries.isEmpty) {
-              return const BookmarkEmptyState();
-            }
-
             return LiquidGlassBackground(
               child: SafeArea(
                 child: LayoutBuilder(
@@ -109,32 +105,10 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                         constraints: BoxConstraints(
                           maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
                         ),
-                        child: ListView.builder(
-                          padding: EdgeInsets.fromLTRB(
-                            16,
-                            applePlatform ? 12 : 16,
-                            16,
-                            28,
-                          ),
-                          itemCount: bookmarkedEntries.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: EdgeInsets.only(
-                                bottom: index == bookmarkedEntries.length - 1
-                                    ? 0
-                                    : 10,
-                              ),
-                              child: SelectionArea(
-                                child: EntryListItem(
-                                  entry: bookmarkedEntries[index],
-                                  onTap: () => _showEntryDetails(
-                                    snapshot.data!,
-                                    bookmarkedEntries[index],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+                        child: bookmarkedContent(
+                          bookmarkedEntries,
+                          snapshot.data!,
+                          applePlatform,
                         ),
                       ),
                     );
@@ -146,21 +120,58 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
         );
 
         if (applePlatform) {
-          return CupertinoPageScaffold(
-            navigationBar: CupertinoNavigationBar(
-              middle: Text(l10n.bookmarksTitle),
-              backgroundColor: resolveLiquidGlassSecondaryTint(
-                context,
-              ).withValues(alpha: 0.82),
-              border: null,
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: glass.GlassAppBar(
+              useOwnLayer: true,
+              quality: glass.GlassQuality.premium,
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              title: Text(
+                l10n.bookmarksTitle,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: resolveLiquidGlassForeground(context),
+                ),
+              ),
             ),
-            child: body,
+            body: body,
           );
         }
 
         return Scaffold(
           appBar: AppBar(title: Text(l10n.bookmarksTitle)),
           body: body,
+        );
+      },
+    );
+  }
+
+  Widget bookmarkedContent(
+    List<DictionaryEntry> bookmarkedEntries,
+    DictionaryBundle bundle,
+    bool applePlatform,
+  ) {
+    if (bookmarkedEntries.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.fromLTRB(16, applePlatform ? 24 : 16, 16, 28),
+        child: const BookmarkEmptyState(),
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.fromLTRB(16, applePlatform ? 12 : 16, 16, 28),
+      itemCount: bookmarkedEntries.length,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: index == bookmarkedEntries.length - 1 ? 0 : 10,
+          ),
+          child: SelectionArea(
+            child: EntryListItem(
+              entry: bookmarkedEntries[index],
+              onTap: () => _showEntryDetails(bundle, bookmarkedEntries[index]),
+            ),
+          ),
         );
       },
     );

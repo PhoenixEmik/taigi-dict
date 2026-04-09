@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 ThemeData buildLightAppTheme() {
-  const canvas = Color(0xFFF7F1E7);
+  const canvas = Color(0xFFF2F2F7);
   const surface = Color(0xFFFFFFFF);
-  const deepInk = Color(0xFF0E2F35);
-  const primary = Color(0xFF17454C);
-  const tertiary = Color(0xFFC9752D);
-  const outline = Color(0xFFD7D0C4);
-  const mutedText = Color(0xFF5F6C70);
+  const deepInk = Color(0xFF111111);
+  const primary = Color(0xFF007AFF);
+  const tertiary = Color(0xFFFF9F0A);
+  const outline = Color(0xFFD1D1D6);
+  const mutedText = Color(0xFF8E8E93);
 
   return _buildAppTheme(
     brightness: Brightness.light,
@@ -20,11 +20,11 @@ ThemeData buildLightAppTheme() {
     onSurfaceVariantColor: mutedText,
     outlineColor: outline,
     mutedTextColor: mutedText,
-    surfaceContainerLow: const Color(0xFFFFFBF5),
+    surfaceContainerLow: const Color(0xFFFFFFFF),
     appBarBackgroundColor: Colors.transparent,
     appBarForegroundColor: deepInk,
-    cardShadowColor: Colors.black.withValues(alpha: 0.08),
-    searchShadowColor: Colors.black.withValues(alpha: 0.10),
+    cardShadowColor: Colors.black.withValues(alpha: 0.03),
+    searchShadowColor: Colors.black.withValues(alpha: 0.04),
   );
 }
 
