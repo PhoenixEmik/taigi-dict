@@ -65,100 +65,67 @@ class WordDetailScreen extends StatelessWidget {
               ? l10n.wordDetailFallbackTitle
               : entry.hanji;
           final tint = resolveLiquidGlassTint(context);
+          final topPadding =
+              MediaQuery.of(context).padding.top + kToolbarHeight + 16;
           return Scaffold(
+            extendBodyBehindAppBar: true,
             backgroundColor: Colors.transparent,
-            body: LiquidGlassBackground(
-              child: SafeArea(
-                top: true,
-                bottom: false,
-                child: CustomScrollView(
-                  slivers: [
-                    SliverAppBar.large(
-                      primary: false,
-                      pinned: true,
-                      stretch: false,
-                      centerTitle: false,
-                      elevation: 0,
-                      backgroundColor: Colors.transparent,
-                      foregroundColor: resolveLiquidGlassForeground(context),
-                      surfaceTintColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      scrolledUnderElevation: 0,
-                      forceMaterialTransparency: true,
-                      expandedHeight: 116,
-                      title: Text(
-                        title,
-                        style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: resolveLiquidGlassForeground(context),
-                            ),
-                      ),
-                      leading: IconButton(
-                        tooltip: MaterialLocalizations.of(
-                          context,
-                        ).backButtonTooltip,
-                        onPressed: () => Navigator.of(context).maybePop(),
-                        icon: Icon(CupertinoIcons.back, color: tint, size: 22),
-                      ),
-                      actions: [
-                        IconButton(
-                          tooltip: l10n.shareEntry,
-                          onPressed: () {
-                            unawaited(_shareEntry(l10n));
-                          },
-                          icon: Icon(
-                            CupertinoIcons.share,
-                            color: tint,
-                            size: 21,
-                          ),
-                        ),
-                        IconButton(
-                          tooltip: isBookmarked
-                              ? l10n.removeBookmark
-                              : l10n.addBookmark,
-                          onPressed: () {
-                            unawaited(bookmarkStore.toggleBookmark(entry.id));
-                          },
-                          icon: Icon(
-                            isBookmarked
-                                ? CupertinoIcons.bookmark_fill
-                                : CupertinoIcons.bookmark,
-                            color: tint,
-                            size: 21,
-                          ),
-                        ),
-                      ],
-                      flexibleSpace: const _AppleLargeTitleAppBarBackground(),
-                    ),
-                    SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 34),
-                      sliver: SliverToBoxAdapter(
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: MediaQuery.sizeOf(context).width >= 900
-                                  ? 920
-                                  : 720,
-                            ),
-                            child: SelectionArea(
-                              child: _WordDetailContent(
-                                entry: entry,
-                                audioLibrary: audioLibrary,
-                                onPlayClip: onPlayClip,
-                                onWordTapped: onWordTapped,
-                                readingTextScale: AppPreferencesScope.of(
-                                  context,
-                                ).readingTextScale,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+            appBar: AppBar(
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              backgroundColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              title: Text(
+                title,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: resolveLiquidGlassForeground(context),
                 ),
+              ),
+              leading: IconButton(
+                tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+                onPressed: () => Navigator.of(context).maybePop(),
+                icon: Icon(CupertinoIcons.back, color: tint, size: 22),
+              ),
+              actions: [
+                IconButton(
+                  tooltip: l10n.shareEntry,
+                  onPressed: () {
+                    unawaited(_shareEntry(l10n));
+                  },
+                  icon: Icon(CupertinoIcons.share, color: tint, size: 21),
+                ),
+                IconButton(
+                  tooltip: isBookmarked
+                      ? l10n.removeBookmark
+                      : l10n.addBookmark,
+                  onPressed: () {
+                    unawaited(bookmarkStore.toggleBookmark(entry.id));
+                  },
+                  icon: Icon(
+                    isBookmarked
+                        ? CupertinoIcons.bookmark_fill
+                        : CupertinoIcons.bookmark,
+                    color: tint,
+                    size: 21,
+                  ),
+                ),
+              ],
+              flexibleSpace: ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 25.0, sigmaY: 25.0),
+                  child: Container(color: Colors.transparent),
+                ),
+              ),
+            ),
+            body: LiquidGlassBackground(
+              child: WordDetailBody(
+                entry: entry,
+                audioLibrary: audioLibrary,
+                onPlayClip: onPlayClip,
+                onWordTapped: onWordTapped,
+                topPadding: topPadding,
               ),
             ),
           );
@@ -233,16 +200,19 @@ class WordDetailBody extends StatelessWidget {
     required this.audioLibrary,
     required this.onPlayClip,
     required this.onWordTapped,
+    this.topPadding = 12,
   });
 
   final DictionaryEntry entry;
   final OfflineAudioLibrary audioLibrary;
   final Future<void> Function(AudioArchiveType type, String clipId) onPlayClip;
   final Future<void> Function(String word) onWordTapped;
+  final double topPadding;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Align(
@@ -254,7 +224,7 @@ class WordDetailBody extends StatelessWidget {
               child: ListView(
                 padding: EdgeInsets.fromLTRB(
                   isApplePlatform(context) ? 16 : 20,
-                  12,
+                  topPadding,
                   isApplePlatform(context) ? 16 : 20,
                   isApplePlatform(context) ? 34 : 24,
                 ),
@@ -316,25 +286,6 @@ class _WordDetailContent extends StatelessWidget {
           );
         }),
       ],
-    );
-  }
-}
-
-class _AppleLargeTitleAppBarBackground extends StatelessWidget {
-  const _AppleLargeTitleAppBarBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-    final fillColor = brightness == Brightness.dark
-        ? Colors.black.withValues(alpha: 0.24)
-        : Colors.white.withValues(alpha: 0.50);
-
-    return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: DecoratedBox(decoration: BoxDecoration(color: fillColor)),
-      ),
     );
   }
 }
