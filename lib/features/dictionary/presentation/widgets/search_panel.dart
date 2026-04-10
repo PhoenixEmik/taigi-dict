@@ -362,17 +362,23 @@ class SearchLoadingState extends StatelessWidget {
     if (isApplePlatform(context)) {
       final brightness = Theme.of(context).brightness;
       final baseFill = brightness == Brightness.light
-          ? Colors.white.withValues(alpha: 0.30)
-          : Colors.white.withValues(alpha: 0.08);
+          ? Colors.white.withValues(alpha: 0.18)
+          : Colors.white.withValues(alpha: 0.06);
       final glowFill = brightness == Brightness.light
-          ? resolveLiquidGlassSecondaryTint(context).withValues(alpha: 0.92)
-          : Colors.white.withValues(alpha: 0.16);
+          ? Colors.white.withValues(alpha: 0.42)
+          : Colors.white.withValues(alpha: 0.14);
       final strokeColor = brightness == Brightness.light
           ? Colors.black.withValues(alpha: 0.08)
           : Colors.white.withValues(alpha: 0.14);
+      final lineColor = brightness == Brightness.light
+          ? Colors.white.withValues(alpha: 0.72)
+          : Colors.white.withValues(alpha: 0.18);
+      final mutedLineColor = brightness == Brightness.light
+          ? Colors.white.withValues(alpha: 0.46)
+          : Colors.white.withValues(alpha: 0.10);
 
       return TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0.22, end: 0.62),
+        tween: Tween(begin: 0.20, end: 0.70),
         duration: const Duration(milliseconds: 900),
         curve: Curves.easeInOut,
         builder: (context, opacity, child) {
@@ -385,7 +391,14 @@ class SearchLoadingState extends StatelessWidget {
                 final cardFill = Color.lerp(
                   baseFill,
                   glowFill,
-                  index.isEven ? opacity : opacity * 0.72,
+                  index.isEven ? opacity : opacity * 0.66,
+                )!;
+                final shimmerColor = Color.lerp(
+                  lineColor,
+                  Colors.white.withValues(
+                    alpha: brightness == Brightness.light ? 0.92 : 0.28,
+                  ),
+                  opacity,
                 )!;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
@@ -408,6 +421,78 @@ class SearchLoadingState extends StatelessWidget {
                           borderRadius: BorderRadius.circular(28),
                           border: Border.all(color: strokeColor, width: 0.5),
                         ),
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              top: -8,
+                              left: 12 + (index * 18),
+                              child: IgnorePointer(
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: shimmerColor.withValues(
+                                          alpha: brightness == Brightness.light
+                                              ? 0.26
+                                              : 0.12,
+                                        ),
+                                        blurRadius: 22,
+                                        spreadRadius: 6,
+                                      ),
+                                    ],
+                                  ),
+                                  child: const SizedBox(width: 24, height: 24),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(18, 16, 16, 14),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        _SkeletonLine(
+                                          widthFactor: 0.30 + (index * 0.06),
+                                          height: 18,
+                                          color: shimmerColor,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        _SkeletonLine(
+                                          widthFactor: 0.22 + (index * 0.03),
+                                          height: 12,
+                                          color: lineColor,
+                                        ),
+                                        const SizedBox(height: 12),
+                                        _SkeletonLine(
+                                          widthFactor: 0.82,
+                                          height: 10,
+                                          color: mutedLineColor,
+                                        ),
+                                        const SizedBox(height: 6),
+                                        _SkeletonLine(
+                                          widthFactor: 0.64,
+                                          height: 10,
+                                          color: mutedLineColor,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  _SkeletonCircle(
+                                    size: 18,
+                                    color: mutedLineColor,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -426,6 +511,52 @@ class SearchLoadingState extends StatelessWidget {
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
         ),
+      ),
+    );
+  }
+}
+
+class _SkeletonLine extends StatelessWidget {
+  const _SkeletonLine({
+    required this.widthFactor,
+    required this.height,
+    required this.color,
+  });
+
+  final double widthFactor;
+  final double height;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return FractionallySizedBox(
+      widthFactor: widthFactor.clamp(0.0, 1.0),
+      alignment: Alignment.centerLeft,
+      child: Container(
+        height: height,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(999),
+        ),
+      ),
+    );
+  }
+}
+
+class _SkeletonCircle extends StatelessWidget {
+  const _SkeletonCircle({required this.size, required this.color});
+
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
       ),
     );
   }
