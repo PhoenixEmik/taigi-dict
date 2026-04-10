@@ -357,6 +357,31 @@ class SenseSection extends StatelessWidget {
               );
             }),
           ],
+          if (sense.definitionSynonyms.isNotEmpty ||
+              sense.definitionAntonyms.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Divider(
+              height: 1,
+              thickness: 0.5,
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.7),
+            ),
+            const SizedBox(height: 12),
+            if (sense.definitionSynonyms.isNotEmpty)
+              MaterialRelationshipChipGroup(
+                label: AppLocalizations.of(context).synonymsLabel,
+                values: sense.definitionSynonyms,
+                onWordTapped: onWordTapped,
+              ),
+            if (sense.definitionSynonyms.isNotEmpty &&
+                sense.definitionAntonyms.isNotEmpty)
+              const SizedBox(height: 12),
+            if (sense.definitionAntonyms.isNotEmpty)
+              MaterialRelationshipChipGroup(
+                label: AppLocalizations.of(context).antonymsLabel,
+                values: sense.definitionAntonyms,
+                onWordTapped: onWordTapped,
+              ),
+          ],
         ],
       ),
     );
@@ -663,6 +688,82 @@ class RelationshipChip extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class MaterialRelationshipChipGroup extends StatelessWidget {
+  const MaterialRelationshipChipGroup({
+    super.key,
+    required this.label,
+    required this.values,
+    required this.onWordTapped,
+  });
+
+  final String label;
+  final List<String> values;
+  final Future<void> Function(String word) onWordTapped;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
+    final uniqueValues = values.toSet().toList(growable: false);
+    if (uniqueValues.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(
+            label,
+            textAlign: TextAlign.left,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        Wrap(
+          alignment: WrapAlignment.start,
+          spacing: 8,
+          runSpacing: 8,
+          children: uniqueValues
+              .map((value) {
+                return Semantics(
+                  button: true,
+                  label: value,
+                  onTapHint: l10n.searchThisWordHint,
+                  child: ExcludeSemantics(
+                    child: ActionChip(
+                      label: Text(value),
+                      onPressed: () {
+                        unawaited(onWordTapped(value));
+                      },
+                      backgroundColor: colorScheme.surfaceContainerHighest,
+                      surfaceTintColor: Colors.transparent,
+                      side: BorderSide(
+                        color: colorScheme.outlineVariant.withValues(
+                          alpha: 0.75,
+                        ),
+                      ),
+                      labelStyle: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                );
+              })
+              .toList(growable: false),
+        ),
+      ],
     );
   }
 }
