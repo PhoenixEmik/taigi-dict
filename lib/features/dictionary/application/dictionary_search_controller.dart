@@ -1,20 +1,27 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:hokkien_dictionary/core/localization/app_localizations.dart';
+import 'package:hokkien_dictionary/core/translation/chinese_translation_service.dart';
 import 'package:hokkien_dictionary/features/dictionary/data/dictionary_repository.dart';
 import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
 import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_search_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DictionarySearchController extends ChangeNotifier {
-  DictionarySearchController({required DictionaryRepository repository})
-    : _repository = repository;
+  DictionarySearchController({
+    required DictionaryRepository repository,
+    ChineseTranslationService? translationService,
+  }) : _repository = repository,
+       _translationService =
+           translationService ?? ChineseTranslationService.instance;
 
   static const _searchHistoryKey = 'recent_search_history';
   static const _maxSearchHistoryItems = 10;
   static const _searchDebounceDuration = Duration(milliseconds: 300);
 
   final DictionaryRepository _repository;
+  final ChineseTranslationService _translationService;
   final TextEditingController searchController = TextEditingController();
 
   late final Future<DictionaryBundle> bundleFuture;
@@ -28,11 +35,24 @@ class DictionarySearchController extends ChangeNotifier {
   Timer? _searchDebounceTimer;
   bool _initialized = false;
   bool _disposed = false;
+  Locale _displayLocale = AppLocalizations.traditionalChineseLocale;
 
   List<DictionaryEntry> get filteredResults => _filteredResults;
   List<String> get searchHistory => _searchHistory;
   String get normalizedQuery => _normalizedQuery;
   bool get isSearching => _isSearching;
+
+  void updateDisplayLocale(Locale locale) {
+    final resolved = AppLocalizations.resolveLocale(locale);
+    if (_displayLocale == resolved) {
+      return;
+    }
+
+    _displayLocale = resolved;
+    if (_bundle != null) {
+      unawaited(_applySearchQuery(forceRefresh: true));
+    }
+  }
 
   void initialize() {
     if (_initialized) {
@@ -105,7 +125,10 @@ class DictionarySearchController extends ChangeNotifier {
     await applySearchQueryImmediately(saveHistoryIfValid: true);
   }
 
-  Future<void> _applySearchQuery({bool saveHistoryIfValid = false}) async {
+  Future<void> _applySearchQuery({
+    bool saveHistoryIfValid = false,
+    bool forceRefresh = false,
+  }) async {
     final bundle = _bundle;
     if (bundle == null) {
       return;
@@ -113,7 +136,11 @@ class DictionarySearchController extends ChangeNotifier {
 
     final rawQuery = searchController.text;
     final trimmedQuery = rawQuery.trim();
-    final normalizedQuery = normalizeQuery(rawQuery);
+    final convertedQuery = await _translationService.normalizeSearchInput(
+      trimmedQuery,
+      locale: _displayLocale,
+    );
+    final normalizedQuery = normalizeQuery(convertedQuery);
     final requestId = ++_searchRequestId;
 
     if (normalizedQuery.isEmpty) {
@@ -130,7 +157,9 @@ class DictionarySearchController extends ChangeNotifier {
       return;
     }
 
-    if (_normalizedQuery == normalizedQuery && _isSearching == false) {
+    if (!forceRefresh &&
+        _normalizedQuery == normalizedQuery &&
+        _isSearching == false) {
       if (saveHistoryIfValid && _filteredResults.isNotEmpty) {
         await _saveSearchHistory(trimmedQuery);
       }
@@ -143,7 +172,11 @@ class DictionarySearchController extends ChangeNotifier {
 
     late final List<DictionaryEntry> filteredResults;
     try {
-      filteredResults = await _repository.searchAsync(bundle, normalizedQuery);
+      final results = await _repository.searchAsync(bundle, normalizedQuery);
+      filteredResults = await _translationService.translateEntriesForDisplay(
+        results,
+        locale: _displayLocale,
+      );
     } catch (_) {
       if (_disposed || requestId != _searchRequestId) {
         return;
@@ -156,7 +189,7 @@ class DictionarySearchController extends ChangeNotifier {
 
     if (_disposed ||
         requestId != _searchRequestId ||
-        normalizeQuery(searchController.text) != normalizedQuery) {
+        searchController.text.trim() != trimmedQuery) {
       return;
     }
 

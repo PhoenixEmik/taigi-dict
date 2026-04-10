@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hokkien_dictionary/core/localization/app_localizations.dart';
@@ -357,8 +359,69 @@ class SearchLoadingState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isApplePlatform(context)) {
-      return const Center(child: CircularProgressIndicator.adaptive());
+      return TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.35, end: 0.85),
+        duration: const Duration(milliseconds: 900),
+        curve: Curves.easeInOut,
+        builder: (context, opacity, child) {
+          return Column(
+            children: List.generate(3, (index) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Opacity(
+                  opacity: index.isEven ? opacity : 1 - (opacity * 0.35),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(28),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                      child: Container(
+                        height: 92,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.06),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            width: 0.5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          );
+        },
+      );
     }
-    return const Center(child: CircularProgressIndicator());
+
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.35, end: 0.85),
+      duration: const Duration(milliseconds: 900),
+      curve: Curves.easeInOut,
+      builder: (context, opacity, child) {
+        return Column(
+          children: List.generate(3, (index) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Opacity(
+                opacity: index.isEven ? opacity : 1 - (opacity * 0.35),
+                child: Card(
+                  child: Container(
+                    height: 92,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      color: colorScheme.surface,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+        );
+      },
+    );
   }
 }

@@ -7,6 +7,7 @@ import 'package:hokkien_dictionary/app/theme/app_theme.dart';
 import 'package:hokkien_dictionary/core/localization/app_localizations.dart';
 import 'package:hokkien_dictionary/core/localization/locale_provider.dart';
 import 'package:hokkien_dictionary/core/preferences/app_preferences.dart';
+import 'package:hokkien_dictionary/core/translation/chinese_translation_service.dart';
 
 class HokkienDictionaryApp extends StatefulWidget {
   const HokkienDictionaryApp({super.key});
@@ -24,6 +25,7 @@ class _HokkienDictionaryAppState extends State<HokkienDictionaryApp> {
     super.initState();
     unawaited(_appPreferences.initialize());
     unawaited(_localeProvider.initialize());
+    unawaited(ChineseTranslationService.instance.initialize());
   }
 
   @override

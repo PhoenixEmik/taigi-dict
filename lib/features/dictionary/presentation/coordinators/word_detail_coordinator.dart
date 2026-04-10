@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hokkien_dictionary/core/localization/app_localizations.dart';
+import 'package:hokkien_dictionary/core/translation/chinese_translation_service.dart';
 import 'package:hokkien_dictionary/features/bookmarks/application/bookmark_store.dart';
 import 'package:hokkien_dictionary/features/dictionary/data/dictionary_repository.dart';
 import 'package:hokkien_dictionary/features/dictionary/domain/dictionary_models.dart';
@@ -29,6 +30,25 @@ class WordDetailCoordinator {
     required BookmarkStore bookmarkStore,
     required ValueChanged<AudioActionResult> onActionResult,
   }) async {
+    final resolvedLocale = AppLocalizations.resolveLocale(
+      Localizations.localeOf(context),
+    );
+    final translationService = ChineseTranslationService.instance;
+    final sourceEntry = bundle.entries
+        .where((candidate) {
+          return candidate.id == entry.id;
+        })
+        .fold<DictionaryEntry?>(null, (previous, candidate) {
+          return previous ?? candidate;
+        });
+    final localizedEntry = await translationService.translateEntryForDisplay(
+      sourceEntry ?? entry,
+      locale: resolvedLocale,
+    );
+    if (!context.mounted) {
+      return;
+    }
+
     Future<void> onPlayClip(AudioArchiveType type, String clipId) {
       return playClip(
         audioLibrary: audioLibrary,
@@ -40,7 +60,15 @@ class WordDetailCoordinator {
     }
 
     Future<void> onWordTapped(String word) async {
-      final linkedEntry = repository.findLinkedEntry(bundle, word);
+      final normalizedLookupWord = await translationService
+          .normalizeSearchInput(word, locale: resolvedLocale);
+      if (!context.mounted) {
+        return;
+      }
+      final linkedEntry = repository.findLinkedEntry(
+        bundle,
+        normalizedLookupWord,
+      );
       if (linkedEntry == null) {
         final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(
@@ -63,7 +91,7 @@ class WordDetailCoordinator {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (context) => WordDetailScreen(
-          entry: entry,
+          entry: localizedEntry,
           audioLibrary: audioLibrary,
           bookmarkStore: bookmarkStore,
           onPlayClip: onPlayClip,

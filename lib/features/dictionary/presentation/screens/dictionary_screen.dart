@@ -32,6 +32,7 @@ class DictionaryScreen extends StatefulWidget {
 
 class _DictionaryScreenState extends State<DictionaryScreen> {
   late final DictionarySearchController _searchController;
+  Locale? _lastResolvedLocale;
 
   @override
   void initState() {
@@ -39,6 +40,19 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
     _searchController = DictionarySearchController(
       repository: widget.repository,
     )..initialize();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final resolvedLocale = AppLocalizations.resolveLocale(
+      Localizations.localeOf(context),
+    );
+    if (_lastResolvedLocale == resolvedLocale) {
+      return;
+    }
+    _lastResolvedLocale = resolvedLocale;
+    _searchController.updateDisplayLocale(resolvedLocale);
   }
 
   @override
