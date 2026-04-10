@@ -82,103 +82,117 @@ class SearchHistorySection extends StatelessWidget {
       return LiquidGlassSection(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(18, 16, 14, 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    l10n.searchHistory,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: resolveLiquidGlassForeground(context),
-                    ),
-                  ),
-                ),
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  minimumSize: const Size(28, 28),
-                  onPressed: onClearHistory,
-                  child: Icon(
-                    CupertinoIcons.delete_simple,
-                    color: resolveLiquidGlassTint(context),
-                    size: 20,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 0, 18, 16),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: history
-                  .map((query) {
-                    return Semantics(
-                      button: true,
-                      label: '${l10n.searchHistory} $query',
-                      hint: l10n.searchHint,
-                      child: CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        onPressed: () => onHistoryTap(query),
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: resolveLiquidGlassSecondaryTint(
-                              context,
-                            ).withValues(alpha: 0.86),
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.08),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 22,
-                                  height: 22,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        resolveAdaptiveCircleButtonBackground(
-                                          context,
-                                        ),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Center(
-                                    child: Icon(
-                                      CupertinoIcons.time,
-                                      size: 14,
-                                      color:
-                                          resolveAdaptiveCircleButtonIconColor(
-                                            context,
-                                          ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  query,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: resolveLiquidGlassForeground(
-                                      context,
-                                    ),
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l10n.searchHistory,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: resolveLiquidGlassForeground(context),
                           ),
                         ),
                       ),
-                    );
-                  })
-                  .toList(growable: false),
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(28, 28),
+                        onPressed: onClearHistory,
+                        child: Icon(
+                          CupertinoIcons.delete_simple,
+                          color: resolveLiquidGlassTint(context),
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Wrap(
+                      alignment: WrapAlignment.start,
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: history
+                          .map((query) {
+                            return Semantics(
+                              button: true,
+                              label: '${l10n.searchHistory} $query',
+                              hint: l10n.searchHint,
+                              child: CupertinoButton(
+                                padding: EdgeInsets.zero,
+                                minimumSize: Size.zero,
+                                onPressed: () => onHistoryTap(query),
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: resolveLiquidGlassSecondaryTint(
+                                      context,
+                                    ).withValues(alpha: 0.86),
+                                    borderRadius: BorderRadius.circular(999),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.08,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          width: 22,
+                                          height: 22,
+                                          decoration: BoxDecoration(
+                                            color:
+                                                resolveAdaptiveCircleButtonBackground(
+                                                  context,
+                                                ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Center(
+                                            child: Icon(
+                                              CupertinoIcons.time,
+                                              size: 14,
+                                              color:
+                                                  resolveAdaptiveCircleButtonIconColor(
+                                                    context,
+                                                  ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          query,
+                                          style: theme.textTheme.bodyMedium
+                                              ?.copyWith(
+                                                color:
+                                                    resolveLiquidGlassForeground(
+                                                      context,
+                                                    ),
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          })
+                          .toList(growable: false),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
