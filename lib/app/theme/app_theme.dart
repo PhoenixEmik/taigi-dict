@@ -1,64 +1,88 @@
 import 'package:flutter/material.dart';
 
-ThemeData buildLightAppTheme() {
-  const canvas = Color(0xFFF2F2F7);
+ThemeData buildLightAppTheme({required bool applePlatform}) {
+  const iosCanvas = Color(0xFFF2F2F7);
+  const iosDeepInk = Color(0xFF111111);
+  const iosPrimary = Color(0xFF007AFF);
+  const iosTertiary = Color(0xFFFF9F0A);
+  const iosOutline = Color(0xFFD1D1D6);
+  const iosMutedText = Color(0xFF8E8E93);
+
+  const androidCanvas = Color(0xFFF7F1E7);
   const surface = Color(0xFFFFFFFF);
-  const deepInk = Color(0xFF111111);
-  const primary = Color(0xFF007AFF);
-  const tertiary = Color(0xFFFF9F0A);
-  const outline = Color(0xFFD1D1D6);
-  const mutedText = Color(0xFF8E8E93);
+  const androidDeepInk = Color(0xFF0E2F35);
+  const androidPrimary = Color(0xFF17454C);
+  const androidTertiary = Color(0xFFC9752D);
+  const androidOutline = Color(0xFFD7D0C4);
+  const androidMutedText = Color(0xFF5F6C70);
 
   return _buildAppTheme(
     brightness: Brightness.light,
-    seedColor: primary,
-    scaffoldBackgroundColor: canvas,
+    seedColor: applePlatform ? iosPrimary : androidPrimary,
+    scaffoldBackgroundColor: applePlatform ? iosCanvas : androidCanvas,
     surfaceColor: surface,
-    primaryColor: primary,
-    tertiaryColor: tertiary,
-    onSurfaceColor: deepInk,
-    onSurfaceVariantColor: mutedText,
-    outlineColor: outline,
-    mutedTextColor: mutedText,
-    surfaceContainerLow: const Color(0xFFFFFFFF),
+    primaryColor: applePlatform ? iosPrimary : androidPrimary,
+    tertiaryColor: applePlatform ? iosTertiary : androidTertiary,
+    onSurfaceColor: applePlatform ? iosDeepInk : androidDeepInk,
+    onSurfaceVariantColor: applePlatform ? iosMutedText : androidMutedText,
+    outlineColor: applePlatform ? iosOutline : androidOutline,
+    mutedTextColor: applePlatform ? iosMutedText : androidMutedText,
+    surfaceContainerLow: applePlatform
+        ? const Color(0xFFFFFFFF)
+        : const Color(0xFFFFFBF5),
     appBarBackgroundColor: Colors.transparent,
-    appBarForegroundColor: deepInk,
-    cardShadowColor: Colors.black.withValues(alpha: 0.03),
-    searchShadowColor: Colors.black.withValues(alpha: 0.04),
+    appBarForegroundColor: applePlatform ? iosDeepInk : androidDeepInk,
+    cardShadowColor: Colors.black.withValues(
+      alpha: applePlatform ? 0.03 : 0.08,
+    ),
+    searchShadowColor: Colors.black.withValues(
+      alpha: applePlatform ? 0.04 : 0.10,
+    ),
   );
 }
 
-ThemeData buildDarkAppTheme() {
-  const canvas = Color(0xFF101417);
-  const surface = Color(0xFF171C1F);
-  const primary = Color(0xFFBFE4EC);
-  const tertiary = Color(0xFFFFC56B);
-  const onSurface = Color(0xFFF3F7F8);
-  const outline = Color(0xFF314046);
-  const mutedText = Color(0xFFD2DDE0);
+ThemeData buildDarkAppTheme({required bool applePlatform}) {
+  const iosCanvas = Color(0xFF111214);
+  const iosSurface = Color(0xFF1C1C1E);
+  const iosPrimary = Color(0xFF8CCBFF);
+  const iosTertiary = Color(0xFFFFC56B);
+  const iosOnSurface = Color(0xFFF5F5F7);
+  const iosOutline = Color(0xFF3A3A3C);
+  const iosMutedText = Color(0xFFAEAEB2);
+
+  const androidCanvas = Color(0xFF101417);
+  const androidSurface = Color(0xFF171C1F);
+  const androidPrimary = Color(0xFFBFE4EC);
+  const androidTertiary = Color(0xFFFFC56B);
+  const androidOnSurface = Color(0xFFF3F7F8);
+  const androidOutline = Color(0xFF314046);
+  const androidMutedText = Color(0xFFD2DDE0);
 
   return _buildAppTheme(
     brightness: Brightness.dark,
-    seedColor: primary,
-    scaffoldBackgroundColor: canvas,
-    surfaceColor: surface,
-    primaryColor: primary,
-    tertiaryColor: tertiary,
-    onSurfaceColor: onSurface,
-    onSurfaceVariantColor: mutedText,
-    outlineColor: outline,
-    mutedTextColor: mutedText,
-    surfaceContainerLow: const Color(0xFF1D2529),
-    appBarBackgroundColor: surface,
-    appBarForegroundColor: onSurface,
+    seedColor: applePlatform ? iosPrimary : androidPrimary,
+    scaffoldBackgroundColor: applePlatform ? iosCanvas : androidCanvas,
+    surfaceColor: applePlatform ? iosSurface : androidSurface,
+    primaryColor: applePlatform ? iosPrimary : androidPrimary,
+    tertiaryColor: applePlatform ? iosTertiary : androidTertiary,
+    onSurfaceColor: applePlatform ? iosOnSurface : androidOnSurface,
+    onSurfaceVariantColor: applePlatform ? iosMutedText : androidMutedText,
+    outlineColor: applePlatform ? iosOutline : androidOutline,
+    mutedTextColor: applePlatform ? iosMutedText : androidMutedText,
+    surfaceContainerLow: applePlatform
+        ? const Color(0xFF242426)
+        : const Color(0xFF1D2529),
+    appBarBackgroundColor: applePlatform ? iosSurface : androidSurface,
+    appBarForegroundColor: applePlatform ? iosOnSurface : androidOnSurface,
     cardShadowColor: Colors.black.withValues(alpha: 0.24),
     searchShadowColor: Colors.black.withValues(alpha: 0.28),
   );
 }
 
-ThemeData buildAmoledAppTheme() {
+ThemeData buildAmoledAppTheme({required bool applePlatform}) {
   const black = Color(0xFF000000);
-  const primary = Color(0xFFA9D8FF);
+  const iosPrimary = Color(0xFF8CCBFF);
+  const androidPrimary = Color(0xFFA9D8FF);
   const tertiary = Color(0xFFFFC777);
   const onSurface = Color(0xFFF9F9F9);
   const outline = Color(0xFF2C2C2C);
@@ -66,10 +90,10 @@ ThemeData buildAmoledAppTheme() {
 
   return _buildAppTheme(
     brightness: Brightness.dark,
-    seedColor: primary,
+    seedColor: applePlatform ? iosPrimary : androidPrimary,
     scaffoldBackgroundColor: black,
     surfaceColor: black,
-    primaryColor: primary,
+    primaryColor: applePlatform ? iosPrimary : androidPrimary,
     tertiaryColor: tertiary,
     onSurfaceColor: onSurface,
     onSurfaceVariantColor: mutedText,

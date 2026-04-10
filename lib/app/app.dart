@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hokkien_dictionary/app/shell/main_shell.dart';
 import 'package:hokkien_dictionary/app/theme/app_theme.dart';
@@ -41,6 +42,10 @@ class _HokkienDictionaryAppState extends State<HokkienDictionaryApp> {
         child: ListenableBuilder(
           listenable: Listenable.merge([_appPreferences, _localeProvider]),
           builder: (context, child) {
+            final applePlatform =
+                !kIsWeb &&
+                (defaultTargetPlatform == TargetPlatform.iOS ||
+                    defaultTargetPlatform == TargetPlatform.macOS);
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               onGenerateTitle: (context) =>
@@ -49,10 +54,10 @@ class _HokkienDictionaryAppState extends State<HokkienDictionaryApp> {
               supportedLocales: AppLocalizations.supportedLocales,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               localeListResolutionCallback: AppLocalizations.resolveLocaleList,
-              theme: buildLightAppTheme(),
+              theme: buildLightAppTheme(applePlatform: applePlatform),
               darkTheme: _appPreferences.useAmoledTheme
-                  ? buildAmoledAppTheme()
-                  : buildDarkAppTheme(),
+                  ? buildAmoledAppTheme(applePlatform: applePlatform)
+                  : buildDarkAppTheme(applePlatform: applePlatform),
               themeMode: _appPreferences.materialThemeMode,
               home: child,
             );
