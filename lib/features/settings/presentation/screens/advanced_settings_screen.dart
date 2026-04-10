@@ -128,8 +128,34 @@ class AdvancedSettingsScreen extends StatelessWidget {
       ),
     ];
 
+    final body = Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 720),
+        child: ListTileTheme(
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: applePlatform ? 20 : 24,
+          ),
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(16, applePlatform ? 12 : 8, 16, 28),
+            children: [
+              SettingsSectionHeader(title: l10n.advancedSettings),
+              applePlatform
+                  ? _GlassSettingsGroup(
+                      settings: _sectionSettings(context),
+                      children: sectionChildren,
+                    )
+                  : Card(child: Column(children: sectionChildren)),
+            ],
+          ),
+        ),
+      ),
+    );
+
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: applePlatform
+          ? Colors.transparent
+          : Theme.of(context).scaffoldBackgroundColor,
       appBar: applePlatform
           ? glass.GlassAppBar(
               useOwnLayer: true,
@@ -153,36 +179,7 @@ class AdvancedSettingsScreen extends StatelessWidget {
               ),
             )
           : AppBar(title: Text(l10n.advancedSettings)),
-      body: LiquidGlassBackground(
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
-            child: ListTileTheme(
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: applePlatform ? 20 : 24,
-              ),
-              child: ListView(
-                padding: EdgeInsets.fromLTRB(
-                  16,
-                  applePlatform ? 12 : 8,
-                  16,
-                  28,
-                ),
-                children: [
-                  SettingsSectionHeader(title: l10n.advancedSettings),
-                  applePlatform
-                      ? _GlassSettingsGroup(
-                          settings: _sectionSettings(context),
-                          children: sectionChildren,
-                        )
-                      : Column(children: sectionChildren),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+      body: applePlatform ? LiquidGlassBackground(child: body) : body,
     );
   }
 }
