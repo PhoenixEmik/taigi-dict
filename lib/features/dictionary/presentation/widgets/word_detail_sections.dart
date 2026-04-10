@@ -64,6 +64,27 @@ class WordDetailHeader extends StatelessWidget {
                 ),
               ),
             ),
+          if (entry.alternativePronunciations.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            _PronunciationNoteLine(
+              label: l10n.alternativePronunciationLabel,
+              values: entry.alternativePronunciations,
+            ),
+          ],
+          if (entry.contractedPronunciations.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            _PronunciationNoteLine(
+              label: l10n.contractedPronunciationLabel,
+              values: entry.contractedPronunciations,
+            ),
+          ],
+          if (entry.colloquialPronunciations.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            _PronunciationNoteLine(
+              label: l10n.colloquialPronunciationLabel,
+              values: entry.colloquialPronunciations,
+            ),
+          ],
           if (subtitle.isNotEmpty) ...[
             const SizedBox(height: 10),
             Text(
@@ -581,6 +602,92 @@ class RelationshipChip extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class DetailNoteCard extends StatelessWidget {
+  const DetailNoteCard({super.key, required this.title, required this.lines});
+
+  final String title;
+  final List<String> lines;
+
+  @override
+  Widget build(BuildContext context) {
+    if (lines.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final theme = Theme.of(context);
+    final applePlatform = isApplePlatform(context);
+    final content = Padding(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            textAlign: TextAlign.left,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+              color: applePlatform
+                  ? resolveLiquidGlassForeground(context)
+                  : theme.colorScheme.onSurface,
+            ),
+          ),
+          const SizedBox(height: 10),
+          ...lines.map((line) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(
+                line,
+                textAlign: TextAlign.left,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  height: 1.55,
+                  color: applePlatform
+                      ? resolveLiquidGlassSecondaryForeground(context)
+                      : theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+
+    if (applePlatform) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: LiquidGlassSection(children: [content]),
+      );
+    }
+
+    return Card(margin: const EdgeInsets.only(bottom: 16), child: content);
+  }
+}
+
+class _PronunciationNoteLine extends StatelessWidget {
+  const _PronunciationNoteLine({required this.label, required this.values});
+
+  final String label;
+  final List<String> values;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final mutedColor = isApplePlatform(context)
+        ? resolveLiquidGlassSecondaryForeground(context)
+        : theme.colorScheme.onSurfaceVariant;
+    final text = '$label：${values.join('、')}';
+
+    return Text(
+      text,
+      textAlign: TextAlign.left,
+      style: theme.textTheme.bodyMedium?.copyWith(
+        color: mutedColor,
+        height: 1.45,
+        fontWeight: FontWeight.w600,
       ),
     );
   }

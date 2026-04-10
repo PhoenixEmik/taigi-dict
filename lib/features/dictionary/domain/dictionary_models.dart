@@ -38,6 +38,11 @@ class DictionaryEntry {
     this.variantChars = const [],
     this.wordSynonyms = const [],
     this.wordAntonyms = const [],
+    this.alternativePronunciations = const [],
+    this.contractedPronunciations = const [],
+    this.colloquialPronunciations = const [],
+    this.phoneticDifferences = const [],
+    this.vocabularyComparisons = const [],
     required this.senses,
   });
 
@@ -58,6 +63,17 @@ class DictionaryEntry {
       variantChars: _stringListFromJson(json['variantChars']),
       wordSynonyms: _stringListFromJson(json['wordSynonyms']),
       wordAntonyms: _stringListFromJson(json['wordAntonyms']),
+      alternativePronunciations: _stringListFromJson(
+        json['alternativePronunciations'],
+      ),
+      contractedPronunciations: _stringListFromJson(
+        json['contractedPronunciations'],
+      ),
+      colloquialPronunciations: _stringListFromJson(
+        json['colloquialPronunciations'],
+      ),
+      phoneticDifferences: _stringListFromJson(json['phoneticDifferences']),
+      vocabularyComparisons: _stringListFromJson(json['vocabularyComparisons']),
       senses: senses,
     );
   }
@@ -73,6 +89,11 @@ class DictionaryEntry {
   final List<String> variantChars;
   final List<String> wordSynonyms;
   final List<String> wordAntonyms;
+  final List<String> alternativePronunciations;
+  final List<String> contractedPronunciations;
+  final List<String> colloquialPronunciations;
+  final List<String> phoneticDifferences;
+  final List<String> vocabularyComparisons;
   final List<DictionarySense> senses;
 
   String get briefSummary {

@@ -286,6 +286,16 @@ class _WordDetailContent extends StatelessWidget {
             textScale: readingTextScale,
           );
         }),
+        if (entry.phoneticDifferences.isNotEmpty)
+          DetailNoteCard(
+            title: AppLocalizations.of(context).phoneticDifferencesLabel,
+            lines: entry.phoneticDifferences,
+          ),
+        if (entry.vocabularyComparisons.isNotEmpty)
+          DetailNoteCard(
+            title: AppLocalizations.of(context).vocabularyComparisonLabel,
+            lines: entry.vocabularyComparisons,
+          ),
       ],
     );
   }

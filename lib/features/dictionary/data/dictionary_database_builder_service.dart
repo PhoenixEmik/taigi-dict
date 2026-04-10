@@ -24,6 +24,11 @@ const _senseToWordSynonymSheet = '義項tuì詞目近義';
 const _senseToWordAntonymSheet = '義項tuì詞目反義';
 const _wordToWordSynonymSheet = '詞目tuì詞目近義';
 const _wordToWordAntonymSheet = '詞目tuì詞目反義';
+const _alternativePronunciationSheet = '又唸作';
+const _contractedPronunciationSheet = '合音唸作';
+const _colloquialPronunciationSheet = '俗唸作';
+const _phoneticDifferencesSheet = '語音差異';
+const _vocabularyComparisonSheet = '詞彙比較';
 
 class MissingDictionarySourceException implements Exception {
   const MissingDictionarySourceException({required this.path});
@@ -423,6 +428,21 @@ class DictionaryDatabaseBuilderService {
               variantChars: _decodeStoredStringList(row['variant_chars']),
               wordSynonyms: _decodeStoredStringList(row['word_synonyms']),
               wordAntonyms: _decodeStoredStringList(row['word_antonyms']),
+              alternativePronunciations: _decodeStoredStringList(
+                row['alternative_pronunciations'],
+              ),
+              contractedPronunciations: _decodeStoredStringList(
+                row['contracted_pronunciations'],
+              ),
+              colloquialPronunciations: _decodeStoredStringList(
+                row['colloquial_pronunciations'],
+              ),
+              phoneticDifferences: _decodeStoredStringList(
+                row['phonetic_differences'],
+              ),
+              vocabularyComparisons: _decodeStoredStringList(
+                row['vocabulary_comparisons'],
+              ),
               senses: sensesByEntry[row['id'] as int] ?? const [],
             ),
           )
@@ -492,6 +512,11 @@ class DictionaryDatabaseBuilderService {
         variant_chars TEXT NOT NULL,
         word_synonyms TEXT NOT NULL,
         word_antonyms TEXT NOT NULL,
+        alternative_pronunciations TEXT NOT NULL,
+        contracted_pronunciations TEXT NOT NULL,
+        colloquial_pronunciations TEXT NOT NULL,
+        phonetic_differences TEXT NOT NULL,
+        vocabulary_comparisons TEXT NOT NULL,
         hokkien_search TEXT NOT NULL,
         mandarin_search TEXT NOT NULL
       )
@@ -566,6 +591,11 @@ class DictionaryDatabaseBuilderService {
     return entryColumnNames.contains('variant_chars') &&
         entryColumnNames.contains('word_synonyms') &&
         entryColumnNames.contains('word_antonyms') &&
+        entryColumnNames.contains('alternative_pronunciations') &&
+        entryColumnNames.contains('contracted_pronunciations') &&
+        entryColumnNames.contains('colloquial_pronunciations') &&
+        entryColumnNames.contains('phonetic_differences') &&
+        entryColumnNames.contains('vocabulary_comparisons') &&
         senseColumnNames.contains('definition_synonyms') &&
         senseColumnNames.contains('definition_antonyms');
   }
@@ -635,6 +665,26 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
       workbook,
       _wordToWordAntonymSheet,
     );
+    final alternativePronunciationTable = _optionalSheet(
+      workbook,
+      _alternativePronunciationSheet,
+    );
+    final contractedPronunciationTable = _optionalSheet(
+      workbook,
+      _contractedPronunciationSheet,
+    );
+    final colloquialPronunciationTable = _optionalSheet(
+      workbook,
+      _colloquialPronunciationSheet,
+    );
+    final phoneticDifferencesTable = _optionalSheet(
+      workbook,
+      _phoneticDifferencesSheet,
+    );
+    final vocabularyComparisonTable = _optionalSheet(
+      workbook,
+      _vocabularyComparisonSheet,
+    );
 
     final totalRows =
         _dataRowCount(headwordTable) +
@@ -646,7 +696,12 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
         _dataRowCount(senseToWordSynonymTable) +
         _dataRowCount(senseToWordAntonymTable) +
         _dataRowCount(wordToWordSynonymTable) +
-        _dataRowCount(wordToWordAntonymTable);
+        _dataRowCount(wordToWordAntonymTable) +
+        _dataRowCount(alternativePronunciationTable) +
+        _dataRowCount(contractedPronunciationTable) +
+        _dataRowCount(colloquialPronunciationTable) +
+        _dataRowCount(phoneticDifferencesTable) +
+        _dataRowCount(vocabularyComparisonTable);
 
     final headwordHeaders = _headersForRows(headwordTable.rows);
     final senseHeaders = _headersForRows(senseTable.rows);
@@ -670,6 +725,21 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
     final wordToWordAntonymHeaders = _headersForRows(
       wordToWordAntonymTable.rows,
     );
+    final alternativePronunciationHeaders = _headersForRows(
+      alternativePronunciationTable.rows,
+    );
+    final contractedPronunciationHeaders = _headersForRows(
+      contractedPronunciationTable.rows,
+    );
+    final colloquialPronunciationHeaders = _headersForRows(
+      colloquialPronunciationTable.rows,
+    );
+    final phoneticDifferencesHeaders = _headersForRows(
+      phoneticDifferencesTable.rows,
+    );
+    final vocabularyComparisonHeaders = _headersForRows(
+      vocabularyComparisonTable.rows,
+    );
 
     var processedRows = 0;
     final entryRowsById = <int, Map<String, Object?>>{};
@@ -677,9 +747,15 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
     final variantCharsByEntryId = <int, Set<String>>{};
     final wordSynonymsByEntryId = <int, Set<String>>{};
     final wordAntonymsByEntryId = <int, Set<String>>{};
+    final alternativePronunciationsByEntryId = <int, Set<String>>{};
+    final contractedPronunciationsByEntryId = <int, Set<String>>{};
+    final colloquialPronunciationsByEntryId = <int, Set<String>>{};
+    final phoneticDifferencesByEntryId = <int, List<String>>{};
+    final vocabularyComparisonsByEntryId = <int, List<String>>{};
     final definitionSynonymsBySenseId = <int, Set<String>>{};
     final definitionAntonymsBySenseId = <int, Set<String>>{};
     final entryIdBySenseId = <int, int>{};
+    final entryIdsByHanji = <String, Set<int>>{};
 
     void sendProgress() {
       sendPort.send({
@@ -711,7 +787,16 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
           'variant_chars': '[]',
           'word_synonyms': '[]',
           'word_antonyms': '[]',
+          'alternative_pronunciations': '[]',
+          'contracted_pronunciations': '[]',
+          'colloquial_pronunciations': '[]',
+          'phonetic_differences': '[]',
+          'vocabulary_comparisons': '[]',
         };
+        final hanji = record['漢字'] ?? '';
+        if (hanji.isNotEmpty) {
+          entryIdsByHanji.putIfAbsent(hanji, () => <int>{}).add(headwordId);
+        }
       }
 
       if (processedRows % _progressUpdateInterval == 0) {
@@ -936,6 +1021,119 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
       target: wordAntonymsByEntryId,
     );
 
+    void collectPronunciations({
+      required SpreadsheetTable table,
+      required List<String> headers,
+      required Map<int, Set<String>> target,
+    }) {
+      for (final row in table.rows.skip(1)) {
+        processedRows++;
+        final record = _recordForRow(headers, row);
+        if (record.isEmpty) {
+          if (processedRows % _progressUpdateInterval == 0) {
+            sendProgress();
+          }
+          continue;
+        }
+
+        final entryId = _parseInt(record['詞目id']);
+        final romanization = record['羅馬字'] ?? '';
+        if (entryId != null &&
+            romanization.isNotEmpty &&
+            entryRowsById.containsKey(entryId)) {
+          for (final value in _splitSlashSeparatedValues(romanization)) {
+            target.putIfAbsent(entryId, () => <String>{}).add(value);
+          }
+        }
+
+        if (processedRows % _progressUpdateInterval == 0) {
+          sendProgress();
+        }
+      }
+    }
+
+    collectPronunciations(
+      table: alternativePronunciationTable,
+      headers: alternativePronunciationHeaders,
+      target: alternativePronunciationsByEntryId,
+    );
+    collectPronunciations(
+      table: contractedPronunciationTable,
+      headers: contractedPronunciationHeaders,
+      target: contractedPronunciationsByEntryId,
+    );
+    collectPronunciations(
+      table: colloquialPronunciationTable,
+      headers: colloquialPronunciationHeaders,
+      target: colloquialPronunciationsByEntryId,
+    );
+
+    for (final row in phoneticDifferencesTable.rows.skip(1)) {
+      processedRows++;
+      final record = _recordForRow(phoneticDifferencesHeaders, row);
+      if (record.isEmpty) {
+        if (processedRows % _progressUpdateInterval == 0) {
+          sendProgress();
+        }
+        continue;
+      }
+
+      final entryId = _parseInt(record['詞目id']);
+      if (entryId != null && entryRowsById.containsKey(entryId)) {
+        final notes = <String>[];
+        for (final header in phoneticDifferencesHeaders.skip(2)) {
+          final value = record[header] ?? '';
+          if (header.isNotEmpty && value.isNotEmpty) {
+            notes.add('$header：$value');
+          }
+        }
+        if (notes.isNotEmpty) {
+          phoneticDifferencesByEntryId[entryId] = notes;
+        }
+      }
+
+      if (processedRows % _progressUpdateInterval == 0) {
+        sendProgress();
+      }
+    }
+
+    for (final row in vocabularyComparisonTable.rows.skip(1)) {
+      processedRows++;
+      final record = _recordForRow(vocabularyComparisonHeaders, row);
+      if (record.isEmpty) {
+        if (processedRows % _progressUpdateInterval == 0) {
+          sendProgress();
+        }
+        continue;
+      }
+
+      final hanji = record['漢字'] ?? '';
+      final mandarin = record['華語詞目'] ?? '';
+      final dialect = record['腔'] ?? '';
+      final romanization = record['羅馬字'] ?? '';
+      final entryIds = entryIdsByHanji[hanji];
+      if (entryIds != null && hanji.isNotEmpty) {
+        final summary = [
+          if (mandarin.isNotEmpty) mandarin,
+          if (dialect.isNotEmpty) dialect,
+        ].join('／');
+        final line = [
+          if (summary.isNotEmpty) '$summary：',
+          hanji,
+          if (romanization.isNotEmpty) '（$romanization）',
+        ].join();
+        for (final entryId in entryIds) {
+          vocabularyComparisonsByEntryId
+              .putIfAbsent(entryId, () => <String>[])
+              .add(line);
+        }
+      }
+
+      if (processedRows % _progressUpdateInterval == 0) {
+        sendProgress();
+      }
+    }
+
     final senseChunk = <Map<String, Object?>>[];
     final sortedSenseKeys = senseRowsByKey.keys.toList()
       ..sort((a, b) {
@@ -983,12 +1181,30 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
       final variantChars = _sortedStringList(variantCharsByEntryId[entryId]);
       final wordSynonyms = _sortedStringList(wordSynonymsByEntryId[entryId]);
       final wordAntonyms = _sortedStringList(wordAntonymsByEntryId[entryId]);
+      final alternativePronunciations = _sortedStringList(
+        alternativePronunciationsByEntryId[entryId],
+      );
+      final contractedPronunciations = _sortedStringList(
+        contractedPronunciationsByEntryId[entryId],
+      );
+      final colloquialPronunciations = _sortedStringList(
+        colloquialPronunciationsByEntryId[entryId],
+      );
+      final phoneticDifferences = _dedupePreservingOrder(
+        phoneticDifferencesByEntryId[entryId],
+      );
+      final vocabularyComparisons = _dedupePreservingOrder(
+        vocabularyComparisonsByEntryId[entryId],
+      );
       final hokkienSearch = normalizeQuery(
         [
           row['hanji'] ?? '',
           row['romanization'] ?? '',
           row['category'] ?? '',
           ...variantChars,
+          ...alternativePronunciations,
+          ...contractedPronunciations,
+          ...colloquialPronunciations,
         ].join(' '),
       );
       final mandarinSearch = normalizeQuery(
@@ -999,6 +1215,11 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
         'variant_chars': jsonEncode(variantChars),
         'word_synonyms': jsonEncode(wordSynonyms),
         'word_antonyms': jsonEncode(wordAntonyms),
+        'alternative_pronunciations': jsonEncode(alternativePronunciations),
+        'contracted_pronunciations': jsonEncode(contractedPronunciations),
+        'colloquial_pronunciations': jsonEncode(colloquialPronunciations),
+        'phonetic_differences': jsonEncode(phoneticDifferences),
+        'vocabulary_comparisons': jsonEncode(vocabularyComparisons),
         'hokkien_search': hokkienSearch,
         'mandarin_search': mandarinSearch,
       });
@@ -1156,4 +1377,28 @@ List<String> _sortedStringList(Set<String>? values) {
           .toList(growable: false)
         ..sort();
   return sorted;
+}
+
+List<String> _splitSlashSeparatedValues(String value) {
+  return value
+      .split('/')
+      .map((part) => part.trim())
+      .where((part) => part.isNotEmpty)
+      .toList(growable: false);
+}
+
+List<String> _dedupePreservingOrder(List<String>? values) {
+  if (values == null || values.isEmpty) {
+    return const [];
+  }
+  final seen = <String>{};
+  final result = <String>[];
+  for (final value in values) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty || !seen.add(trimmed)) {
+      continue;
+    }
+    result.add(trimmed);
+  }
+  return result;
 }

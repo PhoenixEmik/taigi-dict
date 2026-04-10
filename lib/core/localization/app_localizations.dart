@@ -715,6 +715,21 @@ class AppLocalizations {
 
   String get antonymsLabel => _selectText('Antonyms', '反义', '反義');
 
+  String get alternativePronunciationLabel =>
+      _selectText('Alternative Pronunciation', '又唸作', '又唸作');
+
+  String get contractedPronunciationLabel =>
+      _selectText('Contracted Pronunciation', '合音唸作', '合音唸作');
+
+  String get colloquialPronunciationLabel =>
+      _selectText('Colloquial Pronunciation', '俗唸作', '俗唸作');
+
+  String get phoneticDifferencesLabel =>
+      _selectText('Phonetic Differences', '语音差异', '語音差異');
+
+  String get vocabularyComparisonLabel =>
+      _selectText('Vocabulary Comparison', '词汇比较', '詞彙比較');
+
   String semanticsProgressValue(int downloadedBytes, int totalBytes) =>
       _selectText(
         totalBytes > 0
