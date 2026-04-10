@@ -53,6 +53,20 @@ Color resolveLiquidGlassForeground(BuildContext context) =>
 Color resolveLiquidGlassSecondaryForeground(BuildContext context) =>
     CupertinoDynamicColor.resolve(_liquidGlassSecondaryForeground, context);
 
+Color resolveAdaptiveCircleButtonBackground(BuildContext context) {
+  final brightness = Theme.of(context).brightness;
+  return brightness == Brightness.light
+      ? Colors.black.withValues(alpha: 0.05)
+      : Colors.white.withValues(alpha: 0.15);
+}
+
+Color resolveAdaptiveCircleButtonIconColor(BuildContext context) {
+  final brightness = Theme.of(context).brightness;
+  return brightness == Brightness.light
+      ? Theme.of(context).colorScheme.primary
+      : Colors.blueAccent.shade100;
+}
+
 class LiquidGlassBackground extends StatelessWidget {
   const LiquidGlassBackground({super.key, required this.child});
 
@@ -193,6 +207,60 @@ class AdaptiveSettingsActionButton extends StatelessWidget {
             border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
           ),
           child: Icon(icon, color: tint, size: 20),
+        ),
+      ),
+    );
+  }
+}
+
+class AdaptiveCircleButton extends StatelessWidget {
+  const AdaptiveCircleButton({
+    super.key,
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+    this.size = 48,
+    this.iconSize = 22,
+    this.enabled = true,
+    this.child,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onPressed;
+  final double size;
+  final double iconSize;
+  final bool enabled;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    final backgroundColor = resolveAdaptiveCircleButtonBackground(context);
+    final iconColor = resolveAdaptiveCircleButtonIconColor(context);
+    final buttonChild =
+        child ??
+        Icon(
+          icon,
+          color: enabled
+              ? iconColor
+              : resolveLiquidGlassSecondaryForeground(context),
+          size: iconSize,
+        );
+
+    return Tooltip(
+      message: tooltip,
+      child: CupertinoButton(
+        padding: EdgeInsets.zero,
+        minimumSize: Size.zero,
+        onPressed: enabled ? onPressed : null,
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            shape: BoxShape.circle,
+          ),
+          child: Center(child: buttonChild),
         ),
       ),
     );

@@ -49,42 +49,29 @@ class AudioButton extends StatelessWidget {
           width: buttonSize,
           height: buttonSize,
           child: applePlatform
-              ? CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  minimumSize: const Size(48, 48),
-                  onPressed: isLoading ? null : () => onPressed(type, audioId),
-                  child: Container(
-                    width: buttonSize,
-                    height: buttonSize,
-                    decoration: BoxDecoration(
-                      color: resolveLiquidGlassSecondaryTint(
-                        context,
-                      ).withValues(alpha: 0.82),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.10),
-                      ),
-                    ),
-                    child: Center(
-                      child: isLoading
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator.adaptive(
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : Icon(
-                              isPlaying
-                                  ? CupertinoIcons.stop_circle
-                                  : archiveReady
-                                  ? CupertinoIcons.speaker_2_fill
-                                  : CupertinoIcons.arrow_down_circle,
-                              size: compact ? 20 : 22,
-                              color: resolveLiquidGlassTint(context),
+              ? AdaptiveCircleButton(
+                  tooltip: actionLabel,
+                  onPressed: () => onPressed(type, audioId),
+                  enabled: !isLoading,
+                  size: buttonSize,
+                  iconSize: compact ? 20 : 22,
+                  icon: isPlaying
+                      ? CupertinoIcons.stop_circle
+                      : archiveReady
+                      ? CupertinoIcons.speaker_2_fill
+                      : CupertinoIcons.arrow_down_circle,
+                  child: isLoading
+                      ? SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator.adaptive(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              resolveAdaptiveCircleButtonIconColor(context),
                             ),
-                    ),
-                  ),
+                          ),
+                        )
+                      : null,
                 )
               : FilledButton.tonal(
                   style: FilledButton.styleFrom(

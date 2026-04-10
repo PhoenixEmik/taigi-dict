@@ -140,12 +140,28 @@ class SearchHistorySection extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
-                                  CupertinoIcons.time,
-                                  size: 16,
-                                  color: resolveLiquidGlassTint(context),
+                                Container(
+                                  width: 22,
+                                  height: 22,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        resolveAdaptiveCircleButtonBackground(
+                                          context,
+                                        ),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      CupertinoIcons.time,
+                                      size: 14,
+                                      color:
+                                          resolveAdaptiveCircleButtonIconColor(
+                                            context,
+                                          ),
+                                    ),
+                                  ),
                                 ),
-                                const SizedBox(width: 6),
+                                const SizedBox(width: 8),
                                 Text(
                                   query,
                                   style: theme.textTheme.bodyMedium?.copyWith(
