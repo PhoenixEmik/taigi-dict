@@ -394,19 +394,26 @@ class _SensePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final backgroundColor = brightness == Brightness.light
+        ? Colors.black.withValues(alpha: 0.06)
+        : Colors.white.withValues(alpha: 0.15);
+    final foregroundColor = brightness == Brightness.light
+        ? Colors.black87
+        : Colors.white;
+
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: resolveLiquidGlassSecondaryTint(context).withValues(alpha: 0.88),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         child: Text(
           label,
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w700,
-            color: resolveLiquidGlassForeground(context),
+            color: foregroundColor,
           ),
         ),
       ),
