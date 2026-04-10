@@ -364,68 +364,50 @@ class SearchLoadingState extends StatelessWidget {
         duration: const Duration(milliseconds: 900),
         curve: Curves.easeInOut,
         builder: (context, opacity, child) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: List.generate(3, (index) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Opacity(
-                  opacity: index.isEven ? opacity : 1 - (opacity * 0.35),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(28),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                      child: Container(
-                        height: 92,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.06),
-                          borderRadius: BorderRadius.circular(28),
-                          border: Border.all(
-                            color: Colors.black.withValues(alpha: 0.08),
-                            width: 0.5,
+          return SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: List.generate(3, (index) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Opacity(
+                    opacity: index.isEven ? opacity : 1 - (opacity * 0.35),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(28),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                        child: Container(
+                          height: 92,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.06),
+                            borderRadius: BorderRadius.circular(28),
+                            border: Border.all(
+                              color: Colors.black.withValues(alpha: 0.08),
+                              width: 0.5,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
           );
         },
       );
     }
 
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.35, end: 0.85),
-      duration: const Duration(milliseconds: 900),
-      curve: Curves.easeInOut,
-      builder: (context, opacity, child) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: List.generate(3, (index) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Opacity(
-                opacity: index.isEven ? opacity : 1 - (opacity * 0.35),
-                child: Card(
-                  child: Container(
-                    height: 92,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24),
-                      color: colorScheme.surface,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }),
-        );
-      },
+    final colorScheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+        ),
+      ),
     );
   }
 }
