@@ -79,8 +79,22 @@ class SearchHistorySection extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final applePlatform = isApplePlatform(context);
+    final brightness = theme.brightness;
 
     if (applePlatform) {
+      final chipBackgroundColor = brightness == Brightness.dark
+          ? Colors.white.withValues(alpha: 0.12)
+          : Colors.black.withValues(alpha: 0.06);
+      final chipBorderColor = brightness == Brightness.dark
+          ? Colors.white.withValues(alpha: 0.14)
+          : Colors.black.withValues(alpha: 0.08);
+      final chipTextColor = brightness == Brightness.dark
+          ? Colors.white
+          : Colors.black87;
+      final chipIconColor = brightness == Brightness.dark
+          ? Colors.blueAccent.shade100
+          : theme.colorScheme.primary;
+
       return LiquidGlassSection(
         children: [
           Padding(
@@ -132,14 +146,10 @@ class SearchHistorySection extends StatelessWidget {
                                 onPressed: () => onHistoryTap(query),
                                 child: DecoratedBox(
                                   decoration: BoxDecoration(
-                                    color: resolveLiquidGlassSecondaryTint(
-                                      context,
-                                    ).withValues(alpha: 0.86),
+                                    color: chipBackgroundColor,
                                     borderRadius: BorderRadius.circular(999),
                                     border: Border.all(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.08,
-                                      ),
+                                      color: chipBorderColor,
                                     ),
                                   ),
                                   child: Padding(
@@ -154,20 +164,14 @@ class SearchHistorySection extends StatelessWidget {
                                           width: 22,
                                           height: 22,
                                           decoration: BoxDecoration(
-                                            color:
-                                                resolveAdaptiveCircleButtonBackground(
-                                                  context,
-                                                ),
+                                            color: chipBackgroundColor,
                                             shape: BoxShape.circle,
                                           ),
                                           child: Center(
                                             child: Icon(
                                               CupertinoIcons.time,
                                               size: 14,
-                                              color:
-                                                  resolveAdaptiveCircleButtonIconColor(
-                                                    context,
-                                                  ),
+                                              color: chipIconColor,
                                             ),
                                           ),
                                         ),
@@ -176,10 +180,7 @@ class SearchHistorySection extends StatelessWidget {
                                           query,
                                           style: theme.textTheme.bodyMedium
                                               ?.copyWith(
-                                                color:
-                                                    resolveLiquidGlassForeground(
-                                                      context,
-                                                    ),
+                                                color: chipTextColor,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                         ),
