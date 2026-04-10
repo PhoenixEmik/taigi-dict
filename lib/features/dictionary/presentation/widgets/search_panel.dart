@@ -359,8 +359,19 @@ class SearchLoadingState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isApplePlatform(context)) {
+      final brightness = Theme.of(context).brightness;
+      final baseFill = brightness == Brightness.light
+          ? Colors.white.withValues(alpha: 0.30)
+          : Colors.white.withValues(alpha: 0.08);
+      final glowFill = brightness == Brightness.light
+          ? resolveLiquidGlassSecondaryTint(context).withValues(alpha: 0.92)
+          : Colors.white.withValues(alpha: 0.16);
+      final strokeColor = brightness == Brightness.light
+          ? Colors.black.withValues(alpha: 0.08)
+          : Colors.white.withValues(alpha: 0.14);
+
       return TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0.35, end: 0.85),
+        tween: Tween(begin: 0.22, end: 0.62),
         duration: const Duration(milliseconds: 900),
         curve: Curves.easeInOut,
         builder: (context, opacity, child) {
@@ -370,24 +381,31 @@ class SearchLoadingState extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: List.generate(3, (index) {
+                final cardFill = Color.lerp(
+                  baseFill,
+                  glowFill,
+                  index.isEven ? opacity : opacity * 0.72,
+                )!;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
-                  child: Opacity(
-                    opacity: index.isEven ? opacity : 1 - (opacity * 0.35),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(28),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                        child: Container(
-                          height: 92,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.06),
-                            borderRadius: BorderRadius.circular(28),
-                            border: Border.all(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              width: 0.5,
-                            ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(28),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                      child: Container(
+                        height: 92,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              cardFill,
+                              baseFill,
+                              Color.lerp(cardFill, baseFill, 0.45)!,
+                            ],
                           ),
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(color: strokeColor, width: 0.5),
                         ),
                       ),
                     ),
