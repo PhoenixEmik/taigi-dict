@@ -744,16 +744,16 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
     var processedRows = 0;
     final entryRowsById = <int, Map<String, Object?>>{};
     final mandarinByEntryId = <int, StringBuffer>{};
-    final variantCharsByEntryId = <int, Set<String>>{};
-    final wordSynonymsByEntryId = <int, Set<String>>{};
-    final wordAntonymsByEntryId = <int, Set<String>>{};
-    final alternativePronunciationsByEntryId = <int, Set<String>>{};
-    final contractedPronunciationsByEntryId = <int, Set<String>>{};
-    final colloquialPronunciationsByEntryId = <int, Set<String>>{};
+    final variantCharsByEntryId = <int, List<String>>{};
+    final wordSynonymsByEntryId = <int, List<String>>{};
+    final wordAntonymsByEntryId = <int, List<String>>{};
+    final alternativePronunciationsByEntryId = <int, List<String>>{};
+    final contractedPronunciationsByEntryId = <int, List<String>>{};
+    final colloquialPronunciationsByEntryId = <int, List<String>>{};
     final phoneticDifferencesByEntryId = <int, List<String>>{};
     final vocabularyComparisonsByEntryId = <int, List<String>>{};
-    final definitionSynonymsBySenseId = <int, Set<String>>{};
-    final definitionAntonymsBySenseId = <int, Set<String>>{};
+    final definitionSynonymsBySenseId = <int, List<String>>{};
+    final definitionAntonymsBySenseId = <int, List<String>>{};
     final entryIdBySenseId = <int, int>{};
     final entryIdsByHanji = <String, Set<int>>{};
 
@@ -917,9 +917,7 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
       if (headwordId != null &&
           variant.isNotEmpty &&
           entryRowsById.containsKey(headwordId)) {
-        variantCharsByEntryId
-            .putIfAbsent(headwordId, () => <String>{})
-            .add(variant);
+        _appendUniqueValue(variantCharsByEntryId, headwordId, variant);
       }
 
       if (processedRows % _progressUpdateInterval == 0) {
@@ -930,7 +928,7 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
     void collectSenseLinks({
       required SpreadsheetTable table,
       required List<String> headers,
-      required Map<int, Set<String>> target,
+      required Map<int, List<String>> target,
       required String targetWordColumn,
     }) {
       for (final row in table.rows.skip(1)) {
@@ -948,7 +946,7 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
         if (senseId != null &&
             linkedWord.isNotEmpty &&
             entryIdBySenseId.containsKey(senseId)) {
-          target.putIfAbsent(senseId, () => <String>{}).add(linkedWord);
+          _appendUniqueValue(target, senseId, linkedWord);
         }
 
         if (processedRows % _progressUpdateInterval == 0) {
@@ -960,7 +958,7 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
     void collectWordLinks({
       required SpreadsheetTable table,
       required List<String> headers,
-      required Map<int, Set<String>> target,
+      required Map<int, List<String>> target,
     }) {
       for (final row in table.rows.skip(1)) {
         processedRows++;
@@ -977,7 +975,7 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
         if (entryId != null &&
             linkedWord.isNotEmpty &&
             entryRowsById.containsKey(entryId)) {
-          target.putIfAbsent(entryId, () => <String>{}).add(linkedWord);
+          _appendUniqueValue(target, entryId, linkedWord);
         }
 
         if (processedRows % _progressUpdateInterval == 0) {
@@ -1024,7 +1022,7 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
     void collectPronunciations({
       required SpreadsheetTable table,
       required List<String> headers,
-      required Map<int, Set<String>> target,
+      required Map<int, List<String>> target,
     }) {
       for (final row in table.rows.skip(1)) {
         processedRows++;
@@ -1042,7 +1040,7 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
             romanization.isNotEmpty &&
             entryRowsById.containsKey(entryId)) {
           for (final value in _splitSlashSeparatedValues(romanization)) {
-            target.putIfAbsent(entryId, () => <String>{}).add(value);
+            _appendUniqueValue(target, entryId, value);
           }
         }
 
@@ -1149,10 +1147,10 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
       final row = senseRowsByKey[senseKey]!;
       final senseId = row['sense_id'] as int;
       row['definition_synonyms'] = jsonEncode(
-        _sortedStringList(definitionSynonymsBySenseId[senseId]),
+        _dedupePreservingOrder(definitionSynonymsBySenseId[senseId]),
       );
       row['definition_antonyms'] = jsonEncode(
-        _sortedStringList(definitionAntonymsBySenseId[senseId]),
+        _dedupePreservingOrder(definitionAntonymsBySenseId[senseId]),
       );
       senseChunk.add(Map<String, Object?>.from(row));
       if (senseChunk.length >= _buildChunkSize) {
@@ -1178,16 +1176,22 @@ void _parseDictionaryOdsIsolateEntryPoint(List<Object?> args) async {
     final entryChunk = <Map<String, Object?>>[];
     for (final entryId in entryIds) {
       final row = entryRowsById[entryId]!;
-      final variantChars = _sortedStringList(variantCharsByEntryId[entryId]);
-      final wordSynonyms = _sortedStringList(wordSynonymsByEntryId[entryId]);
-      final wordAntonyms = _sortedStringList(wordAntonymsByEntryId[entryId]);
-      final alternativePronunciations = _sortedStringList(
+      final variantChars = _dedupePreservingOrder(
+        variantCharsByEntryId[entryId],
+      );
+      final wordSynonyms = _dedupePreservingOrder(
+        wordSynonymsByEntryId[entryId],
+      );
+      final wordAntonyms = _dedupePreservingOrder(
+        wordAntonymsByEntryId[entryId],
+      );
+      final alternativePronunciations = _dedupePreservingOrder(
         alternativePronunciationsByEntryId[entryId],
       );
-      final contractedPronunciations = _sortedStringList(
+      final contractedPronunciations = _dedupePreservingOrder(
         contractedPronunciationsByEntryId[entryId],
       );
-      final colloquialPronunciations = _sortedStringList(
+      final colloquialPronunciations = _dedupePreservingOrder(
         colloquialPronunciationsByEntryId[entryId],
       );
       final phoneticDifferences = _dedupePreservingOrder(
@@ -1365,26 +1369,23 @@ List<String> _decodeStoredStringList(Object? value) {
   }
 }
 
-List<String> _sortedStringList(Set<String>? values) {
-  if (values == null || values.isEmpty) {
-    return const [];
-  }
-  final sorted =
-      values
-          .map((value) => value.trim())
-          .where((value) => value.isNotEmpty)
-          .toSet()
-          .toList(growable: false)
-        ..sort();
-  return sorted;
-}
-
 List<String> _splitSlashSeparatedValues(String value) {
   return value
       .split('/')
       .map((part) => part.trim())
       .where((part) => part.isNotEmpty)
       .toList(growable: false);
+}
+
+void _appendUniqueValue(Map<int, List<String>> target, int key, String value) {
+  final trimmed = value.trim();
+  if (trimmed.isEmpty) {
+    return;
+  }
+  final items = target.putIfAbsent(key, () => <String>[]);
+  if (!items.contains(trimmed)) {
+    items.add(trimmed);
+  }
 }
 
 List<String> _dedupePreservingOrder(List<String>? values) {
