@@ -134,9 +134,10 @@ Current release-build caveat:
 
 ## Acknowledgments
 
-- The app bundles the `Tauhu-oo (豆腐烏)` font to render Taiwanese Hanzi and specific CJK Extension characters that may be missing from the default platform fonts.
-- Tauhu-oo is licensed under the `SIL Open Font License 1.1`.
-- Original project repository: `https://github.com/tauhu-tw/tauhu-oo`
+- Ministry of Education Taiwanese Hokkien Dictionary: `https://sutian.moe.edu.tw/`
+- Tauhu-oo (豆腐烏) 20.05 font for Taiwanese Hanzi and specific CJK Extension glyph coverage: `https://github.com/tauhu-tw/tauhu-oo`
+- Liquid Glass Widgets for iOS-style glass surfaces: `https://github.com/sdegenaar/liquid_glass_widgets`
+- Open Chinese Convert for Flutter for runtime OpenCC conversion: `https://github.com/zonble/flutter_open_chinese_convert`
 
 ## License
 

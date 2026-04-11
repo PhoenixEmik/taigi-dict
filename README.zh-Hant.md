@@ -133,9 +133,10 @@ flutter build apk --release
 
 ## 致謝
 
-- 本 App 內含 `Tauhu-oo（豆腐烏）` 字型，用於顯示平台預設字型可能缺漏的台語漢字與特定 CJK Extension 字元。
-- Tauhu-oo 採用 `SIL Open Font License 1.1` 授權。
-- 原始專案倉庫：`https://github.com/tauhu-tw/tauhu-oo`
+- 教育部臺灣台語常用詞辭典：`https://sutian.moe.edu.tw/`
+- Tauhu-oo（豆腐烏）20.05 字型，用於顯示台語漢字與特定 CJK Extension 字元：`https://github.com/tauhu-tw/tauhu-oo`
+- Liquid Glass Widgets，提供 iOS 風格的 glass 介面元件：`https://github.com/sdegenaar/liquid_glass_widgets`
+- Open Chinese Convert for Flutter，提供執行期 OpenCC 繁簡轉換：`https://github.com/zonble/flutter_open_chinese_convert`
 
 ## 授權
 
