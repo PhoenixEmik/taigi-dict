@@ -24,6 +24,7 @@ Canonical reference:
 
 Reference pages:
 
+- `https://sutian.moe.edu.tw/zh-hant/piantsip/pankhuan-singbing/`
 - `https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/`
 - `https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/`
 

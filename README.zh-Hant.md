@@ -38,6 +38,7 @@
 教育部官方參考來源：
 
 - 辭典入口：`https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/`
+- 版權與授權說明：`https://sutian.moe.edu.tw/zh-hant/piantsip/pankhuan-singbing/`
 - 原始試算表：`https://sutian.moe.edu.tw/media/senn/ods/kautian.ods`
 - 台羅說明：`https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/`
 - 漢字使用說明：`https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/`
@@ -134,4 +135,5 @@ flutter build apk --release
 
 - App 程式碼：MIT，請見 `LICENSE`
 - 詞典資料：`CC BY-ND 3.0 TW`，請見 `DATA_LICENSE.md`
-- 詞典音檔：衍生自相同教育部來源，仍受上游授權條款約束
+- 詞典音檔：`CC BY-ND 3.0 TW`，請見 `DATA_LICENSE.md`
+- 教育部版權說明：`https://sutian.moe.edu.tw/zh-hant/piantsip/pankhuan-singbing/`

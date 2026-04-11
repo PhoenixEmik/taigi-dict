@@ -39,6 +39,7 @@ lookup, and downloads large offline resources directly to the user's device.
 Canonical ministry references:
 
 - Dictionary reference: `https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/`
+- Copyright and licensing note: `https://sutian.moe.edu.tw/zh-hant/piantsip/pankhuan-singbing/`
 - Source spreadsheet: `https://sutian.moe.edu.tw/media/senn/ods/kautian.ods`
 - Tailo guide: `https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/`
 - Hanji usage guide: `https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/`
@@ -135,4 +136,5 @@ Current release-build caveat:
 
 - App code: MIT. See `LICENSE`.
 - Dictionary data: `CC BY-ND 3.0 TW`. See `DATA_LICENSE.md`.
-- Dictionary audio: derived from the same ministry source and remains separately licensed under the upstream terms.
+- Dictionary audio: `CC BY-ND 3.0 TW`. See `DATA_LICENSE.md`.
+- Ministry copyright note: `https://sutian.moe.edu.tw/zh-hant/piantsip/pankhuan-singbing/`
