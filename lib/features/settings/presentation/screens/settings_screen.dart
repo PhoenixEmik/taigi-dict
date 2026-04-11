@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:taigi_dict/core/localization/app_localizations.dart';
 import 'package:taigi_dict/core/localization/locale_provider.dart';
 import 'package:taigi_dict/core/preferences/app_preferences.dart';
@@ -182,9 +183,10 @@ class SettingsScreen extends StatelessWidget {
                 '${l10n.hanjiGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/',
               ),
             ],
-            applicationIcon: Icon(
-              Icons.menu_book_outlined,
-              color: colorScheme.primary,
+            applicationIcon: SvgPicture.asset(
+              'assets/icon/taigi_dict.svg',
+              width: 56,
+              height: 56,
             ),
             child: Text(l10n.aboutApp),
           ),
