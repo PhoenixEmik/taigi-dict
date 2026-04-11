@@ -193,6 +193,48 @@ class _MainScreenState extends State<MainScreen> {
     return l10n.dictionaryDatabaseRebuildFailed('$error');
   }
 
+  PreferredSizeWidget? _buildRootAppBar(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
+    switch (_selectedIndex) {
+      case 1:
+        if (isApplePlatform(context)) {
+          return glass.GlassAppBar(
+            useOwnLayer: true,
+            quality: glass.GlassQuality.premium,
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            title: Text(
+              l10n.bookmarksTitle,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: resolveLiquidGlassForeground(context),
+              ),
+            ),
+          );
+        }
+        return AppBar(title: Text(l10n.bookmarksTitle));
+      case 2:
+        if (isApplePlatform(context)) {
+          return glass.GlassAppBar(
+            useOwnLayer: true,
+            quality: glass.GlassQuality.premium,
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            title: Text(
+              l10n.settingsTitle,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: resolveLiquidGlassForeground(context),
+              ),
+            ),
+          );
+        }
+        return AppBar(title: Text(l10n.settingsTitle));
+      default:
+        return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -241,6 +283,7 @@ class _MainScreenState extends State<MainScreen> {
             audioLibrary: _audioLibrary,
             bookmarkStore: _bookmarkStore,
             onActionResult: _showResult,
+            showOwnScaffold: false,
           ),
           SettingsScreen(
             audioLibrary: _audioLibrary,
@@ -248,6 +291,7 @@ class _MainScreenState extends State<MainScreen> {
             onDownloadArchive: _handleArchiveDownloadAction,
             onDownloadDictionarySource: _handleDictionarySourceDownloadAction,
             onRebuildDictionaryDatabase: _rebuildDictionaryDatabase,
+            showOwnScaffold: false,
           ),
         ];
 
@@ -255,6 +299,7 @@ class _MainScreenState extends State<MainScreen> {
           return Scaffold(
             extendBody: true,
             backgroundColor: Colors.transparent,
+            appBar: _buildRootAppBar(context, l10n),
             body: IndexedStack(index: _selectedIndex, children: screens),
             bottomNavigationBar: SafeArea(
               top: false,
@@ -305,6 +350,7 @@ class _MainScreenState extends State<MainScreen> {
         }
 
         return Scaffold(
+          appBar: _buildRootAppBar(context, l10n),
           body: IndexedStack(index: _selectedIndex, children: screens),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _selectedIndex,

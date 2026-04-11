@@ -8,7 +8,6 @@ import 'package:taigi_dict/features/dictionary/presentation/coordinators/word_de
 import 'package:taigi_dict/features/dictionary/presentation/widgets/entry_list_item.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
 import 'package:taigi_dict/offline_audio.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as glass;
 
 class BookmarksScreen extends StatefulWidget {
   const BookmarksScreen({
@@ -17,12 +16,14 @@ class BookmarksScreen extends StatefulWidget {
     required this.audioLibrary,
     required this.bookmarkStore,
     required this.onActionResult,
+    this.showOwnScaffold = true,
   });
 
   final DictionaryRepository repository;
   final OfflineAudioLibrary audioLibrary;
   final BookmarkStore bookmarkStore;
   final ValueChanged<AudioActionResult> onActionResult;
+  final bool showOwnScaffold;
 
   @override
   State<BookmarksScreen> createState() => _BookmarksScreenState();
@@ -70,7 +71,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
     return AnimatedBuilder(
       animation: widget.bookmarkStore,
       builder: (context, child) {
-        final body = FutureBuilder<DictionaryBundle>(
+        final content = FutureBuilder<DictionaryBundle>(
           future: _bundleFuture,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
@@ -97,6 +98,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
             final bookmarkedEntries = _buildBookmarkedEntries(snapshot.data!);
             return LiquidGlassBackground(
               child: SafeArea(
+                top: false,
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     return Align(
@@ -119,28 +121,13 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
           },
         );
 
-        if (applePlatform) {
-          return Scaffold(
-            backgroundColor: Colors.transparent,
-            appBar: glass.GlassAppBar(
-              useOwnLayer: true,
-              quality: glass.GlassQuality.premium,
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              title: Text(
-                l10n.bookmarksTitle,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: resolveLiquidGlassForeground(context),
-                ),
-              ),
-            ),
-            body: body,
-          );
+        if (!widget.showOwnScaffold) {
+          return content;
         }
 
         return Scaffold(
           appBar: AppBar(title: Text(l10n.bookmarksTitle)),
-          body: body,
+          body: content,
         );
       },
     );
@@ -153,13 +140,23 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
   ) {
     if (bookmarkedEntries.isEmpty) {
       return Padding(
-        padding: EdgeInsets.fromLTRB(16, applePlatform ? 24 : 16, 16, 28),
+        padding: EdgeInsets.fromLTRB(
+          16,
+          applePlatform ? 24 : 16,
+          16,
+          applePlatform ? 120 : 28,
+        ),
         child: const BookmarkEmptyState(),
       );
     }
 
     return ListView.builder(
-      padding: EdgeInsets.fromLTRB(16, applePlatform ? 12 : 16, 16, 28),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        applePlatform ? 12 : 16,
+        16,
+        applePlatform ? 120 : 28,
+      ),
       itemCount: bookmarkedEntries.length,
       itemBuilder: (context, index) {
         return Padding(

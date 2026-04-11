@@ -27,6 +27,7 @@ class SettingsScreen extends StatelessWidget {
     required this.onDownloadArchive,
     required this.onDownloadDictionarySource,
     required this.onRebuildDictionaryDatabase,
+    this.showOwnScaffold = true,
   });
 
   final OfflineAudioLibrary audioLibrary;
@@ -34,6 +35,7 @@ class SettingsScreen extends StatelessWidget {
   final Future<void> Function(AudioArchiveType type) onDownloadArchive;
   final Future<void> Function() onDownloadDictionarySource;
   final Future<void> Function() onRebuildDictionaryDatabase;
+  final bool showOwnScaffold;
 
   void _showReferenceArticle(
     BuildContext context, {
@@ -192,6 +194,63 @@ class SettingsScreen extends StatelessWidget {
           ),
         ];
 
+        final content = LiquidGlassBackground(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
+                  ),
+                  child: ListTileTheme(
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: applePlatform ? 20 : 24,
+                    ),
+                    child: ListView(
+                      padding: EdgeInsets.fromLTRB(
+                        16,
+                        applePlatform ? 12 : 8,
+                        16,
+                        applePlatform ? 120 : 28,
+                      ),
+                      children: [
+                        SettingsSectionHeader(title: l10n.offlineResources),
+                        applePlatform
+                            ? _GlassSettingsGroup(
+                                settings: _sectionSettings(context),
+                                children: offlineSection,
+                              )
+                            : Column(children: offlineSection),
+                        if (!applePlatform) const Divider(height: 32),
+                        SettingsSectionHeader(title: l10n.appearance),
+                        applePlatform
+                            ? _GlassSettingsGroup(
+                                settings: _sectionSettings(context),
+                                children: appearanceSection,
+                              )
+                            : Column(children: appearanceSection),
+                        if (!applePlatform) const Divider(height: 32),
+                        SettingsSectionHeader(title: l10n.about),
+                        applePlatform
+                            ? _GlassSettingsGroup(
+                                settings: _sectionSettings(context),
+                                children: aboutSection,
+                              )
+                            : Column(children: aboutSection),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+
+        if (!showOwnScaffold) {
+          return content;
+        }
+
         return Scaffold(
           backgroundColor: Colors.transparent,
           appBar: applePlatform
@@ -208,58 +267,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 )
               : AppBar(title: Text(l10n.settingsTitle)),
-          body: LiquidGlassBackground(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return Align(
-                  alignment: Alignment.topCenter,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
-                    ),
-                    child: ListTileTheme(
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: applePlatform ? 20 : 24,
-                      ),
-                      child: ListView(
-                        padding: EdgeInsets.fromLTRB(
-                          16,
-                          applePlatform ? 12 : 8,
-                          16,
-                          applePlatform ? 120 : 28,
-                        ),
-                        children: [
-                          SettingsSectionHeader(title: l10n.offlineResources),
-                          applePlatform
-                              ? _GlassSettingsGroup(
-                                  settings: _sectionSettings(context),
-                                  children: offlineSection,
-                                )
-                              : Column(children: offlineSection),
-                          if (!applePlatform) const Divider(height: 32),
-                          SettingsSectionHeader(title: l10n.appearance),
-                          applePlatform
-                              ? _GlassSettingsGroup(
-                                  settings: _sectionSettings(context),
-                                  children: appearanceSection,
-                                )
-                              : Column(children: appearanceSection),
-                          if (!applePlatform) const Divider(height: 32),
-                          SettingsSectionHeader(title: l10n.about),
-                          applePlatform
-                              ? _GlassSettingsGroup(
-                                  settings: _sectionSettings(context),
-                                  children: aboutSection,
-                                )
-                              : Column(children: aboutSection),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+          body: content,
         );
       },
     );
