@@ -62,7 +62,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: assets/icon/ministry_logo.png
+  image_path: assets/icon/taigi_dict.png
   remove_alpha_ios: true
 
 # For information on the generic Dart part of this file, see the
