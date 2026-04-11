@@ -132,6 +132,12 @@ Current release-build caveat:
 - iOS uses adaptive Cupertino navigation, glass bottom bars, glass search bars, and glass settings sections.
 - Android intentionally does not reuse the iOS palette; it keeps the app's warmer branded Material styling for better platform fit.
 
+## Acknowledgments
+
+- The app bundles the `Tauhu-oo (豆腐烏)` font to render Taiwanese Hanzi and specific CJK Extension characters that may be missing from the default platform fonts.
+- Tauhu-oo is licensed under the `SIL Open Font License 1.1`.
+- Original project repository: `https://github.com/tauhu-tw/tauhu-oo`
+
 ## License
 
 - App code: MIT. See `LICENSE`.

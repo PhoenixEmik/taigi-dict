@@ -131,6 +131,12 @@ flutter build apk --release
 - iOS 使用自適應的 Cupertino 導覽、glass bottom bar、glass search bar 與 glass settings section。
 - Android 不會沿用 iOS palette，而是維持較溫暖的品牌化 Material 風格，以保留平台適配性。
 
+## 致謝
+
+- 本 App 內含 `Tauhu-oo（豆腐烏）` 字型，用於顯示平台預設字型可能缺漏的台語漢字與特定 CJK Extension 字元。
+- Tauhu-oo 採用 `SIL Open Font License 1.1` 授權。
+- 原始專案倉庫：`https://github.com/tauhu-tw/tauhu-oo`
+
 ## 授權
 
 - App 程式碼：MIT，請見 `LICENSE`
