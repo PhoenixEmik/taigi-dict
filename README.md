@@ -6,6 +6,7 @@ lookup, and downloads large offline resources directly to the user's device.
 
 ## App Identity
 
+- Dart package name: `taigi_dict`
 - App display name: `台語辭典`
 - Android application ID: `org.taigidict.app`
 - iOS bundle identifier: `org.taigidict.app`
@@ -25,9 +26,11 @@ lookup, and downloads large offline resources directly to the user's device.
 - Offline dictionary source download for `kautian.ods`
 - On-device SQLite database build from the downloaded ODS file using `spreadsheet_decoder` and `sqflite`
 - Localized UI for Traditional Chinese, Simplified Chinese, and English
+- Runtime Traditional/Simplified Chinese conversion using the native OpenCC engine with Taiwanese phrase-aware configs
 - Accessibility improvements for semantics labels, merged semantics on complex settings tiles, and localized tooltips
 - Platform-adaptive UI: Android keeps the app's branded Material palette, while iOS uses Cupertino navigation and Liquid Glass surfaces
 - Reading text size adjustment and system-aware light / dark / AMOLED theme selection
+- Bundled `TauhuOo` fallback font for CJK Ext-C/D/E glyph coverage when the system font is missing characters
 
 ## Data And Licensing
 
@@ -55,6 +58,7 @@ Important distribution note:
 - Flutter
 - `dio` for resumable downloads
 - `just_audio` for offline audio playback
+- `flutter_open_chinese_convert` for runtime OpenCC conversion
 - `liquid_glass_widgets` for iOS-style Liquid Glass surfaces
 - `path` and `path_provider` for local file management
 - `shared_preferences` for user settings, bookmarks, and search history
@@ -66,7 +70,7 @@ Important distribution note:
 
 - `lib/main.dart`: app entry point
 - `lib/app/`: app shell, navigation, and theme bootstrap
-- `lib/core/`: constants, localization, and shared preferences
+- `lib/core/`: constants, localization, translation, and shared preferences
 - `lib/features/dictionary/`: dictionary models, search, SQLite build/load logic, and UI
 - `lib/features/audio/`: offline audio archive download, indexing, and playback
 - `lib/features/bookmarks/`: bookmark persistence and screens
