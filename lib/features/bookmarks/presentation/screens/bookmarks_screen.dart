@@ -53,16 +53,6 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
     );
   }
 
-  List<DictionaryEntry> _buildBookmarkedEntries(DictionaryBundle bundle) {
-    final entriesById = <int, DictionaryEntry>{
-      for (final entry in bundle.entries) entry.id: entry,
-    };
-    return widget.bookmarkStore.bookmarkedIds
-        .map((id) => entriesById[id])
-        .whereType<DictionaryEntry>()
-        .toList(growable: false);
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -95,24 +85,78 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
               );
             }
 
-            final bookmarkedEntries = _buildBookmarkedEntries(snapshot.data!);
+            final bookmarkedIds = widget.bookmarkStore.bookmarkedIds;
+            if (bookmarkedIds.isEmpty) {
+              return LiquidGlassBackground(
+                child: SafeArea(
+                  top: false,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Align(
+                        alignment: Alignment.topCenter,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
+                          ),
+                          child: bookmarkedContent(
+                            const [],
+                            snapshot.data!,
+                            applePlatform,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            }
+
             return LiquidGlassBackground(
               child: SafeArea(
                 top: false,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Align(
-                      alignment: Alignment.topCenter,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
+                child: FutureBuilder<List<DictionaryEntry>>(
+                  future: widget.repository.entriesByIdsAsync(
+                    snapshot.data!,
+                    bookmarkedIds,
+                  ),
+                  builder: (context, entriesSnapshot) {
+                    if (entriesSnapshot.hasError) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Text(
+                            l10n.loadDataFailed('${entriesSnapshot.error}'),
+                            style: Theme.of(context).textTheme.titleMedium,
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                        child: bookmarkedContent(
-                          bookmarkedEntries,
-                          snapshot.data!,
-                          applePlatform,
-                        ),
-                      ),
+                      );
+                    }
+
+                    if (!entriesSnapshot.hasData) {
+                      return Center(
+                        child: applePlatform
+                            ? const CircularProgressIndicator.adaptive()
+                            : const CircularProgressIndicator(),
+                      );
+                    }
+
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        return Align(
+                          alignment: Alignment.topCenter,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
+                            ),
+                            child: bookmarkedContent(
+                              entriesSnapshot.data!,
+                              snapshot.data!,
+                              applePlatform,
+                            ),
+                          ),
+                        );
+                      },
                     );
                   },
                 ),

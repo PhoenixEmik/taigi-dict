@@ -4,6 +4,7 @@ class DictionaryBundle {
     required this.senseCount,
     required this.exampleCount,
     required this.entries,
+    this.databasePath,
   });
 
   factory DictionaryBundle.fromJson(Map<String, dynamic> json) {
@@ -23,6 +24,9 @@ class DictionaryBundle {
   final int senseCount;
   final int exampleCount;
   final List<DictionaryEntry> entries;
+  final String? databasePath;
+
+  bool get isDatabaseBacked => databasePath != null;
 }
 
 class DictionaryEntry {

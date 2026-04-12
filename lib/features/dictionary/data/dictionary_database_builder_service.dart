@@ -364,96 +364,38 @@ class DictionaryDatabaseBuilderService {
         return null;
       }
 
-      final entryRows = await database.query(_entriesTable, orderBy: 'id ASC');
-      if (entryRows.isEmpty) {
+      final metadataRows = await database.query(_metadataTable);
+      final metadata = {
+        for (final row in metadataRows)
+          row['key'] as String: row['value']?.toString() ?? '0',
+      };
+      final entryCount =
+          int.tryParse(metadata['entry_count'] ?? '') ??
+          Sqflite.firstIntValue(
+            await database.rawQuery('SELECT COUNT(*) FROM $_entriesTable'),
+          ) ??
+          0;
+      if (entryCount == 0) {
         return null;
       }
-
-      final senseRows = await database.query(
-        _sensesTable,
-        orderBy: 'entry_id ASC, sense_id ASC',
-      );
-      final exampleRows = await database.query(
-        _examplesTable,
-        orderBy: 'entry_id ASC, sense_id ASC, example_order ASC, id ASC',
-      );
-
-      final examplesBySense = <(int, int), List<DictionaryExample>>{};
-      for (final row in exampleRows) {
-        final entryId = row['entry_id'] as int;
-        final senseId = row['sense_id'] as int;
-        examplesBySense
-            .putIfAbsent((entryId, senseId), () => [])
-            .add(
-              DictionaryExample(
-                hanji: row['hanji'] as String? ?? '',
-                romanization: row['romanization'] as String? ?? '',
-                mandarin: row['mandarin'] as String? ?? '',
-                audioId: row['audio_id'] as String? ?? '',
-              ),
-            );
-      }
-
-      final sensesByEntry = <int, List<DictionarySense>>{};
-      for (final row in senseRows) {
-        final entryId = row['entry_id'] as int;
-        final senseId = row['sense_id'] as int;
-        sensesByEntry
-            .putIfAbsent(entryId, () => [])
-            .add(
-              DictionarySense(
-                partOfSpeech: row['part_of_speech'] as String? ?? '',
-                definition: row['definition'] as String? ?? '',
-                definitionSynonyms: _decodeStoredStringList(
-                  row['definition_synonyms'],
-                ),
-                definitionAntonyms: _decodeStoredStringList(
-                  row['definition_antonyms'],
-                ),
-                examples: examplesBySense[(entryId, senseId)] ?? const [],
-              ),
-            );
-      }
-
-      final entries = entryRows
-          .map(
-            (row) => DictionaryEntry(
-              id: row['id'] as int,
-              type: row['type'] as String? ?? '',
-              hanji: row['hanji'] as String? ?? '',
-              romanization: row['romanization'] as String? ?? '',
-              category: row['category'] as String? ?? '',
-              audioId: row['audio_id'] as String? ?? '',
-              hokkienSearch: row['hokkien_search'] as String? ?? '',
-              mandarinSearch: row['mandarin_search'] as String? ?? '',
-              variantChars: _decodeStoredStringList(row['variant_chars']),
-              wordSynonyms: _decodeStoredStringList(row['word_synonyms']),
-              wordAntonyms: _decodeStoredStringList(row['word_antonyms']),
-              alternativePronunciations: _decodeStoredStringList(
-                row['alternative_pronunciations'],
-              ),
-              contractedPronunciations: _decodeStoredStringList(
-                row['contracted_pronunciations'],
-              ),
-              colloquialPronunciations: _decodeStoredStringList(
-                row['colloquial_pronunciations'],
-              ),
-              phoneticDifferences: _decodeStoredStringList(
-                row['phonetic_differences'],
-              ),
-              vocabularyComparisons: _decodeStoredStringList(
-                row['vocabulary_comparisons'],
-              ),
-              senses: sensesByEntry[row['id'] as int] ?? const [],
-            ),
-          )
-          .toList(growable: false);
-
+      final senseCount =
+          int.tryParse(metadata['sense_count'] ?? '') ??
+          Sqflite.firstIntValue(
+            await database.rawQuery('SELECT COUNT(*) FROM $_sensesTable'),
+          ) ??
+          0;
+      final exampleCount =
+          int.tryParse(metadata['example_count'] ?? '') ??
+          Sqflite.firstIntValue(
+            await database.rawQuery('SELECT COUNT(*) FROM $_examplesTable'),
+          ) ??
+          0;
       return DictionaryBundle(
-        entryCount: entries.length,
-        senseCount: senseRows.length,
-        exampleCount: exampleRows.length,
-        entries: entries,
+        entryCount: entryCount,
+        senseCount: senseCount,
+        exampleCount: exampleCount,
+        entries: const [],
+        databasePath: databaseFile.path,
       );
     } finally {
       await database.close();
@@ -612,11 +554,7 @@ class DictionaryDatabaseBuilderService {
   }
 
   Future<Database> _openReadOnlyDatabase(String databasePath) {
-    return openDatabase(
-      databasePath,
-      readOnly: true,
-      singleInstance: false,
-    );
+    return openDatabase(databasePath, readOnly: true, singleInstance: false);
   }
 }
 
@@ -1356,26 +1294,6 @@ String _cellToString(dynamic value) {
     return '';
   }
   return value.toString().trim();
-}
-
-List<String> _decodeStoredStringList(Object? value) {
-  final raw = value as String? ?? '';
-  if (raw.isEmpty) {
-    return const [];
-  }
-
-  try {
-    final decoded = jsonDecode(raw);
-    if (decoded is! List<dynamic>) {
-      return const [];
-    }
-    return decoded
-        .map((item) => item?.toString().trim() ?? '')
-        .where((item) => item.isNotEmpty)
-        .toList(growable: false);
-  } catch (_) {
-    return const [];
-  }
 }
 
 List<String> _splitSlashSeparatedValues(String value) {

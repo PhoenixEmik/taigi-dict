@@ -34,13 +34,15 @@ class WordDetailCoordinator {
       Localizations.localeOf(context),
     );
     final translationService = ChineseTranslationService.instance;
-    final sourceEntry = bundle.entries
-        .where((candidate) {
-          return candidate.id == entry.id;
-        })
-        .fold<DictionaryEntry?>(null, (previous, candidate) {
-          return previous ?? candidate;
-        });
+    final sourceEntry = bundle.isDatabaseBacked
+        ? entry
+        : bundle.entries
+              .where((candidate) {
+                return candidate.id == entry.id;
+              })
+              .fold<DictionaryEntry?>(null, (previous, candidate) {
+                return previous ?? candidate;
+              });
     final localizedEntry = await translationService.translateEntryForDisplay(
       sourceEntry ?? entry,
       locale: resolvedLocale,
@@ -65,10 +67,13 @@ class WordDetailCoordinator {
       if (!context.mounted) {
         return;
       }
-      final linkedEntry = repository.findLinkedEntry(
+      final linkedEntry = await repository.findLinkedEntryAsync(
         bundle,
         normalizedLookupWord,
       );
+      if (!context.mounted) {
+        return;
+      }
       if (linkedEntry == null) {
         final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(
