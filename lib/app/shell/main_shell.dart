@@ -195,47 +195,130 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildAppleFloatingDock(BuildContext context, AppLocalizations l10n) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final brightness = Theme.of(context).brightness;
+    final settings = glass.LiquidGlassSettings(
+      blur: 30,
+      thickness: 26,
+      glassColor: brightness == Brightness.dark
+          ? Colors.black.withValues(alpha: 0.15)
+          : Colors.white.withValues(alpha: 0.20),
+      lightIntensity: brightness == Brightness.dark ? 0.42 : 0.68,
+      ambientStrength: brightness == Brightness.dark ? 0.05 : 0.02,
+      refractiveIndex: 1.18,
+      saturation: brightness == Brightness.dark ? 1.20 : 1.08,
+      chromaticAberration: 0.008,
+      specularSharpness: glass.GlassSpecularSharpness.medium,
+    );
 
     return Positioned(
-      left: 20,
-      right: 20,
-      bottom: bottomInset + 20,
-      child: glass.GlassBottomBar(
-        selectedIndex: _selectedIndex,
-        onTabSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        quality: glass.GlassQuality.premium,
-        barHeight: 68,
-        horizontalPadding: 14,
-        verticalPadding: 14,
-        spacing: 10,
-        barBorderRadius: 30,
-        selectedIconColor: resolveLiquidGlassForeground(context),
-        unselectedIconColor: resolveLiquidGlassSecondaryForeground(context),
-        indicatorColor: resolveLiquidGlassTint(context).withValues(alpha: 0.20),
-        tabs: [
-          glass.GlassBottomBarTab(
-            label: l10n.dictionaryTab,
-            icon: const Icon(CupertinoIcons.book),
-            activeIcon: const Icon(CupertinoIcons.book_fill),
-            glowColor: resolveLiquidGlassTint(context),
+      left: 0,
+      right: 0,
+      bottom: bottomInset + 24,
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: glass.GlassCard(
+          useOwnLayer: true,
+          quality: glass.GlassQuality.premium,
+          settings: settings,
+          margin: EdgeInsets.zero,
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+          shape: const glass.LiquidRoundedSuperellipse(borderRadius: 50),
+          clipBehavior: Clip.antiAlias,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildAppleDockTab(
+                context,
+                index: 0,
+                label: l10n.dictionaryTab,
+                icon: CupertinoIcons.book,
+                selectedIcon: CupertinoIcons.book_fill,
+              ),
+              const SizedBox(width: 10),
+              _buildAppleDockTab(
+                context,
+                index: 1,
+                label: l10n.bookmarksTab,
+                icon: CupertinoIcons.bookmark,
+                selectedIcon: CupertinoIcons.bookmark_fill,
+              ),
+              const SizedBox(width: 10),
+              _buildAppleDockTab(
+                context,
+                index: 2,
+                label: l10n.settingsTab,
+                icon: CupertinoIcons.gear,
+                selectedIcon: CupertinoIcons.gear_solid,
+              ),
+            ],
           ),
-          glass.GlassBottomBarTab(
-            label: l10n.bookmarksTab,
-            icon: const Icon(CupertinoIcons.bookmark),
-            activeIcon: const Icon(CupertinoIcons.bookmark_fill),
-            glowColor: resolveLiquidGlassTint(context),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppleDockTab(
+    BuildContext context, {
+    required int index,
+    required String label,
+    required IconData icon,
+    required IconData selectedIcon,
+  }) {
+    final selected = _selectedIndex == index;
+    final foregroundColor = selected
+        ? CupertinoColors.activeBlue.resolveFrom(context)
+        : CupertinoColors.systemGrey.resolveFrom(context);
+
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: CupertinoButton(
+          minimumSize: const Size(54, 48),
+          padding: EdgeInsets.zero,
+          borderRadius: BorderRadius.circular(24),
+          onPressed: () {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          child: AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 160),
+            curve: Curves.easeOutCubic,
+            style:
+                Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: foregroundColor,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0,
+                ) ??
+                TextStyle(
+                  color: foregroundColor,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0,
+                ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  selected ? selectedIcon : icon,
+                  size: 22,
+                  color: foregroundColor,
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
-          glass.GlassBottomBarTab(
-            label: l10n.settingsTab,
-            icon: const Icon(CupertinoIcons.gear),
-            activeIcon: const Icon(CupertinoIcons.gear_solid),
-            glowColor: resolveLiquidGlassTint(context),
-          ),
-        ],
+        ),
       ),
     );
   }

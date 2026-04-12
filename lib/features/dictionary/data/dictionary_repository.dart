@@ -280,22 +280,51 @@ Future<List<DictionaryEntry>> _searchDatabase({
       '''
       SELECT id
       FROM $_entriesTable
-      WHERE hokkien_search LIKE ? ESCAPE '\\'
+      WHERE hanji LIKE ? ESCAPE '\\'
+         OR hokkien_search LIKE ? ESCAPE '\\'
          OR mandarin_search LIKE ? ESCAPE '\\'
+         OR EXISTS (
+           SELECT 1
+           FROM $_sensesTable
+           WHERE $_sensesTable.entry_id = $_entriesTable.id
+             AND $_sensesTable.definition LIKE ? ESCAPE '\\'
+         )
+         OR EXISTS (
+           SELECT 1
+           FROM $_examplesTable
+           WHERE $_examplesTable.entry_id = $_entriesTable.id
+             AND (
+               $_examplesTable.hanji LIKE ? ESCAPE '\\'
+               OR $_examplesTable.mandarin LIKE ? ESCAPE '\\'
+             )
+         )
       ORDER BY
         CASE
           WHEN hanji = ? THEN 0
           WHEN hokkien_search LIKE ? ESCAPE '\\' THEN 1
+          WHEN hanji LIKE ? ESCAPE '\\' THEN 1
           ELSE 2
         END ASC,
         length(hokkien_search) ASC,
         id ASC
       LIMIT ? OFFSET ?
       ''',
-      [likeQuery, likeQuery, query, likeQuery, limit, offset],
+      [
+        likeQuery,
+        likeQuery,
+        likeQuery,
+        likeQuery,
+        likeQuery,
+        likeQuery,
+        query,
+        likeQuery,
+        likeQuery,
+        limit,
+        offset,
+      ],
     );
     final ids = idRows.map((row) => row['id'] as int).toList(growable: false);
-    return _entriesByIds(database, ids);
+    return await _entriesByIds(database, ids);
   } finally {
     await database.close();
   }
@@ -343,7 +372,7 @@ Future<List<DictionaryEntry>> _entriesByIdsFromDatabase(
 ) async {
   final database = await _openReadOnlyDatabase(databasePath);
   try {
-    return _entriesByIds(database, ids);
+    return await _entriesByIds(database, ids);
   } finally {
     await database.close();
   }
@@ -465,7 +494,10 @@ Future<List<DictionaryEntry>> _entriesByIds(
 }
 
 Future<Database> _openReadOnlyDatabase(String databasePath) {
-  return openDatabase(databasePath, readOnly: true, singleInstance: false);
+  return databaseFactorySqflitePlugin.openDatabase(
+    databasePath,
+    options: OpenDatabaseOptions(readOnly: true, singleInstance: false),
+  );
 }
 
 String _escapeSqlLike(String value) {
@@ -479,7 +511,12 @@ List<String> _decodeStoredStringList(Object? value) {
   if (value is! String || value.isEmpty) {
     return const [];
   }
-  final decoded = jsonDecode(value);
+  final Object? decoded;
+  try {
+    decoded = jsonDecode(value);
+  } on FormatException {
+    return const [];
+  }
   if (decoded is! List<dynamic>) {
     return const [];
   }
