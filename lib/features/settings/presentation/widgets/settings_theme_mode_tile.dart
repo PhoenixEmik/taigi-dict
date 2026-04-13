@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:taigi_dict/core/localization/app_localizations.dart';
 import 'package:taigi_dict/core/preferences/app_preferences.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
+import 'package:taigi_dict/features/settings/presentation/widgets/settings_glass_option_menu.dart';
 
 class SettingsThemeModeTile extends StatelessWidget {
   const SettingsThemeModeTile({
@@ -24,57 +24,12 @@ class SettingsThemeModeTile extends StatelessWidget {
       leading: Icon(Icons.palette, color: colorScheme.primary),
       title: Text(l10n.theme),
       trailing: applePlatform
-          ? CupertinoButton(
-              padding: EdgeInsets.zero,
-              minimumSize: Size.zero,
-              onPressed: () async {
-                final selected =
-                    await showCupertinoModalPopup<AppThemePreference>(
-                      context: context,
-                      builder: (context) {
-                        return CupertinoActionSheet(
-                          actions: AppThemePreference.values
-                              .map((mode) {
-                                return CupertinoActionSheetAction(
-                                  isDefaultAction: mode == value,
-                                  onPressed: () {
-                                    Navigator.of(context).pop(mode);
-                                  },
-                                  child: Text(_themeLabel(mode, l10n)),
-                                );
-                              })
-                              .toList(growable: false),
-                          cancelButton: CupertinoActionSheetAction(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text(l10n.cancelAction),
-                          ),
-                        );
-                      },
-                    );
-                if (selected != null) {
-                  onSelected(selected);
-                }
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _themeLabel(value, l10n),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: resolveLiquidGlassForeground(context),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    CupertinoIcons.chevron_down,
-                    size: 16,
-                    color: resolveLiquidGlassSecondaryForeground(context),
-                  ),
-                ],
-              ),
+          ? SettingsGlassOptionMenu<AppThemePreference>(
+              value: value,
+              label: _themeLabel(value, l10n),
+              items: AppThemePreference.values,
+              itemLabel: (mode) => _themeLabel(mode, l10n),
+              onSelected: onSelected,
             )
           : DropdownButtonHideUnderline(
               child: DropdownButton<AppThemePreference>(

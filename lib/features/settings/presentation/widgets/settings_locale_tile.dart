@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:taigi_dict/core/localization/app_localizations.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
+import 'package:taigi_dict/features/settings/presentation/widgets/settings_glass_option_menu.dart';
 
 class SettingsLocaleTile extends StatelessWidget {
   const SettingsLocaleTile({
@@ -23,56 +23,12 @@ class SettingsLocaleTile extends StatelessWidget {
       leading: Icon(Icons.language, color: colorScheme.primary),
       title: Text(l10n.languageSetting),
       trailing: applePlatform
-          ? CupertinoButton(
-              padding: EdgeInsets.zero,
-              minimumSize: Size.zero,
-              onPressed: () async {
-                final selected = await showCupertinoModalPopup<Locale>(
-                  context: context,
-                  builder: (context) {
-                    return CupertinoActionSheet(
-                      actions: AppLocalizations.supportedLocales
-                          .map((locale) {
-                            return CupertinoActionSheetAction(
-                              isDefaultAction: locale == value,
-                              onPressed: () {
-                                Navigator.of(context).pop(locale);
-                              },
-                              child: Text(l10n.localeLabel(locale)),
-                            );
-                          })
-                          .toList(growable: false),
-                      cancelButton: CupertinoActionSheetAction(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(l10n.cancelAction),
-                      ),
-                    );
-                  },
-                );
-                if (selected != null) {
-                  onSelected(selected);
-                }
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    l10n.localeLabel(value),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: resolveLiquidGlassForeground(context),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    CupertinoIcons.chevron_down,
-                    size: 16,
-                    color: resolveLiquidGlassSecondaryForeground(context),
-                  ),
-                ],
-              ),
+          ? SettingsGlassOptionMenu<Locale>(
+              value: value,
+              label: l10n.localeLabel(value),
+              items: AppLocalizations.supportedLocales,
+              itemLabel: l10n.localeLabel,
+              onSelected: onSelected,
             )
           : DropdownButtonHideUnderline(
               child: DropdownButton<Locale>(
