@@ -217,8 +217,8 @@ class _MainScreenState extends State<MainScreen> {
                 glass.GlassBottomBarTab(
                   label: l10n.dictionaryTab,
                   icon: Icon(CupertinoIcons.book, color: unselectedItemColor),
-                  activeIcon: Icon(
-                    CupertinoIcons.book_fill,
+                  activeIcon: _DockActiveIcon(
+                    icon: CupertinoIcons.book_fill,
                     color: selectedItemColor,
                   ),
                 ),
@@ -228,16 +228,16 @@ class _MainScreenState extends State<MainScreen> {
                     CupertinoIcons.bookmark,
                     color: unselectedItemColor,
                   ),
-                  activeIcon: Icon(
-                    CupertinoIcons.bookmark_fill,
+                  activeIcon: _DockActiveIcon(
+                    icon: CupertinoIcons.bookmark_fill,
                     color: selectedItemColor,
                   ),
                 ),
                 glass.GlassBottomBarTab(
                   label: l10n.settingsTab,
                   icon: Icon(CupertinoIcons.gear, color: unselectedItemColor),
-                  activeIcon: Icon(
-                    CupertinoIcons.gear_solid,
+                  activeIcon: _DockActiveIcon(
+                    icon: CupertinoIcons.gear_solid,
                     color: selectedItemColor,
                   ),
                 ),
@@ -254,9 +254,9 @@ class _MainScreenState extends State<MainScreen> {
     return glass.LiquidGlassSettings(
       glassColor: isLight
           ? Colors.white.withValues(alpha: 0.58)
-          : Colors.white.withValues(alpha: 0.24),
+          : Colors.black.withValues(alpha: 0.6),
       thickness: 30,
-      blur: 3,
+      blur: isLight ? 3 : 25,
       chromaticAberration: 0.3,
       lightIntensity: 0.6,
       refractiveIndex: 1.59,
@@ -271,9 +271,7 @@ class _MainScreenState extends State<MainScreen> {
 
   Color _dockUnselectedItemColor(BuildContext context) {
     final isLight = Theme.of(context).brightness == Brightness.light;
-    return isLight
-        ? Colors.black87
-        : CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, context);
+    return isLight ? Colors.black87 : Colors.white;
   }
 
   Color _dockIndicatorColor(BuildContext context) {
@@ -432,6 +430,32 @@ class _MainScreenState extends State<MainScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+class _DockActiveIcon extends StatelessWidget {
+  const _DockActiveIcon({required this.icon, required this.color});
+
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconWidget = Icon(icon, color: color);
+
+    if (!isDark) {
+      return iconWidget;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: iconWidget,
     );
   }
 }
