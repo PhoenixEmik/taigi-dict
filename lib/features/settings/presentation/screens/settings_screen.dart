@@ -126,72 +126,189 @@ class SettingsScreen extends StatelessWidget {
           ),
         ];
         final aboutSection = [
-          ListTile(
-            leading: Icon(Icons.tune_outlined, color: colorScheme.primary),
-            title: Text(l10n.advancedSettings),
-            subtitle: Text(l10n.advancedSettingsSubtitle),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) => AdvancedSettingsScreen(
-                    onRebuildDictionaryDatabase: onRebuildDictionaryDatabase,
+          applePlatform
+              ? glass.GlassListTile(
+                  showDivider: false,
+                  leadingIconColor: resolveLiquidGlassTint(context),
+                  titleStyle: resolveGlassListTileTitleStyle(context),
+                  subtitleStyle: resolveGlassListTileSubtitleStyle(context),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
                   ),
+                  leading: const Icon(Icons.tune_outlined),
+                  title: Text(l10n.advancedSettings),
+                  subtitle: Text(l10n.advancedSettingsSubtitle),
+                  trailing: glassChevron(context),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (context) => AdvancedSettingsScreen(
+                          onRebuildDictionaryDatabase:
+                              onRebuildDictionaryDatabase,
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : ListTile(
+                  leading: Icon(
+                    Icons.tune_outlined,
+                    color: colorScheme.primary,
+                  ),
+                  title: Text(l10n.advancedSettings),
+                  subtitle: Text(l10n.advancedSettingsSubtitle),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (context) => AdvancedSettingsScreen(
+                          onRebuildDictionaryDatabase:
+                              onRebuildDictionaryDatabase,
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.translate_outlined, color: colorScheme.primary),
-            title: Text(l10n.tailoGuide),
-            subtitle: Text(l10n.tailoGuideSubtitle),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              _showReferenceArticle(
-                context,
-                article: buildTailoReferenceArticle(l10n),
-              );
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.edit_note_outlined, color: colorScheme.primary),
-            title: Text(l10n.hanjiGuide),
-            subtitle: Text(l10n.hanjiGuideSubtitle),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              _showReferenceArticle(
-                context,
-                article: buildHanjiReferenceArticle(l10n),
-              );
-            },
-          ),
-          AboutListTile(
-            icon: Icon(Icons.info_outline, color: colorScheme.primary),
-            applicationName: l10n.appTitle,
-            applicationLegalese: l10n.aboutLegalese,
-            aboutBoxChildren: [
-              const SizedBox(height: 12),
-              Text(l10n.aboutDescription),
-              const SizedBox(height: 12),
-              Text(
-                '${l10n.referencePage}: https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${l10n.tailoGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/',
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${l10n.hanjiGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/',
-              ),
-            ],
-            applicationIcon: SvgPicture.asset(
-              'assets/icon/taigi_dict.svg',
-              width: 56,
-              height: 56,
-            ),
-            child: Text(l10n.aboutApp),
-          ),
+          applePlatform
+              ? glass.GlassListTile(
+                  showDivider: false,
+                  leadingIconColor: resolveLiquidGlassTint(context),
+                  titleStyle: resolveGlassListTileTitleStyle(context),
+                  subtitleStyle: resolveGlassListTileSubtitleStyle(context),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
+                  leading: const Icon(Icons.translate_outlined),
+                  title: Text(l10n.tailoGuide),
+                  subtitle: Text(l10n.tailoGuideSubtitle),
+                  trailing: glassChevron(context),
+                  onTap: () {
+                    _showReferenceArticle(
+                      context,
+                      article: buildTailoReferenceArticle(l10n),
+                    );
+                  },
+                )
+              : ListTile(
+                  leading: Icon(
+                    Icons.translate_outlined,
+                    color: colorScheme.primary,
+                  ),
+                  title: Text(l10n.tailoGuide),
+                  subtitle: Text(l10n.tailoGuideSubtitle),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    _showReferenceArticle(
+                      context,
+                      article: buildTailoReferenceArticle(l10n),
+                    );
+                  },
+                ),
+          applePlatform
+              ? glass.GlassListTile(
+                  showDivider: false,
+                  leadingIconColor: resolveLiquidGlassTint(context),
+                  titleStyle: resolveGlassListTileTitleStyle(context),
+                  subtitleStyle: resolveGlassListTileSubtitleStyle(context),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
+                  leading: const Icon(Icons.edit_note_outlined),
+                  title: Text(l10n.hanjiGuide),
+                  subtitle: Text(l10n.hanjiGuideSubtitle),
+                  trailing: glassChevron(context),
+                  onTap: () {
+                    _showReferenceArticle(
+                      context,
+                      article: buildHanjiReferenceArticle(l10n),
+                    );
+                  },
+                )
+              : ListTile(
+                  leading: Icon(
+                    Icons.edit_note_outlined,
+                    color: colorScheme.primary,
+                  ),
+                  title: Text(l10n.hanjiGuide),
+                  subtitle: Text(l10n.hanjiGuideSubtitle),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    _showReferenceArticle(
+                      context,
+                      article: buildHanjiReferenceArticle(l10n),
+                    );
+                  },
+                ),
+          applePlatform
+              ? glass.GlassListTile(
+                  showDivider: false,
+                  leadingIconColor: resolveLiquidGlassTint(context),
+                  titleStyle: resolveGlassListTileTitleStyle(context),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
+                  leading: const Icon(Icons.info_outline),
+                  title: Text(l10n.aboutApp),
+                  onTap: () {
+                    showAboutDialog(
+                      context: context,
+                      applicationName: l10n.appTitle,
+                      applicationLegalese: l10n.aboutLegalese,
+                      applicationIcon: SvgPicture.asset(
+                        'assets/icon/taigi_dict.svg',
+                        width: 56,
+                        height: 56,
+                      ),
+                      children: [
+                        const SizedBox(height: 12),
+                        Text(l10n.aboutDescription),
+                        const SizedBox(height: 12),
+                        Text(
+                          '${l10n.referencePage}: https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${l10n.tailoGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/',
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${l10n.hanjiGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/',
+                        ),
+                      ],
+                    );
+                  },
+                )
+              : AboutListTile(
+                  icon: Icon(Icons.info_outline, color: colorScheme.primary),
+                  applicationName: l10n.appTitle,
+                  applicationLegalese: l10n.aboutLegalese,
+                  aboutBoxChildren: [
+                    const SizedBox(height: 12),
+                    Text(l10n.aboutDescription),
+                    const SizedBox(height: 12),
+                    Text(
+                      '${l10n.referencePage}: https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${l10n.tailoGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/',
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${l10n.hanjiGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/',
+                    ),
+                  ],
+                  applicationIcon: SvgPicture.asset(
+                    'assets/icon/taigi_dict.svg',
+                    width: 56,
+                    height: 56,
+                  ),
+                  child: Text(l10n.aboutApp),
+                ),
         ];
 
         final content = LiquidGlassBackground(

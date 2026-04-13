@@ -117,15 +117,33 @@ class AdvancedSettingsScreen extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final applePlatform = isApplePlatform(context);
     final sectionChildren = [
-      ListTile(
-        leading: Icon(Icons.storage_outlined, color: colorScheme.primary),
-        title: Text(l10n.rebuildDictionaryDatabase),
-        subtitle: Text(l10n.rebuildDictionaryDatabaseSubtitle),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () {
-          unawaited(_confirmAndRebuild(context));
-        },
-      ),
+      applePlatform
+          ? glass.GlassListTile(
+              showDivider: false,
+              leadingIconColor: resolveLiquidGlassTint(context),
+              titleStyle: resolveGlassListTileTitleStyle(context),
+              subtitleStyle: resolveGlassListTileSubtitleStyle(context),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 8,
+              ),
+              leading: const Icon(Icons.storage_outlined),
+              title: Text(l10n.rebuildDictionaryDatabase),
+              subtitle: Text(l10n.rebuildDictionaryDatabaseSubtitle),
+              trailing: glassChevron(context),
+              onTap: () {
+                unawaited(_confirmAndRebuild(context));
+              },
+            )
+          : ListTile(
+              leading: Icon(Icons.storage_outlined, color: colorScheme.primary),
+              title: Text(l10n.rebuildDictionaryDatabase),
+              subtitle: Text(l10n.rebuildDictionaryDatabaseSubtitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                unawaited(_confirmAndRebuild(context));
+              },
+            ),
     ];
 
     final body = Align(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as glass;
 import 'package:taigi_dict/core/localization/app_localizations.dart';
 import 'package:taigi_dict/offline_audio.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
@@ -63,6 +64,66 @@ class AudioResourceTile extends StatelessWidget {
         final onPressed = snapshot.state == DownloadState.completed
             ? null
             : () => onDownload(type);
+        final leadingIcon = type == AudioArchiveType.word
+            ? Icons.record_voice_over_outlined
+            : Icons.chat_bubble_outline;
+        final title = Text(
+          titleText,
+          style: applePlatform
+              ? null
+              : theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+        );
+        final subtitle = Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${type.archiveFileName} • ${formatBytes(type.archiveBytes)}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: applePlatform
+                      ? resolveLiquidGlassSecondaryForeground(context)
+                      : colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                statusText,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: applePlatform
+                      ? resolveLiquidGlassSecondaryForeground(context)
+                      : colorScheme.onSurfaceVariant,
+                ),
+              ),
+              if (progress != null &&
+                  (snapshot.state != DownloadState.idle || isReady)) ...[
+                const SizedBox(height: 8),
+                LinearProgressIndicator(
+                  minHeight: applePlatform ? 4 : null,
+                  value: snapshot.state == DownloadState.completed
+                      ? 1
+                      : progress,
+                  borderRadius: applePlatform
+                      ? BorderRadius.circular(999)
+                      : null,
+                  backgroundColor: applePlatform
+                      ? resolveLiquidGlassSecondaryTint(
+                          context,
+                        ).withValues(alpha: 0.45)
+                      : null,
+                ),
+              ],
+            ],
+          ),
+        );
+        final trailing = AdaptiveSettingsActionButton(
+          tooltip: actionTooltip,
+          onPressed: onPressed,
+          icon: actionIcon,
+        );
 
         return MergeSemantics(
           child: Semantics(
@@ -76,69 +137,31 @@ class AudioResourceTile extends StatelessWidget {
               snapshot.downloadedBytes,
               snapshot.totalBytes > 0 ? snapshot.totalBytes : type.archiveBytes,
             ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 4,
-              ),
-              leading: Icon(
-                type == AudioArchiveType.word
-                    ? Icons.record_voice_over_outlined
-                    : Icons.chat_bubble_outline,
-                color: colorScheme.primary,
-              ),
-              title: Text(
-                titleText,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${type.archiveFileName} • ${formatBytes(type.archiveBytes)}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+            child: applePlatform
+                ? glass.GlassListTile(
+                    showDivider: false,
+                    leadingIconColor: resolveLiquidGlassTint(context),
+                    titleStyle: resolveGlassListTileTitleStyle(context),
+                    subtitleStyle: resolveGlassListTileSubtitleStyle(context),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 8,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      statusText,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
+                    leading: Icon(leadingIcon),
+                    title: title,
+                    subtitle: subtitle,
+                    trailing: trailing,
+                  )
+                : ListTile(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 4,
                     ),
-                    if (progress != null &&
-                        (snapshot.state != DownloadState.idle || isReady)) ...[
-                      const SizedBox(height: 8),
-                      LinearProgressIndicator(
-                        minHeight: applePlatform ? 4 : null,
-                        value: snapshot.state == DownloadState.completed
-                            ? 1
-                            : progress,
-                        borderRadius: applePlatform
-                            ? BorderRadius.circular(999)
-                            : null,
-                        backgroundColor: applePlatform
-                            ? resolveLiquidGlassSecondaryTint(
-                                context,
-                              ).withValues(alpha: 0.45)
-                            : null,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              trailing: AdaptiveSettingsActionButton(
-                tooltip: actionTooltip,
-                onPressed: onPressed,
-                icon: actionIcon,
-              ),
-            ),
+                    leading: Icon(leadingIcon, color: colorScheme.primary),
+                    title: title,
+                    subtitle: subtitle,
+                    trailing: trailing,
+                  ),
           ),
         );
       },

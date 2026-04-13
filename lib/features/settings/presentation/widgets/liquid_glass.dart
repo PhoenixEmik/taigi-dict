@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as glass;
 
 const _liquidGlassFill = CupertinoDynamicColor.withBrightness(
   color: Color(0x26FFFFFF),
@@ -65,6 +66,27 @@ Color resolveAdaptiveCircleButtonIconColor(BuildContext context) {
   return brightness == Brightness.light
       ? Theme.of(context).colorScheme.primary
       : Colors.blueAccent.shade100;
+}
+
+TextStyle? resolveGlassListTileTitleStyle(BuildContext context) {
+  return Theme.of(context).textTheme.titleMedium?.copyWith(
+    color: resolveLiquidGlassForeground(context),
+    fontWeight: FontWeight.w700,
+  );
+}
+
+TextStyle? resolveGlassListTileSubtitleStyle(BuildContext context) {
+  return Theme.of(context).textTheme.bodySmall?.copyWith(
+    color: resolveLiquidGlassSecondaryForeground(context),
+  );
+}
+
+Icon glassChevron(BuildContext context) {
+  return Icon(
+    Icons.chevron_right,
+    color: resolveLiquidGlassSecondaryForeground(context),
+    size: 20,
+  );
 }
 
 class LiquidGlassBackground extends StatelessWidget {
@@ -190,24 +212,34 @@ class AdaptiveSettingsActionButton extends StatelessWidget {
     }
 
     final tint = resolveLiquidGlassTint(context);
-    final secondary = resolveLiquidGlassSecondaryTint(context);
+    final buttonSettings = glass.LiquidGlassSettings(
+      blur: 18,
+      thickness: 16,
+      glassColor: Theme.of(context).brightness == Brightness.dark
+          ? Colors.white.withValues(alpha: 0.14)
+          : Colors.white.withValues(alpha: 0.36),
+      lightIntensity: 0.72,
+      ambientStrength: 0.24,
+      refractiveIndex: 1.16,
+      saturation: 1.15,
+      chromaticAberration: 0.01,
+    );
 
     return Tooltip(
       message: tooltip,
-      child: CupertinoButton(
-        padding: EdgeInsets.zero,
-        minimumSize: Size.zero,
-        onPressed: onPressed,
-        child: Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: secondary,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-          ),
-          child: Icon(icon, color: tint, size: 20),
-        ),
+      child: glass.GlassButton(
+        label: tooltip,
+        icon: Icon(icon),
+        onTap: onPressed ?? () {},
+        enabled: onPressed != null,
+        width: 36,
+        height: 36,
+        iconSize: 20,
+        iconColor: tint,
+        settings: buttonSettings,
+        useOwnLayer: false,
+        quality: glass.GlassQuality.standard,
+        shape: const glass.LiquidOval(),
       ),
     );
   }
