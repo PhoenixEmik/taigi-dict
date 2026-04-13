@@ -26,11 +26,15 @@ class SettingsTextScaleTile extends StatelessWidget {
         )
         .toDouble();
     final sliderStep = _valueToSliderStep(sliderValue);
-    final trailing = Text(
-      '${(sliderValue * 100).toInt()}%',
-      style: theme.textTheme.labelLarge?.copyWith(
-        color: applePlatform ? resolveLiquidGlassForeground(context) : null,
-        fontWeight: FontWeight.w700,
+    final trailing = SizedBox(
+      width: 50,
+      child: Text(
+        '${(sliderValue * 100).toInt()}%',
+        textAlign: TextAlign.right,
+        style: theme.textTheme.labelLarge?.copyWith(
+          color: applePlatform ? resolveLiquidGlassForeground(context) : null,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
     final subtitle = Padding(
