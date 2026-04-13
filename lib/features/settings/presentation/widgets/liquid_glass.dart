@@ -82,7 +82,7 @@ class LiquidGlassBackground extends StatelessWidget {
     final bottomGlow = resolveLiquidGlassSecondaryTint(
       context,
     ).withValues(alpha: 0.32);
-    final base = Theme.of(context).colorScheme.surface;
+    final base = Theme.of(context).scaffoldBackgroundColor;
 
     return DecoratedBox(
       decoration: BoxDecoration(

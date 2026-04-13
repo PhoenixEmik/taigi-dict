@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 const _fontFamilyFallback = <String>['TauhuOo'];
 
 ThemeData buildLightAppTheme({required bool applePlatform}) {
-  const iosCanvas = Color(0xFFF2F2F7);
+  const iosCanvas = Color(0xFFE9EBF0);
   const iosDeepInk = Color(0xFF111111);
   const iosPrimary = Color(0xFF007AFF);
   const iosTertiary = Color(0xFFFF9F0A);
@@ -30,7 +30,7 @@ ThemeData buildLightAppTheme({required bool applePlatform}) {
     outlineColor: applePlatform ? iosOutline : androidOutline,
     mutedTextColor: applePlatform ? iosMutedText : androidMutedText,
     surfaceContainerLow: applePlatform
-        ? const Color(0xFFFFFFFF)
+        ? const Color(0xFFF4F5F8)
         : const Color(0xFFFFFBF5),
     appBarBackgroundColor: Colors.transparent,
     appBarForegroundColor: applePlatform ? iosDeepInk : androidDeepInk,
