@@ -31,6 +31,7 @@ class AppPreferences extends ChangeNotifier {
   static const _themePreferenceKey = 'theme_preference';
   static const minReadingTextScale = 0.9;
   static const maxReadingTextScale = 1.4;
+  static const readingTextScaleDivisions = 5;
 
   double _readingTextScale = 1.0;
   AppThemePreference _themePreference = AppThemePreference.system;
@@ -47,9 +48,7 @@ class AppPreferences extends ChangeNotifier {
     );
     final storedScale = preferences.getDouble(_readingTextScaleKey);
     if (storedScale != null) {
-      _readingTextScale = storedScale
-          .clamp(minReadingTextScale, maxReadingTextScale)
-          .toDouble();
+      _readingTextScale = _snapReadingTextScale(storedScale);
     }
     notifyListeners();
   }
@@ -67,9 +66,7 @@ class AppPreferences extends ChangeNotifier {
   }
 
   Future<void> setReadingTextScale(double value) async {
-    final nextValue = value
-        .clamp(minReadingTextScale, maxReadingTextScale)
-        .toDouble();
+    final nextValue = _snapReadingTextScale(value);
     if (_readingTextScale == nextValue) {
       return;
     }
@@ -79,6 +76,16 @@ class AppPreferences extends ChangeNotifier {
 
     final preferences = await SharedPreferences.getInstance();
     await preferences.setDouble(_readingTextScaleKey, nextValue);
+  }
+
+  static double _snapReadingTextScale(double value) {
+    const step =
+        (maxReadingTextScale - minReadingTextScale) / readingTextScaleDivisions;
+    final clamped = value.clamp(minReadingTextScale, maxReadingTextScale);
+    final snapped =
+        minReadingTextScale +
+        (((clamped - minReadingTextScale) / step).round() * step);
+    return double.parse(snapped.toStringAsFixed(2));
   }
 }
 

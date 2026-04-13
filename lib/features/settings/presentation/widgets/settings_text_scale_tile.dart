@@ -19,8 +19,14 @@ class SettingsTextScaleTile extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final applePlatform = isApplePlatform(context);
+    final sliderValue = value
+        .clamp(
+          AppPreferences.minReadingTextScale,
+          AppPreferences.maxReadingTextScale,
+        )
+        .toDouble();
     final trailing = Text(
-      '${(value * 100).round()}%',
+      '${(sliderValue * 100).round()}%',
       style: theme.textTheme.labelLarge?.copyWith(
         color: applePlatform ? resolveLiquidGlassForeground(context) : null,
         fontWeight: FontWeight.w700,
@@ -36,8 +42,8 @@ class SettingsTextScaleTile extends StatelessWidget {
               value: value,
               min: AppPreferences.minReadingTextScale,
               max: AppPreferences.maxReadingTextScale,
-              divisions: 5,
-              label: l10n.readingTextScaleLabel(value),
+              divisions: AppPreferences.readingTextScaleDivisions,
+              label: l10n.readingTextScaleLabel(sliderValue),
               activeColor: resolveLiquidGlassTint(context),
               inactiveColor: Theme.of(context).brightness == Brightness.dark
                   ? Colors.white.withValues(alpha: 0.16)
@@ -46,16 +52,16 @@ class SettingsTextScaleTile extends StatelessWidget {
               trackHeight: 4,
               thumbRadius: 13,
               quality: glass.GlassQuality.standard,
-              onChanged: onChanged,
+              onChanged: _handleDiscreteValueChanged,
             )
           else
             Slider.adaptive(
-              value: value,
+              value: sliderValue,
               min: AppPreferences.minReadingTextScale,
               max: AppPreferences.maxReadingTextScale,
-              divisions: 5,
-              label: l10n.readingTextScaleLabel(value),
-              onChanged: onChanged,
+              divisions: AppPreferences.readingTextScaleDivisions,
+              label: l10n.readingTextScaleLabel(sliderValue),
+              onChanged: _handleDiscreteValueChanged,
             ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -102,5 +108,17 @@ class SettingsTextScaleTile extends StatelessWidget {
       trailing: trailing,
       subtitle: subtitle,
     );
+  }
+
+  void _handleDiscreteValueChanged(double rawValue) {
+    final step =
+        (AppPreferences.maxReadingTextScale -
+            AppPreferences.minReadingTextScale) /
+        AppPreferences.readingTextScaleDivisions;
+    final snapped =
+        AppPreferences.minReadingTextScale +
+        (((rawValue - AppPreferences.minReadingTextScale) / step).round() *
+            step);
+    onChanged(double.parse(snapped.toStringAsFixed(2)));
   }
 }

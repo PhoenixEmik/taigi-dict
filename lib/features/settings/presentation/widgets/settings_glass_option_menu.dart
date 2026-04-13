@@ -87,12 +87,12 @@ glass.LiquidGlassSettings _settingsMenuGlassSettings(BuildContext context) {
     blur: 24,
     thickness: 22,
     glassColor: isDark
-        ? Colors.black.withValues(alpha: 0.26)
-        : Colors.black.withValues(alpha: 0.36),
+        ? Colors.black.withValues(alpha: 0.46)
+        : Colors.black.withValues(alpha: 0.68),
     lightIntensity: 0.72,
-    ambientStrength: 0.28,
+    ambientStrength: isDark ? 0.22 : 0.16,
     refractiveIndex: 1.18,
-    saturation: isDark ? 1.25 : 1.1,
+    saturation: isDark ? 1.25 : 0.95,
     chromaticAberration: 0.02,
   );
 }
