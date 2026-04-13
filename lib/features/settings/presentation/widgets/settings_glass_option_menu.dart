@@ -30,12 +30,15 @@ class SettingsGlassOptionMenu<T> extends StatelessWidget {
       items: [
         for (final item in items)
           glass.GlassMenuItem(
-            title: itemLabel(item),
+            // GlassMenuItem hardcodes white text, so render the visible label
+            // as a custom child to keep light-mode menus accessible.
+            title: '',
+            icon: _SettingsGlassMenuItemLabel(label: itemLabel(item)),
             height: 48,
             trailing: item == value
                 ? Icon(
-                    CupertinoIcons.check_mark,
-                    color: resolveLiquidGlassTint(context),
+                    CupertinoIcons.checkmark,
+                    color: CupertinoColors.activeBlue.resolveFrom(context),
                     size: 18,
                   )
                 : null,
@@ -46,6 +49,27 @@ class SettingsGlassOptionMenu<T> extends StatelessWidget {
             },
           ),
       ],
+    );
+  }
+}
+
+class _SettingsGlassMenuItemLabel extends StatelessWidget {
+  const _SettingsGlassMenuItemLabel({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Text(
+      label,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        color: isDark ? Colors.white : Colors.black87,
+        fontSize: 17,
+        fontWeight: FontWeight.w400,
+      ),
     );
   }
 }
@@ -88,11 +112,11 @@ glass.LiquidGlassSettings _settingsMenuGlassSettings(BuildContext context) {
     thickness: 22,
     glassColor: isDark
         ? Colors.black.withValues(alpha: 0.46)
-        : Colors.black.withValues(alpha: 0.68),
+        : Colors.white.withValues(alpha: 0.82),
     lightIntensity: 0.72,
-    ambientStrength: isDark ? 0.22 : 0.16,
+    ambientStrength: isDark ? 0.22 : 0.3,
     refractiveIndex: 1.18,
-    saturation: isDark ? 1.25 : 0.95,
+    saturation: isDark ? 1.25 : 1.08,
     chromaticAberration: 0.02,
   );
 }
