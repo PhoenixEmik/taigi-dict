@@ -197,6 +197,8 @@ class _MainScreenState extends State<MainScreen> {
     final barWidth = (MediaQuery.sizeOf(context).width - 64)
         .clamp(248.0, 320.0)
         .toDouble();
+    final selectedItemColor = _dockSelectedItemColor(context);
+    final unselectedItemColor = _dockUnselectedItemColor(context);
 
     return Positioned(
       left: 0,
@@ -210,6 +212,10 @@ class _MainScreenState extends State<MainScreen> {
             width: barWidth,
             child: glass.GlassBottomBar(
               selectedIndex: _selectedIndex,
+              glassSettings: _dockGlassSettings(context),
+              indicatorColor: _dockIndicatorColor(context),
+              selectedIconColor: selectedItemColor,
+              unselectedIconColor: unselectedItemColor,
               onTabSelected: (index) {
                 setState(() {
                   _selectedIndex = index;
@@ -218,18 +224,33 @@ class _MainScreenState extends State<MainScreen> {
               tabs: [
                 glass.GlassBottomBarTab(
                   label: l10n.dictionaryTab,
-                  icon: const Icon(CupertinoIcons.book),
-                  activeIcon: const Icon(CupertinoIcons.book_fill),
+                  icon: Icon(CupertinoIcons.book, color: unselectedItemColor),
+                  activeIcon: Icon(
+                    CupertinoIcons.book_fill,
+                    color: selectedItemColor,
+                  ),
+                  glowColor: selectedItemColor.withValues(alpha: 0.16),
                 ),
                 glass.GlassBottomBarTab(
                   label: l10n.bookmarksTab,
-                  icon: const Icon(CupertinoIcons.bookmark),
-                  activeIcon: const Icon(CupertinoIcons.bookmark_fill),
+                  icon: Icon(
+                    CupertinoIcons.bookmark,
+                    color: unselectedItemColor,
+                  ),
+                  activeIcon: Icon(
+                    CupertinoIcons.bookmark_fill,
+                    color: selectedItemColor,
+                  ),
+                  glowColor: selectedItemColor.withValues(alpha: 0.16),
                 ),
                 glass.GlassBottomBarTab(
                   label: l10n.settingsTab,
-                  icon: const Icon(CupertinoIcons.gear),
-                  activeIcon: const Icon(CupertinoIcons.gear_solid),
+                  icon: Icon(CupertinoIcons.gear, color: unselectedItemColor),
+                  activeIcon: Icon(
+                    CupertinoIcons.gear_solid,
+                    color: selectedItemColor,
+                  ),
+                  glowColor: selectedItemColor.withValues(alpha: 0.16),
                 ),
               ],
             ),
@@ -237,6 +258,43 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
+  }
+
+  glass.LiquidGlassSettings _dockGlassSettings(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    return glass.LiquidGlassSettings(
+      glassColor: isLight
+          ? Colors.white.withValues(alpha: 0.82)
+          : Colors.white.withValues(alpha: 0.24),
+      thickness: isLight ? 34 : 30,
+      blur: isLight ? 25 : 3,
+      chromaticAberration: 0.3,
+      lightIntensity: isLight ? 0.75 : 0.6,
+      refractiveIndex: 1.59,
+      saturation: isLight ? 1.1 : 0.7,
+      ambientStrength: isLight ? 0.85 : 1,
+    );
+  }
+
+  Color _dockSelectedItemColor(BuildContext context) {
+    return CupertinoDynamicColor.resolve(CupertinoColors.activeBlue, context);
+  }
+
+  Color _dockUnselectedItemColor(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    return isLight
+        ? Colors.black87
+        : CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, context);
+  }
+
+  Color _dockIndicatorColor(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    return isLight
+        ? CupertinoDynamicColor.resolve(
+            CupertinoColors.activeBlue,
+            context,
+          ).withValues(alpha: 0.18)
+        : Colors.white.withValues(alpha: 0.12);
   }
 
   PreferredSizeWidget? _buildRootAppBar(
