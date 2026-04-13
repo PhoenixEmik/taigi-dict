@@ -91,9 +91,18 @@ class WordDetailCoordinator {
         return;
       }
 
+      final resolvedLinkedEntry = await _resolveAliasEntry(
+        repository: repository,
+        bundle: bundle,
+        entry: linkedEntry,
+      );
+      if (!context.mounted || resolvedLinkedEntry.id == resolvedEntry.id) {
+        return;
+      }
+
       await showWordDetail(
         context: context,
-        entry: linkedEntry,
+        entry: resolvedLinkedEntry,
         repository: repository,
         bundle: bundle,
         audioLibrary: audioLibrary,

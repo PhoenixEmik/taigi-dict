@@ -774,7 +774,7 @@ void main() {
     }
   });
 
-  testWidgets('alias entry list item points to the primary entry', (
+  testWidgets('alias entry list item hides pointer-only summary', (
     WidgetTester tester,
   ) async {
     final semanticsHandle = tester.ensureSemantics();
@@ -807,12 +807,13 @@ void main() {
         ),
       );
 
-      expect(find.text('→ 查閱主詞條'), findsOneWidget);
+      expect(find.text('男人'), findsOneWidget);
       expect(find.text('近反義詞不單列詞目者'), findsNothing);
+      expect(find.textContaining('查閱主詞條'), findsNothing);
       expect(
-        tester.getSemantics(find.bySemanticsLabel('男人。白話字 lâm-jîn。查閱主詞條')),
+        tester.getSemantics(find.bySemanticsLabel('男人。白話字 lâm-jîn')),
         matchesSemantics(
-          label: '男人。白話字 lâm-jîn。查閱主詞條',
+          label: '男人。白話字 lâm-jîn',
           hint: '雙擊開啟詞條詳細資料',
           isButton: true,
         ),

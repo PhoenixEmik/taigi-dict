@@ -17,9 +17,7 @@ class EntryListItem extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final applePlatform = isApplePlatform(context);
-    final summary = entry.redirectsToPrimaryEntry
-        ? '→ ${l10n.seePrimaryEntryLabel}'
-        : entry.briefSummary;
+    final summary = entry.briefSummary;
 
     Widget content;
     if (applePlatform) {
@@ -193,8 +191,6 @@ String _semanticLabel(DictionaryEntry entry, AppLocalizations l10n) {
   }
   if (entry.briefSummary.isNotEmpty) {
     parts.add(l10n.definitionLabel(entry.briefSummary));
-  } else if (entry.redirectsToPrimaryEntry) {
-    parts.add(l10n.seePrimaryEntryLabel);
   }
   return l10n.semanticsJoined(parts);
 }
