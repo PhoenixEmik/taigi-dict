@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:taigi_dict/core/localization/app_localizations.dart';
 import 'package:taigi_dict/core/utils/dialog_utils.dart';
 import 'package:taigi_dict/features/dictionary/data/dictionary_database_builder_service.dart';
+import 'package:taigi_dict/features/settings/presentation/widgets/glass_notification.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/settings_section_header.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as glass;
@@ -89,26 +90,19 @@ class AdvancedSettingsScreen extends StatelessWidget {
 
     Navigator.of(context, rootNavigator: true).pop();
 
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            error == null
-                ? l10n.rebuildDictionaryDatabaseSuccess
-                : error is MissingDictionarySourceException
-                ? l10n.downloadDictionarySourceFirst
-                : error is CorruptedDictionarySourceException
-                ? l10n.dictionarySourceCorrupted
-                : error is MissingDictionarySheetException
-                ? l10n.dictionarySourceSheetMissing(error.sheetName)
-                : l10n.dictionaryDatabaseRebuildFailed('$error'),
-          ),
-          backgroundColor: error == null
-              ? const Color(0xFF0E2F35)
-              : const Color(0xFF8A3B1F),
-        ),
-      );
+    showGlassNotification(
+      context,
+      message: error == null
+          ? l10n.rebuildDictionaryDatabaseSuccess
+          : error is MissingDictionarySourceException
+          ? l10n.downloadDictionarySourceFirst
+          : error is CorruptedDictionarySourceException
+          ? l10n.dictionarySourceCorrupted
+          : error is MissingDictionarySheetException
+          ? l10n.dictionarySourceSheetMissing(error.sheetName)
+          : l10n.dictionaryDatabaseRebuildFailed('$error'),
+      isError: error != null,
+    );
   }
 
   @override

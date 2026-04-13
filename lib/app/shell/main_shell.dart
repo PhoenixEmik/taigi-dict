@@ -12,6 +12,7 @@ import 'package:taigi_dict/features/dictionary/data/dictionary_repository.dart';
 import 'package:taigi_dict/features/dictionary/data/offline_dictionary_library.dart';
 import 'package:taigi_dict/features/dictionary/presentation/screens/dictionary_screen.dart';
 import 'package:taigi_dict/features/settings/presentation/screens/settings_screen.dart';
+import 'package:taigi_dict/features/settings/presentation/widgets/glass_notification.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
 import 'package:taigi_dict/offline_audio.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as glass;
@@ -168,16 +169,7 @@ class _MainScreenState extends State<MainScreen> {
       return;
     }
 
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: result.isError
-              ? const Color(0xFF8A3B1F)
-              : const Color(0xFF0E2F35),
-        ),
-      );
+    showGlassNotification(context, message: message, isError: result.isError);
   }
 
   String _describeDatabaseRebuildError(Object error, AppLocalizations l10n) {
