@@ -192,7 +192,7 @@ class _GlassSettingsGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return glass.GlassCard(
+    return glass.GlassPanel(
       useOwnLayer: true,
       quality: glass.GlassQuality.standard,
       settings: settings,
