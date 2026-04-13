@@ -213,6 +213,7 @@ class _MainScreenState extends State<MainScreen> {
             child: glass.GlassBottomBar(
               selectedIndex: _selectedIndex,
               glassSettings: _dockGlassSettings(context),
+              indicatorColor: _dockIndicatorColor(context),
               selectedIconColor: selectedItemColor,
               unselectedIconColor: unselectedItemColor,
               onTabSelected: (index) {
@@ -228,7 +229,6 @@ class _MainScreenState extends State<MainScreen> {
                     CupertinoIcons.book_fill,
                     color: selectedItemColor,
                   ),
-                  glowColor: selectedItemColor.withValues(alpha: 0.16),
                 ),
                 glass.GlassBottomBarTab(
                   label: l10n.bookmarksTab,
@@ -240,7 +240,6 @@ class _MainScreenState extends State<MainScreen> {
                     CupertinoIcons.bookmark_fill,
                     color: selectedItemColor,
                   ),
-                  glowColor: selectedItemColor.withValues(alpha: 0.16),
                 ),
                 glass.GlassBottomBarTab(
                   label: l10n.settingsTab,
@@ -249,7 +248,6 @@ class _MainScreenState extends State<MainScreen> {
                     CupertinoIcons.gear_solid,
                     color: selectedItemColor,
                   ),
-                  glowColor: selectedItemColor.withValues(alpha: 0.16),
                 ),
               ],
             ),
@@ -284,6 +282,13 @@ class _MainScreenState extends State<MainScreen> {
     return isLight
         ? Colors.black87
         : CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, context);
+  }
+
+  Color _dockIndicatorColor(BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    return isLight
+        ? Colors.black.withValues(alpha: 0.06)
+        : Colors.white.withValues(alpha: 0.12);
   }
 
   PreferredSizeWidget? _buildRootAppBar(
