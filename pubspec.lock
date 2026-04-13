@@ -360,10 +360,9 @@ packages:
   liquid_glass_widgets:
     dependency: "direct main"
     description:
-      name: liquid_glass_widgets
-      sha256: f8be4aeb82ba7892160786d6ee437673fb893d1385ae126a9ddc990f4d79ae83
-      url: "https://pub.dev"
-    source: hosted
+      path: "third_party/liquid_glass_widgets"
+      relative: true
+    source: path
     version: "0.7.8"
   logging:
     dependency: transitive
