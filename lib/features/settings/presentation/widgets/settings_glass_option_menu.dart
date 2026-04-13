@@ -22,7 +22,7 @@ class SettingsGlassOptionMenu<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return glass.GlassMenu(
-      menuWidth: 188,
+      menuWidth: 216,
       menuBorderRadius: 22,
       glassSettings: _settingsMenuGlassSettings(context),
       quality: glass.GlassQuality.premium,
@@ -61,14 +61,17 @@ class _SettingsGlassMenuItemLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Text(
-      label,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      style: TextStyle(
-        color: isDark ? Colors.white : Colors.black87,
-        fontSize: 17,
-        fontWeight: FontWeight.w400,
+    return SizedBox(
+      width: 132,
+      child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: isDark ? Colors.white : Colors.black87,
+          fontSize: 17,
+          fontWeight: FontWeight.w400,
+        ),
       ),
     );
   }
