@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:taigi_dict/core/core.dart';
 import 'package:taigi_dict/features/dictionary/dictionary.dart';
@@ -15,24 +16,12 @@ class AdvancedSettingsScreen extends StatelessWidget {
 
   Future<void> _confirmAndRebuild(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showConfirmationDialog(
       context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(l10n.confirmRebuildDictionaryTitle),
-          content: Text(l10n.confirmRebuildDictionaryBody),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: Text(l10n.cancelAction),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              child: Text(l10n.confirmAction),
-            ),
-          ],
-        );
-      },
+      title: l10n.confirmRebuildDictionaryTitle,
+      content: l10n.confirmRebuildDictionaryBody,
+      cancelLabel: l10n.cancelAction,
+      confirmLabel: l10n.confirmAction,
     );
 
     if (confirmed != true || !context.mounted) {
@@ -44,27 +33,15 @@ class AdvancedSettingsScreen extends StatelessWidget {
 
   Future<void> _handleRebuildDictionaryDatabase(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
-    showDialog<void>(
+    final closeProgressDialog = await showAdaptiveBlockingProgressDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return PopScope(
-          canPop: false,
-          child: AlertDialog(
-            content: Row(
-              children: [
-                const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator.adaptive(strokeWidth: 2.5),
-                ),
-                const SizedBox(width: 16),
-                Expanded(child: Text(l10n.rebuildingDictionaryDatabase)),
-              ],
-            ),
-          ),
-        );
-      },
+      title: l10n.rebuildingDictionaryDatabase,
+      actionLabel: l10n.confirmAction,
+      icon: const SizedBox(
+        width: 24,
+        height: 24,
+        child: CircularProgressIndicator.adaptive(strokeWidth: 2.5),
+      ),
     );
 
     Object? error;
@@ -78,7 +55,9 @@ class AdvancedSettingsScreen extends StatelessWidget {
       return;
     }
 
-    Navigator.of(context, rootNavigator: true).pop();
+    if (context.mounted) {
+      closeProgressDialog();
+    }
 
     showAppNotification(
       context,
@@ -98,24 +77,35 @@ class AdvancedSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.advancedSettings)),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-        children: [
-          Card(
-            clipBehavior: Clip.hardEdge,
-            child: ListTile(
-              leading: const Icon(Icons.storage_outlined),
-              title: Text(l10n.rebuildDictionaryDatabase),
-              subtitle: Text(l10n.rebuildDictionaryDatabaseSubtitle),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                unawaited(_confirmAndRebuild(context));
-              },
+    final topBodyInset = PlatformInfo.isIOS
+        ? MediaQuery.paddingOf(context).top + kToolbarHeight
+        : 0.0;
+
+    return AdaptiveScaffold(
+      appBar: AdaptiveAppBar(
+        title: l10n.advancedSettings,
+        useNativeToolbar: true,
+      ),
+      body: Padding(
+        padding: EdgeInsets.only(top: topBodyInset),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
+          children: [
+            AdaptiveFormSection.insetGrouped(
+              children: [
+                AdaptiveListTile(
+                  leading: const Icon(Icons.storage_outlined),
+                  title: Text(l10n.rebuildDictionaryDatabase),
+                  subtitle: Text(l10n.rebuildDictionaryDatabaseSubtitle),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    unawaited(_confirmAndRebuild(context));
+                  },
+                ),
+              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

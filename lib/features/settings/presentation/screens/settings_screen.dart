@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:taigi_dict/core/core.dart';
 import 'package:taigi_dict/features/audio/audio.dart';
 import 'package:taigi_dict/features/dictionary/dictionary.dart';
@@ -185,31 +184,60 @@ class _SettingsScreenState extends State<SettingsScreen>
                   leading: const Icon(Icons.info_outline),
                   title: Text(l10n.aboutApp),
                   onTap: () {
-                    showAboutDialog(
-                      context: context,
-                      applicationName: l10n.appTitle,
-                      applicationLegalese: l10n.aboutLegalese,
-                      applicationIcon: SvgPicture.asset(
-                        'assets/icon/taigi_dict.svg',
-                        width: 56,
-                        height: 56,
-                      ),
-                      children: [
-                        const SizedBox(height: 12),
-                        Text(l10n.aboutDescription),
-                        const SizedBox(height: 12),
-                        Text(
-                          '${l10n.referencePage}: https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '${l10n.tailoGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/',
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '${l10n.hanjiGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/',
-                        ),
-                      ],
+                    final aboutMessage = [
+                      l10n.aboutLegalese,
+                      '',
+                      l10n.aboutDescription,
+                      '',
+                      '${l10n.referencePage}: https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
+                      '${l10n.tailoGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/',
+                      '${l10n.hanjiGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/',
+                    ].join('\n');
+
+                    final shouldOpenLicenses = Completer<bool>();
+
+                    unawaited(
+                      AdaptiveAlertDialog.show(
+                        context: context,
+                        title: l10n.aboutApp,
+                        message: aboutMessage,
+                        icon: Icons.info_outline,
+                        actions: [
+                          AlertAction(
+                            title: MaterialLocalizations.of(context).viewLicensesButtonLabel,
+                            style: AlertActionStyle.info,
+                            onPressed: () {
+                              if (!shouldOpenLicenses.isCompleted) {
+                                shouldOpenLicenses.complete(true);
+                              }
+                            },
+                          ),
+                          AlertAction(
+                            title: l10n.confirmAction,
+                            style: AlertActionStyle.primary,
+                            onPressed: () {
+                              if (!shouldOpenLicenses.isCompleted) {
+                                shouldOpenLicenses.complete(false);
+                              }
+                            },
+                          ),
+                        ],
+                      ).then((_) {
+                        if (!shouldOpenLicenses.isCompleted) {
+                          shouldOpenLicenses.complete(false);
+                        }
+                      }),
+                    );
+
+                    unawaited(
+                      shouldOpenLicenses.future.then((openLicenses) {
+                        if (openLicenses == true && context.mounted) {
+                          showLicensePage(
+                            context: context,
+                            applicationName: l10n.appTitle,
+                          );
+                        }
+                      }),
                     );
                   },
                 ),
