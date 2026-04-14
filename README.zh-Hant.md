@@ -1,5 +1,9 @@
 # 台語辭典
 
+[![Version](https://img.shields.io/github/v/release/PhoenixEmik/taigi-dict?label=version)](https://github.com/PhoenixEmik/taigi-dict/releases/latest)
+[![Android Downloads](https://img.shields.io/github/downloads/PhoenixEmik/taigi-dict/total?label=android%20downloads)](https://github.com/PhoenixEmik/taigi-dict/releases)
+[![Get it from GitHub](https://img.shields.io/badge/Get%20it%20from-GitHub-24292f?logo=github)](https://github.com/PhoenixEmik/taigi-dict/releases/latest)
+
 [English README](README.md)
 
 這是一個支援 Android 與 iOS 的 Flutter 台語 / 華語辭典 App。
