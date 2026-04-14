@@ -200,7 +200,7 @@ class _MainScreenState extends State<MainScreen> {
         audioLibrary: _audioLibrary,
         bookmarkStore: _bookmarkStore,
         onActionResult: _showResult,
-        showOwnScaffold: true,
+        showOwnScaffold: false,
       ),
       SettingsScreen(
         audioLibrary: _audioLibrary,
@@ -208,9 +208,19 @@ class _MainScreenState extends State<MainScreen> {
         onDownloadArchive: _handleArchiveDownloadAction,
         onDownloadDictionarySource: _handleDictionarySourceDownloadAction,
         onRebuildDictionaryDatabase: _rebuildDictionaryDatabase,
+        showOwnScaffold: false,
       ),
     ];
     return _cachedScreens!;
+  }
+
+  AdaptiveAppBar? _buildTabAppBar(AppLocalizations l10n) {
+    final title = switch (_selectedIndex) {
+      0 => l10n.dictionaryTab,
+      1 => l10n.bookmarksTitle,
+      _ => '設定',
+    };
+    return AdaptiveAppBar(title: title, useNativeToolbar: true);
   }
 
   @override
@@ -244,36 +254,46 @@ class _MainScreenState extends State<MainScreen> {
         }
 
         final screens = _buildTabScreens();
+        final topBodyInset = PlatformInfo.isIOS
+          ? MediaQuery.paddingOf(context).top + kToolbarHeight
+            : 0.0;
 
         return AdaptiveScaffold(
-            body: IndexedStack(index: _selectedIndex, children: screens),
-            bottomNavigationBar: AdaptiveBottomNavigationBar(
-              selectedIndex: _selectedIndex,
-              onTap: (index) => setState(() => _selectedIndex = index),
-              items: [
-                AdaptiveNavigationDestination(
-                  icon: PlatformInfo.isIOS ? 'book.fill' : Icons.menu_book,
-                  selectedIcon:
-                      PlatformInfo.isIOS ? 'book.fill' : Icons.menu_book,
-                  label: l10n.dictionaryTab,
-                ),
-                AdaptiveNavigationDestination(
-                  icon: PlatformInfo.isIOS ? 'bookmark.fill' : Icons.bookmark,
-                  selectedIcon:
-                      PlatformInfo.isIOS ? 'bookmark.fill' : Icons.bookmark,
-                  label: l10n.bookmarksTab,
-                ),
-                AdaptiveNavigationDestination(
-                  icon: PlatformInfo.isIOS
-                      ? 'gearshape'
-                      : Icons.settings_outlined,
-                  selectedIcon:
-                      PlatformInfo.isIOS ? 'gearshape.fill' : Icons.settings,
-                  label: l10n.settingsTab,
-                ),
-              ],
-            ),
-          );
+          appBar: _buildTabAppBar(l10n),
+          extendBodyBehindAppBar: false,
+          minimizeBehavior: TabBarMinimizeBehavior.never,
+          body: Padding(
+            padding: EdgeInsets.only(top: topBodyInset),
+            child: IndexedStack(index: _selectedIndex, children: screens),
+          ),
+          bottomNavigationBar: AdaptiveBottomNavigationBar(
+            useNativeBottomBar: true,
+            selectedIndex: _selectedIndex,
+            onTap: (index) => setState(() => _selectedIndex = index),
+            items: [
+              AdaptiveNavigationDestination(
+                icon: PlatformInfo.isIOS ? 'book.fill' : Icons.menu_book,
+                selectedIcon:
+                    PlatformInfo.isIOS ? 'book.fill' : Icons.menu_book,
+                label: l10n.dictionaryTab,
+              ),
+              AdaptiveNavigationDestination(
+                icon: PlatformInfo.isIOS ? 'bookmark.fill' : Icons.bookmark,
+                selectedIcon:
+                    PlatformInfo.isIOS ? 'bookmark.fill' : Icons.bookmark,
+                label: l10n.bookmarksTab,
+              ),
+              AdaptiveNavigationDestination(
+                icon: PlatformInfo.isIOS
+                    ? 'gearshape'
+                    : Icons.settings_outlined,
+                selectedIcon:
+                    PlatformInfo.isIOS ? 'gearshape.fill' : Icons.settings,
+                label: l10n.settingsTab,
+              ),
+            ],
+          ),
+        );
       },
     );
   }

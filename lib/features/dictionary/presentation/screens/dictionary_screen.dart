@@ -124,6 +124,7 @@ class _DictionaryScreenState extends State<DictionaryScreen>
             final searchHistory = _searchController.searchHistory;
 
             return SafeArea(
+              top: false,
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   return Align(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:taigi_dict/core/core.dart';
 import 'package:taigi_dict/features/audio/audio.dart';
 import 'package:taigi_dict/features/bookmarks/bookmarks.dart';
@@ -150,15 +151,19 @@ class _BookmarksScreenState extends State<BookmarksScreen>
     List<DictionaryEntry> bookmarkedEntries,
     DictionaryBundle bundle,
   ) {
+    final bottomInset = PlatformInfo.isIOS
+        ? MediaQuery.paddingOf(context).bottom + kBottomNavigationBarHeight + 16
+        : 16.0;
+
     if (bookmarkedEntries.isEmpty) {
       return Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.fromLTRB(16, 16, 16, bottomInset),
         child: const BookmarkEmptyState(),
       );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      padding: EdgeInsets.fromLTRB(16, 12, 16, bottomInset),
       itemCount: bookmarkedEntries.length,
       itemBuilder: (context, index) {
         return Padding(

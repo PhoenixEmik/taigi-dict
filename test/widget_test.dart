@@ -485,7 +485,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 900));
 
-    expect(find.text('辭典'), findsOneWidget);
+    expect(find.text('辭典'), findsWidgets);
     expect(find.text('書籤'), findsOneWidget);
     expect(find.text('設定'), findsWidgets);
     expect(find.text('詞目'), findsNothing);
