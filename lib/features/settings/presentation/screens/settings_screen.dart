@@ -79,7 +79,7 @@ class _SettingsScreenState extends State<SettingsScreen>
         localeProvider,
       ]),
       builder: (context, child) {
-        final sectionBackground = Theme.of(context).colorScheme.surface;
+        final appBrightness = Theme.of(context).brightness;
         final offlineSection = [
           DictionarySourceResourceTile(
             dictionaryLibrary: widget.dictionaryLibrary,
@@ -203,17 +203,14 @@ class _SettingsScreenState extends State<SettingsScreen>
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
                   children: [
                     AdaptiveFormSection.insetGrouped(
-                      backgroundColor: sectionBackground,
                       header: Text(l10n.offlineResources),
                       children: offlineSection,
                     ),
                     AdaptiveFormSection.insetGrouped(
-                      backgroundColor: sectionBackground,
                       header: Text(l10n.appearance),
                       children: appearanceSection,
                     ),
                     AdaptiveFormSection.insetGrouped(
-                      backgroundColor: sectionBackground,
                       header: Text(l10n.about),
                       children: aboutSection,
                     ),
@@ -224,8 +221,15 @@ class _SettingsScreenState extends State<SettingsScreen>
           },
         );
 
+        final themedContent = MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(platformBrightness: appBrightness),
+          child: content,
+        );
+
         if (!widget.showOwnScaffold) {
-          return content;
+          return themedContent;
         }
 
         return AdaptiveScaffold(
@@ -233,7 +237,7 @@ class _SettingsScreenState extends State<SettingsScreen>
             title: l10n.settingsTitle,
             useNativeToolbar: false,
           ),
-          body: content,
+          body: themedContent,
         );
       },
     );
