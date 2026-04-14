@@ -118,7 +118,8 @@ class _AppleSearchResultCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(28),
             border: Border.all(color: strokeColor, width: 0.5),
           ),
-          child: InkWell(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: onTap,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(18, 18, 16, 16),
