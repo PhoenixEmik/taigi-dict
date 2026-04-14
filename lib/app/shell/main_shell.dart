@@ -191,12 +191,12 @@ class _MainScreenState extends State<MainScreen> {
       case 1:
         return AdaptiveAppBar(
           title: l10n.bookmarksTitle,
-          useNativeToolbar: false,
+          useNativeToolbar: true,
         );
       case 2:
         return AdaptiveAppBar(
           title: l10n.settingsTitle,
-          useNativeToolbar: false,
+          useNativeToolbar: true,
         );
       default:
         return null;
@@ -341,6 +341,7 @@ class _MainScreenState extends State<MainScreen> {
           body: IndexedStack(index: _selectedIndex, children: screens),
           bottomNavigationBar: AdaptiveBottomNavigationBar(
             items: _buildNavigationDestinations(context, l10n),
+            useNativeBottomBar: true,
             selectedIndex: _selectedIndex,
             onTap: (index) {
               setState(() {

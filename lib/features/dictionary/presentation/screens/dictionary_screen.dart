@@ -91,6 +91,9 @@ class _DictionaryScreenState extends State<DictionaryScreen>
     final platform = Theme.of(context).platform;
     final applePlatform =
         platform == TargetPlatform.iOS || platform == TargetPlatform.macOS;
+    final bottomContentPadding = platform == TargetPlatform.iOS
+      ? MediaQuery.paddingOf(context).bottom + 88
+      : 28.0;
 
     return AnimatedBuilder(
       animation: _searchController,
@@ -168,7 +171,12 @@ class _DictionaryScreenState extends State<DictionaryScreen>
                               ),
                             ),
                           SliverPadding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
+                            padding: EdgeInsets.fromLTRB(
+                              16,
+                              0,
+                              16,
+                              bottomContentPadding,
+                            ),
                             sliver: !hasActiveQuery
                                 ? SliverToBoxAdapter(
                                     child: SelectionArea(

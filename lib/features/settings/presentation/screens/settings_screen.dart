@@ -80,6 +80,10 @@ class _SettingsScreenState extends State<SettingsScreen>
       ]),
       builder: (context, child) {
         final appBrightness = Theme.of(context).brightness;
+        final bottomContentPadding =
+            Theme.of(context).platform == TargetPlatform.iOS
+            ? MediaQuery.paddingOf(context).bottom + 88
+            : 28.0;
         final offlineSection = [
           DictionarySourceResourceTile(
             dictionaryLibrary: widget.dictionaryLibrary,
@@ -200,7 +204,12 @@ class _SettingsScreenState extends State<SettingsScreen>
                   maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
                 ),
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    8,
+                    16,
+                    bottomContentPadding,
+                  ),
                   children: [
                     AdaptiveFormSection.insetGrouped(
                       header: Text(l10n.offlineResources),

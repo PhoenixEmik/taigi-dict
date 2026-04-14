@@ -66,6 +66,9 @@ class _BookmarksScreenState extends State<BookmarksScreen>
     final platform = Theme.of(context).platform;
     final applePlatform =
         platform == TargetPlatform.iOS || platform == TargetPlatform.macOS;
+    final bottomContentPadding = platform == TargetPlatform.iOS
+      ? MediaQuery.paddingOf(context).bottom + 88
+      : 28.0;
 
     return AnimatedBuilder(
       animation: widget.bookmarkStore,
@@ -112,6 +115,7 @@ class _BookmarksScreenState extends State<BookmarksScreen>
                           const [],
                           snapshot.data!,
                           applePlatform,
+                          bottomContentPadding,
                         ),
                       ),
                     );
@@ -167,6 +171,7 @@ class _BookmarksScreenState extends State<BookmarksScreen>
                             entriesSnapshot.data!,
                             snapshot.data!,
                             applePlatform,
+                            bottomContentPadding,
                           ),
                         ),
                       );
@@ -197,6 +202,7 @@ class _BookmarksScreenState extends State<BookmarksScreen>
     List<DictionaryEntry> bookmarkedEntries,
     DictionaryBundle bundle,
     bool applePlatform,
+    double bottomContentPadding,
   ) {
     if (bookmarkedEntries.isEmpty) {
       return Padding(
@@ -204,7 +210,7 @@ class _BookmarksScreenState extends State<BookmarksScreen>
           16,
           applePlatform ? 24 : 16,
           16,
-          28,
+          bottomContentPadding,
         ),
         child: const BookmarkEmptyState(),
       );
@@ -215,7 +221,7 @@ class _BookmarksScreenState extends State<BookmarksScreen>
         16,
         applePlatform ? 12 : 16,
         16,
-        28,
+        bottomContentPadding,
       ),
       itemCount: bookmarkedEntries.length,
       itemBuilder: (context, index) {
