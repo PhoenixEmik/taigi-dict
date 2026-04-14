@@ -1,5 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as glass;
 import 'package:taigi_dict/core/localization/app_localizations.dart';
 import 'package:taigi_dict/core/preferences/app_preferences.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
@@ -48,20 +48,8 @@ class SettingsThemeModeTile extends StatelessWidget {
             ),
           );
 
-    if (applePlatform) {
-      return glass.GlassListTile(
-        showDivider: false,
-        leadingIconColor: resolveLiquidGlassTint(context),
-        titleStyle: resolveGlassListTileTitleStyle(context),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        leading: const Icon(Icons.palette),
-        title: Text(l10n.theme),
-        trailing: trailing,
-      );
-    }
-
-    return ListTile(
-      leading: Icon(Icons.palette, color: colorScheme.primary),
+    return AdaptiveListTile(
+      leading: const Icon(Icons.palette),
       title: Text(l10n.theme),
       trailing: trailing,
     );

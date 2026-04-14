@@ -1,5 +1,5 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as glass;
 import 'package:taigi_dict/core/localization/app_localizations.dart';
 import 'package:taigi_dict/offline_audio.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
@@ -137,31 +137,12 @@ class AudioResourceTile extends StatelessWidget {
               snapshot.downloadedBytes,
               snapshot.totalBytes > 0 ? snapshot.totalBytes : type.archiveBytes,
             ),
-            child: applePlatform
-                ? glass.GlassListTile(
-                    showDivider: false,
-                    leadingIconColor: resolveLiquidGlassTint(context),
-                    titleStyle: resolveGlassListTileTitleStyle(context),
-                    subtitleStyle: resolveGlassListTileSubtitleStyle(context),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 8,
-                    ),
-                    leading: Icon(leadingIcon),
-                    title: title,
-                    subtitle: subtitle,
-                    trailing: trailing,
-                  )
-                : ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 4,
-                    ),
-                    leading: Icon(leadingIcon, color: colorScheme.primary),
-                    title: title,
-                    subtitle: subtitle,
-                    trailing: trailing,
-                  ),
+            child: AdaptiveListTile(
+              leading: Icon(leadingIcon),
+              title: title,
+              subtitle: subtitle,
+              trailing: trailing,
+            ),
           ),
         );
       },

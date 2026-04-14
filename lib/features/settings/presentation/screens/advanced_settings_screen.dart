@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:taigi_dict/core/localization/app_localizations.dart';
@@ -18,22 +19,7 @@ class AdvancedSettingsScreen extends StatelessWidget {
 
   final Future<void> Function() onRebuildDictionaryDatabase;
 
-  glass.LiquidGlassSettings _sectionSettings(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-    return glass.LiquidGlassSettings(
-      blur: 28,
-      thickness: 34,
-      glassColor: brightness == Brightness.dark
-          ? Colors.black.withValues(alpha: 0.06)
-          : Colors.white.withValues(alpha: 0.12),
-      lightIntensity: brightness == Brightness.dark ? 0.44 : 0.62,
-      ambientStrength: brightness == Brightness.dark ? 0.08 : 0.03,
-      refractiveIndex: 1.16,
-      saturation: brightness == Brightness.dark ? 1.2 : 1.06,
-      chromaticAberration: 0.008,
-      specularSharpness: glass.GlassSpecularSharpness.medium,
-    );
-  }
+
 
   Future<void> _confirmAndRebuild(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
@@ -111,55 +97,29 @@ class AdvancedSettingsScreen extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final applePlatform = isApplePlatform(context);
     final sectionChildren = [
-      applePlatform
-          ? glass.GlassListTile(
-              showDivider: false,
-              leadingIconColor: resolveLiquidGlassTint(context),
-              titleStyle: resolveGlassListTileTitleStyle(context),
-              subtitleStyle: resolveGlassListTileSubtitleStyle(context),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 8,
-              ),
-              leading: const Icon(Icons.storage_outlined),
-              title: Text(l10n.rebuildDictionaryDatabase),
-              subtitle: Text(l10n.rebuildDictionaryDatabaseSubtitle),
-              trailing: glassChevron(context),
-              onTap: () {
-                unawaited(_confirmAndRebuild(context));
-              },
-            )
-          : ListTile(
-              leading: Icon(Icons.storage_outlined, color: colorScheme.primary),
-              title: Text(l10n.rebuildDictionaryDatabase),
-              subtitle: Text(l10n.rebuildDictionaryDatabaseSubtitle),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                unawaited(_confirmAndRebuild(context));
-              },
-            ),
+      AdaptiveListTile(
+        leading: const Icon(Icons.storage_outlined),
+        title: Text(l10n.rebuildDictionaryDatabase),
+        subtitle: Text(l10n.rebuildDictionaryDatabaseSubtitle),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () {
+          unawaited(_confirmAndRebuild(context));
+        },
+      ),
     ];
 
     final body = Align(
       alignment: Alignment.topCenter,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 720),
-        child: ListTileTheme(
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: applePlatform ? 20 : 24,
-          ),
-          child: ListView(
-            padding: EdgeInsets.fromLTRB(16, applePlatform ? 12 : 8, 16, 28),
-            children: [
-              SettingsSectionHeader(title: l10n.advancedSettings),
-              applePlatform
-                  ? _GlassSettingsGroup(
-                      settings: _sectionSettings(context),
-                      children: sectionChildren,
-                    )
-                  : Card(child: Column(children: sectionChildren)),
-            ],
-          ),
+        child: ListView(
+          padding: EdgeInsets.fromLTRB(16, applePlatform ? 12 : 8, 16, 28),
+          children: [
+            AdaptiveFormSection.insetGrouped(
+              header: Text(l10n.advancedSettings),
+              children: sectionChildren,
+            ),
+          ],
         ),
       ),
     );
@@ -196,39 +156,4 @@ class AdvancedSettingsScreen extends StatelessWidget {
   }
 }
 
-class _GlassSettingsGroup extends StatelessWidget {
-  const _GlassSettingsGroup({required this.settings, required this.children});
 
-  final glass.LiquidGlassSettings settings;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return glass.GlassPanel(
-      useOwnLayer: true,
-      quality: glass.GlassQuality.standard,
-      settings: settings,
-      padding: EdgeInsets.zero,
-      margin: const EdgeInsets.only(bottom: 4),
-      shape: const glass.LiquidRoundedSuperellipse(borderRadius: 24),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          for (var index = 0; index < children.length; index++) ...[
-            children[index],
-            if (index < children.length - 1)
-              Divider(
-                height: 1,
-                thickness: 0.5,
-                indent: 72,
-                endIndent: 16,
-                color: Theme.of(
-                  context,
-                ).colorScheme.outlineVariant.withValues(alpha: 0.35),
-              ),
-          ],
-        ],
-      ),
-    );
-  }
-}

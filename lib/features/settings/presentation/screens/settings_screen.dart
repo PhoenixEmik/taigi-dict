@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:taigi_dict/core/localization/app_localizations.dart';
@@ -13,7 +14,6 @@ import 'package:taigi_dict/features/settings/presentation/widgets/audio_resource
 import 'package:taigi_dict/features/settings/presentation/widgets/dictionary_source_resource_tile.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/settings_locale_tile.dart';
-import 'package:taigi_dict/features/settings/presentation/widgets/settings_section_header.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/settings_theme_mode_tile.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/settings_text_scale_tile.dart';
 import 'package:taigi_dict/offline_audio.dart';
@@ -53,22 +53,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  glass.LiquidGlassSettings _sectionSettings(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-    return glass.LiquidGlassSettings(
-      blur: 28,
-      thickness: 34,
-      glassColor: brightness == Brightness.dark
-          ? Colors.black.withValues(alpha: 0.06)
-          : Colors.white.withValues(alpha: 0.12),
-      lightIntensity: brightness == Brightness.dark ? 0.44 : 0.62,
-      ambientStrength: brightness == Brightness.dark ? 0.08 : 0.03,
-      refractiveIndex: 1.16,
-      saturation: brightness == Brightness.dark ? 1.2 : 1.06,
-      chromaticAberration: 0.008,
-      specularSharpness: glass.GlassSpecularSharpness.medium,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,189 +110,77 @@ class SettingsScreen extends StatelessWidget {
           ),
         ];
         final aboutSection = [
-          applePlatform
-              ? glass.GlassListTile(
-                  showDivider: false,
-                  leadingIconColor: resolveLiquidGlassTint(context),
-                  titleStyle: resolveGlassListTileTitleStyle(context),
-                  subtitleStyle: resolveGlassListTileSubtitleStyle(context),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 8,
+          AdaptiveListTile(
+            leading: const Icon(Icons.tune_outlined),
+            title: Text(l10n.advancedSettings),
+            subtitle: Text(l10n.advancedSettingsSubtitle),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => AdvancedSettingsScreen(
+                    onRebuildDictionaryDatabase: onRebuildDictionaryDatabase,
                   ),
-                  leading: const Icon(Icons.tune_outlined),
-                  title: Text(l10n.advancedSettings),
-                  subtitle: Text(l10n.advancedSettingsSubtitle),
-                  trailing: glassChevron(context),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (context) => AdvancedSettingsScreen(
-                          onRebuildDictionaryDatabase:
-                              onRebuildDictionaryDatabase,
-                        ),
-                      ),
-                    );
-                  },
-                )
-              : ListTile(
-                  leading: Icon(
-                    Icons.tune_outlined,
-                    color: colorScheme.primary,
-                  ),
-                  title: Text(l10n.advancedSettings),
-                  subtitle: Text(l10n.advancedSettingsSubtitle),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (context) => AdvancedSettingsScreen(
-                          onRebuildDictionaryDatabase:
-                              onRebuildDictionaryDatabase,
-                        ),
-                      ),
-                    );
-                  },
                 ),
-          applePlatform
-              ? glass.GlassListTile(
-                  showDivider: false,
-                  leadingIconColor: resolveLiquidGlassTint(context),
-                  titleStyle: resolveGlassListTileTitleStyle(context),
-                  subtitleStyle: resolveGlassListTileSubtitleStyle(context),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 8,
-                  ),
-                  leading: const Icon(Icons.translate_outlined),
-                  title: Text(l10n.tailoGuide),
-                  subtitle: Text(l10n.tailoGuideSubtitle),
-                  trailing: glassChevron(context),
-                  onTap: () {
-                    _showReferenceArticle(
-                      context,
-                      article: buildTailoReferenceArticle(l10n),
-                    );
-                  },
-                )
-              : ListTile(
-                  leading: Icon(
-                    Icons.translate_outlined,
-                    color: colorScheme.primary,
-                  ),
-                  title: Text(l10n.tailoGuide),
-                  subtitle: Text(l10n.tailoGuideSubtitle),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    _showReferenceArticle(
-                      context,
-                      article: buildTailoReferenceArticle(l10n),
-                    );
-                  },
+              );
+            },
+          ),
+          AdaptiveListTile(
+            leading: const Icon(Icons.translate_outlined),
+            title: Text(l10n.tailoGuide),
+            subtitle: Text(l10n.tailoGuideSubtitle),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              _showReferenceArticle(
+                context,
+                article: buildTailoReferenceArticle(l10n),
+              );
+            },
+          ),
+          AdaptiveListTile(
+            leading: const Icon(Icons.edit_note_outlined),
+            title: Text(l10n.hanjiGuide),
+            subtitle: Text(l10n.hanjiGuideSubtitle),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              _showReferenceArticle(
+                context,
+                article: buildHanjiReferenceArticle(l10n),
+              );
+            },
+          ),
+          AdaptiveListTile(
+            leading: const Icon(Icons.info_outline),
+            title: Text(l10n.aboutApp),
+            onTap: () {
+              showAboutDialog(
+                context: context,
+                applicationName: l10n.appTitle,
+                applicationLegalese: l10n.aboutLegalese,
+                applicationIcon: SvgPicture.asset(
+                  'assets/icon/taigi_dict.svg',
+                  width: 56,
+                  height: 56,
                 ),
-          applePlatform
-              ? glass.GlassListTile(
-                  showDivider: false,
-                  leadingIconColor: resolveLiquidGlassTint(context),
-                  titleStyle: resolveGlassListTileTitleStyle(context),
-                  subtitleStyle: resolveGlassListTileSubtitleStyle(context),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 8,
+                children: [
+                  const SizedBox(height: 12),
+                  Text(l10n.aboutDescription),
+                  const SizedBox(height: 12),
+                  Text(
+                    '${l10n.referencePage}: https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
                   ),
-                  leading: const Icon(Icons.edit_note_outlined),
-                  title: Text(l10n.hanjiGuide),
-                  subtitle: Text(l10n.hanjiGuideSubtitle),
-                  trailing: glassChevron(context),
-                  onTap: () {
-                    _showReferenceArticle(
-                      context,
-                      article: buildHanjiReferenceArticle(l10n),
-                    );
-                  },
-                )
-              : ListTile(
-                  leading: Icon(
-                    Icons.edit_note_outlined,
-                    color: colorScheme.primary,
+                  const SizedBox(height: 8),
+                  Text(
+                    '${l10n.tailoGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/',
                   ),
-                  title: Text(l10n.hanjiGuide),
-                  subtitle: Text(l10n.hanjiGuideSubtitle),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    _showReferenceArticle(
-                      context,
-                      article: buildHanjiReferenceArticle(l10n),
-                    );
-                  },
-                ),
-          applePlatform
-              ? glass.GlassListTile(
-                  showDivider: false,
-                  leadingIconColor: resolveLiquidGlassTint(context),
-                  titleStyle: resolveGlassListTileTitleStyle(context),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 8,
+                  const SizedBox(height: 8),
+                  Text(
+                    '${l10n.hanjiGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/',
                   ),
-                  leading: const Icon(Icons.info_outline),
-                  title: Text(l10n.aboutApp),
-                  onTap: () {
-                    showAboutDialog(
-                      context: context,
-                      applicationName: l10n.appTitle,
-                      applicationLegalese: l10n.aboutLegalese,
-                      applicationIcon: SvgPicture.asset(
-                        'assets/icon/taigi_dict.svg',
-                        width: 56,
-                        height: 56,
-                      ),
-                      children: [
-                        const SizedBox(height: 12),
-                        Text(l10n.aboutDescription),
-                        const SizedBox(height: 12),
-                        Text(
-                          '${l10n.referencePage}: https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '${l10n.tailoGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/',
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '${l10n.hanjiGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/',
-                        ),
-                      ],
-                    );
-                  },
-                )
-              : AboutListTile(
-                  icon: Icon(Icons.info_outline, color: colorScheme.primary),
-                  applicationName: l10n.appTitle,
-                  applicationLegalese: l10n.aboutLegalese,
-                  aboutBoxChildren: [
-                    const SizedBox(height: 12),
-                    Text(l10n.aboutDescription),
-                    const SizedBox(height: 12),
-                    Text(
-                      '${l10n.referencePage}: https://sutian.moe.edu.tw/zh-hant/siongkuantsuguan/',
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${l10n.tailoGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/tailo-phiautsu-suatbing/',
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${l10n.hanjiGuide}: https://sutian.moe.edu.tw/zh-hant/piantsip/hanji-iongji-guantsik/',
-                    ),
-                  ],
-                  applicationIcon: SvgPicture.asset(
-                    'assets/icon/taigi_dict.svg',
-                    width: 56,
-                    height: 56,
-                  ),
-                  child: Text(l10n.aboutApp),
-                ),
+                ],
+              );
+            },
+          ),
         ];
 
         final content = LiquidGlassBackground(
@@ -320,43 +192,27 @@ class SettingsScreen extends StatelessWidget {
                   constraints: BoxConstraints(
                     maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
                   ),
-                  child: ListTileTheme(
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: applePlatform ? 20 : 24,
+                  child: ListView(
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      applePlatform ? 12 : 8,
+                      16,
+                      applePlatform ? 140 : 28,
                     ),
-                    child: ListView(
-                      padding: EdgeInsets.fromLTRB(
-                        16,
-                        applePlatform ? 12 : 8,
-                        16,
-                        applePlatform ? 140 : 28,
+                    children: [
+                      AdaptiveFormSection.insetGrouped(
+                        header: Text(l10n.offlineResources),
+                        children: offlineSection,
                       ),
-                      children: [
-                        SettingsSectionHeader(title: l10n.offlineResources),
-                        applePlatform
-                            ? _GlassSettingsGroup(
-                                settings: _sectionSettings(context),
-                                children: offlineSection,
-                              )
-                            : Column(children: offlineSection),
-                        if (!applePlatform) const Divider(height: 32),
-                        SettingsSectionHeader(title: l10n.appearance),
-                        applePlatform
-                            ? _GlassSettingsGroup(
-                                settings: _sectionSettings(context),
-                                children: appearanceSection,
-                              )
-                            : Column(children: appearanceSection),
-                        if (!applePlatform) const Divider(height: 32),
-                        SettingsSectionHeader(title: l10n.about),
-                        applePlatform
-                            ? _GlassSettingsGroup(
-                                settings: _sectionSettings(context),
-                                children: aboutSection,
-                              )
-                            : Column(children: aboutSection),
-                      ],
-                    ),
+                      AdaptiveFormSection.insetGrouped(
+                        header: Text(l10n.appearance),
+                        children: appearanceSection,
+                      ),
+                      AdaptiveFormSection.insetGrouped(
+                        header: Text(l10n.about),
+                        children: aboutSection,
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -391,39 +247,3 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-class _GlassSettingsGroup extends StatelessWidget {
-  const _GlassSettingsGroup({required this.settings, required this.children});
-
-  final glass.LiquidGlassSettings settings;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return glass.GlassPanel(
-      useOwnLayer: true,
-      quality: glass.GlassQuality.standard,
-      settings: settings,
-      padding: EdgeInsets.zero,
-      margin: const EdgeInsets.only(bottom: 4),
-      shape: const glass.LiquidRoundedSuperellipse(borderRadius: 24),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          for (var index = 0; index < children.length; index++) ...[
-            children[index],
-            if (index < children.length - 1)
-              Divider(
-                height: 1,
-                thickness: 0.5,
-                indent: 72,
-                endIndent: 16,
-                color: Theme.of(
-                  context,
-                ).colorScheme.outlineVariant.withValues(alpha: 0.35),
-              ),
-          ],
-        ],
-      ),
-    );
-  }
-}

@@ -82,22 +82,8 @@ class SettingsTextScaleTile extends StatelessWidget {
       ),
     );
 
-    if (applePlatform) {
-      return glass.GlassListTile(
-        showDivider: false,
-        leadingIconColor: resolveLiquidGlassTint(context),
-        titleStyle: resolveGlassListTileTitleStyle(context),
-        subtitleStyle: resolveGlassListTileSubtitleStyle(context),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        leading: const Icon(Icons.format_size),
-        title: Text(l10n.fontSize),
-        trailing: trailing,
-        subtitle: subtitle,
-      );
-    }
-
-    return ListTile(
-      leading: Icon(Icons.format_size, color: theme.colorScheme.primary),
+    return AdaptiveListTile(
+      leading: const Icon(Icons.format_size),
       title: Text(l10n.fontSize),
       trailing: trailing,
       subtitle: subtitle,
