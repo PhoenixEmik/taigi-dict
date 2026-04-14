@@ -163,7 +163,11 @@ class _MainScreenState extends State<MainScreen> {
       return;
     }
 
-    showAppNotification(context, message: message, isError: result.isError);
+    showAppNotification(
+      context,
+      message: message,
+      isError: result.isError,
+    );
   }
 
   String _describeDatabaseRebuildError(Object error, AppLocalizations l10n) {
