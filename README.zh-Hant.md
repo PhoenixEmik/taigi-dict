@@ -121,11 +121,6 @@ flutter build apk --release
 
 - `build/app/outputs/flutter-apk/app-release.apk`
 
-目前 release build 注意事項：
-
-- Android `release` 目前仍使用 debug signing config，方便本機安裝測試。
-- 若要上架，仍需自行配置 Android keystore 與 Apple 正式簽章設定。
-
 ## UI 說明
 
 - iOS 使用自適應的 Cupertino 導覽，以及平台感知的導覽列、搜尋列與設定區塊元件。

@@ -124,11 +124,6 @@ Generated artifact:
 
 - `build/app/outputs/flutter-apk/app-release.apk`
 
-Current release-build caveat:
-
-- Android `release` still uses the debug signing config so local release APKs can be installed for testing.
-- Configure your own Android keystore and Apple signing settings before store distribution.
-
 ## UI Notes
 
 - iOS uses adaptive Cupertino navigation and platform-aware adaptive bars, search, and settings surfaces.
