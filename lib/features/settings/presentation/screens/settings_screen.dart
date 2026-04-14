@@ -18,7 +18,7 @@ import 'package:taigi_dict/features/settings/presentation/widgets/settings_theme
 import 'package:taigi_dict/features/settings/presentation/widgets/settings_text_scale_tile.dart';
 import 'package:taigi_dict/offline_audio.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
     super.key,
     required this.audioLibrary,
@@ -35,6 +35,15 @@ class SettingsScreen extends StatelessWidget {
   final Future<void> Function() onDownloadDictionarySource;
   final Future<void> Function() onRebuildDictionaryDatabase;
   final bool showOwnScaffold;
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
 
   void _showReferenceArticle(
     BuildContext context, {
@@ -55,6 +64,7 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final appPreferences = AppPreferencesScope.of(context);
     final localeProvider = LocaleProviderScope.of(context);
     final l10n = AppLocalizations.of(context);
@@ -64,8 +74,8 @@ class SettingsScreen extends StatelessWidget {
 
     return AnimatedBuilder(
       animation: Listenable.merge([
-        audioLibrary,
-        dictionaryLibrary,
+        widget.audioLibrary,
+        widget.dictionaryLibrary,
         appPreferences,
         localeProvider,
       ]),
@@ -75,18 +85,18 @@ class SettingsScreen extends StatelessWidget {
         final sectionBackground = Theme.of(context).colorScheme.surface;
         final offlineSection = [
           DictionarySourceResourceTile(
-            dictionaryLibrary: dictionaryLibrary,
-            onDownload: onDownloadDictionarySource,
+            dictionaryLibrary: widget.dictionaryLibrary,
+            onDownload: widget.onDownloadDictionarySource,
           ),
           AudioResourceTile(
             type: AudioArchiveType.word,
-            audioLibrary: audioLibrary,
-            onDownload: onDownloadArchive,
+            audioLibrary: widget.audioLibrary,
+            onDownload: widget.onDownloadArchive,
           ),
           AudioResourceTile(
             type: AudioArchiveType.sentence,
-            audioLibrary: audioLibrary,
-            onDownload: onDownloadArchive,
+            audioLibrary: widget.audioLibrary,
+            onDownload: widget.onDownloadArchive,
           ),
         ];
         final appearanceSection = [
@@ -119,7 +129,8 @@ class SettingsScreen extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute<void>(
                   builder: (context) => AdvancedSettingsScreen(
-                    onRebuildDictionaryDatabase: onRebuildDictionaryDatabase,
+                    onRebuildDictionaryDatabase:
+                        widget.onRebuildDictionaryDatabase,
                   ),
                 ),
               );
@@ -223,7 +234,7 @@ class SettingsScreen extends StatelessWidget {
           ),
         );
 
-        if (!showOwnScaffold) {
+        if (!widget.showOwnScaffold) {
           return MediaQuery(
             data: MediaQuery.of(
               context,

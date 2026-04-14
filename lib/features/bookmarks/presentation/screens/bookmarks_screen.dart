@@ -30,8 +30,14 @@ class BookmarksScreen extends StatefulWidget {
   State<BookmarksScreen> createState() => _BookmarksScreenState();
 }
 
-class _BookmarksScreenState extends State<BookmarksScreen> {
+class _BookmarksScreenState extends State<BookmarksScreen>
+    with AutomaticKeepAliveClientMixin {
   late final Future<DictionaryBundle> _bundleFuture;
+  Future<List<DictionaryEntry>>? _entriesFuture;
+  String _entriesFutureKey = '';
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -56,6 +62,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final l10n = AppLocalizations.of(context);
     final applePlatform = isApplePlatform(context);
 
@@ -86,7 +93,9 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
               );
             }
 
-            final bookmarkedIds = widget.bookmarkStore.bookmarkedIds;
+            final bookmarkedIds = widget.bookmarkStore.bookmarkedIds
+                .toList(growable: false)
+              ..sort();
             if (bookmarkedIds.isEmpty) {
               return LiquidGlassBackground(
                 child: SafeArea(
@@ -112,14 +121,20 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
               );
             }
 
+            final entriesFutureKey = bookmarkedIds.join(',');
+            if (_entriesFuture == null || _entriesFutureKey != entriesFutureKey) {
+              _entriesFutureKey = entriesFutureKey;
+              _entriesFuture = widget.repository.entriesByIdsAsync(
+                snapshot.data!,
+                bookmarkedIds,
+              );
+            }
+
             return LiquidGlassBackground(
               child: SafeArea(
                 top: false,
                 child: FutureBuilder<List<DictionaryEntry>>(
-                  future: widget.repository.entriesByIdsAsync(
-                    snapshot.data!,
-                    bookmarkedIds,
-                  ),
+                  future: _entriesFuture,
                   builder: (context, entriesSnapshot) {
                     if (entriesSnapshot.hasError) {
                       return Center(

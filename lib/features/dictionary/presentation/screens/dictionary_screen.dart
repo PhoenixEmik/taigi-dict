@@ -30,9 +30,13 @@ class DictionaryScreen extends StatefulWidget {
   State<DictionaryScreen> createState() => _DictionaryScreenState();
 }
 
-class _DictionaryScreenState extends State<DictionaryScreen> {
+class _DictionaryScreenState extends State<DictionaryScreen>
+    with AutomaticKeepAliveClientMixin {
   late final DictionarySearchController _searchController;
   Locale? _lastResolvedLocale;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -82,6 +86,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final applePlatform = isApplePlatform(context);
