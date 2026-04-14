@@ -71,6 +71,8 @@ class SettingsScreen extends StatelessWidget {
       ]),
       builder: (context, child) {
         final applePlatform = isApplePlatform(context);
+        final appBrightness = Theme.of(context).brightness;
+        final sectionBackground = Theme.of(context).colorScheme.surface;
         final offlineSection = [
           DictionarySourceResourceTile(
             dictionaryLibrary: dictionaryLibrary,
@@ -199,14 +201,17 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     children: [
                       AdaptiveFormSection.insetGrouped(
+                        backgroundColor: sectionBackground,
                         header: Text(l10n.offlineResources),
                         children: offlineSection,
                       ),
                       AdaptiveFormSection.insetGrouped(
+                        backgroundColor: sectionBackground,
                         header: Text(l10n.appearance),
                         children: appearanceSection,
                       ),
                       AdaptiveFormSection.insetGrouped(
+                        backgroundColor: sectionBackground,
                         header: Text(l10n.about),
                         children: aboutSection,
                       ),
@@ -219,7 +224,12 @@ class SettingsScreen extends StatelessWidget {
         );
 
         if (!showOwnScaffold) {
-          return content;
+          return MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(platformBrightness: appBrightness),
+            child: content,
+          );
         }
 
         return AdaptiveScaffold(
@@ -227,7 +237,12 @@ class SettingsScreen extends StatelessWidget {
             title: l10n.settingsTitle,
             useNativeToolbar: true,
           ),
-          body: content,
+          body: MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(platformBrightness: appBrightness),
+            child: content,
+          ),
         );
       },
     );
