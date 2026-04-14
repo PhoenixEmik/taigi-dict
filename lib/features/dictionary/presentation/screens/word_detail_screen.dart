@@ -69,8 +69,7 @@ class WordDetailScreen extends StatelessWidget {
             actions: [
               AdaptiveAppBarAction(
                 iosSymbol: 'square.and.arrow.up',
-                icon: CupertinoIcons.share,
-                title: l10n.shareEntry,
+                icon: Icons.share,
                 onPressed: () {
                   unawaited(_shareEntry(l10n));
                 },
@@ -78,9 +77,8 @@ class WordDetailScreen extends StatelessWidget {
               AdaptiveAppBarAction(
                 iosSymbol: isBookmarked ? 'bookmark.fill' : 'bookmark',
                 icon: isBookmarked
-                    ? CupertinoIcons.bookmark_fill
-                    : CupertinoIcons.bookmark,
-                title: isBookmarked ? l10n.removeBookmark : l10n.addBookmark,
+                    ? Icons.bookmark
+                    : Icons.bookmark_border,
                 onPressed: () {
                   unawaited(bookmarkStore.toggleBookmark(entry.id));
                 },
