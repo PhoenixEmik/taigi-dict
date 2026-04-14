@@ -39,6 +39,8 @@ class _MainScreenState extends State<MainScreen> {
       );
 
   int _selectedIndex = 0;
+  int? _cachedScreenGeneration;
+  List<Widget>? _cachedScreens;
   bool _startupRequested = false;
   bool _startupGateResolved = false;
   bool _shouldBlockInitialization = true;
@@ -261,6 +263,41 @@ class _MainScreenState extends State<MainScreen> {
     ];
   }
 
+  List<Widget> _buildTabScreens() {
+    final generation = _initializationController.databaseGeneration;
+    if (_cachedScreens != null && _cachedScreenGeneration == generation) {
+      return _cachedScreens!;
+    }
+
+    _cachedScreenGeneration = generation;
+    _cachedScreens = [
+      DictionaryScreen(
+        key: ValueKey('dictionary-$generation'),
+        repository: _repository,
+        audioLibrary: _audioLibrary,
+        bookmarkStore: _bookmarkStore,
+        onActionResult: _showResult,
+      ),
+      BookmarksScreen(
+        key: ValueKey('bookmarks-$generation'),
+        repository: _repository,
+        audioLibrary: _audioLibrary,
+        bookmarkStore: _bookmarkStore,
+        onActionResult: _showResult,
+        showOwnScaffold: false,
+      ),
+      SettingsScreen(
+        audioLibrary: _audioLibrary,
+        dictionaryLibrary: _dictionaryLibrary,
+        onDownloadArchive: _handleArchiveDownloadAction,
+        onDownloadDictionarySource: _handleDictionarySourceDownloadAction,
+        onRebuildDictionaryDatabase: _rebuildDictionaryDatabase,
+        showOwnScaffold: false,
+      ),
+    ];
+    return _cachedScreens!;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -291,35 +328,7 @@ class _MainScreenState extends State<MainScreen> {
           );
         }
 
-        final screens = [
-          DictionaryScreen(
-            key: ValueKey(
-              'dictionary-${_initializationController.databaseGeneration}',
-            ),
-            repository: _repository,
-            audioLibrary: _audioLibrary,
-            bookmarkStore: _bookmarkStore,
-            onActionResult: _showResult,
-          ),
-          BookmarksScreen(
-            key: ValueKey(
-              'bookmarks-${_initializationController.databaseGeneration}',
-            ),
-            repository: _repository,
-            audioLibrary: _audioLibrary,
-            bookmarkStore: _bookmarkStore,
-            onActionResult: _showResult,
-            showOwnScaffold: false,
-          ),
-          SettingsScreen(
-            audioLibrary: _audioLibrary,
-            dictionaryLibrary: _dictionaryLibrary,
-            onDownloadArchive: _handleArchiveDownloadAction,
-            onDownloadDictionarySource: _handleDictionarySourceDownloadAction,
-            onRebuildDictionaryDatabase: _rebuildDictionaryDatabase,
-            showOwnScaffold: false,
-          ),
-        ];
+        final screens = _buildTabScreens();
 
         return AdaptiveScaffold(
           appBar: _buildRootAppBar(l10n),
