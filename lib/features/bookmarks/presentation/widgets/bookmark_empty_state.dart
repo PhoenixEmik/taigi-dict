@@ -1,7 +1,7 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:taigi_dict/core/localization/app_localizations.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as glass;
 
 class BookmarkEmptyState extends StatelessWidget {
   const BookmarkEmptyState({super.key});
@@ -53,30 +53,10 @@ class BookmarkEmptyState extends StatelessWidget {
       return Center(child: content);
     }
 
-    final brightness = theme.brightness;
-    final settings = glass.LiquidGlassSettings(
-      blur: 28,
-      thickness: 34,
-      glassColor: brightness == Brightness.dark
-          ? Colors.black.withValues(alpha: 0.06)
-          : Colors.white.withValues(alpha: 0.12),
-      lightIntensity: brightness == Brightness.dark ? 0.44 : 0.62,
-      ambientStrength: brightness == Brightness.dark ? 0.08 : 0.03,
-      refractiveIndex: 1.16,
-      saturation: brightness == Brightness.dark ? 1.2 : 1.06,
-      chromaticAberration: 0.008,
-      specularSharpness: glass.GlassSpecularSharpness.medium,
-    );
-
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 320),
-        child: glass.GlassCard(
-          useOwnLayer: true,
-          quality: glass.GlassQuality.standard,
-          settings: settings,
-          shape: const glass.LiquidRoundedSuperellipse(borderRadius: 24),
-          clipBehavior: Clip.antiAlias,
+        child: AdaptiveCard(
           child: content,
         ),
       ),
