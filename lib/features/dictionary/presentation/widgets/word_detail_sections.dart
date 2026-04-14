@@ -474,6 +474,7 @@ class RelationshipChip extends StatelessWidget {
     final isMaterialPlatform =
         theme.platform == TargetPlatform.android ||
         theme.platform == TargetPlatform.fuchsia;
+    final useMaterial3Chip = isMaterialPlatform && theme.useMaterial3;
     final labelStyle = theme.textTheme.bodyMedium?.copyWith(
       color: textColor,
       fontWeight: FontWeight.w600,
@@ -486,7 +487,7 @@ class RelationshipChip extends StatelessWidget {
       label: semanticLabel ?? word,
       onTapHint: isInteractive ? l10n.searchThisWordHint : null,
       child: ExcludeSemantics(
-        child: isMaterialPlatform
+        child: useMaterial3Chip
             ? Material(
                 color: Colors.transparent,
                 child: ActionChip(
@@ -500,9 +501,8 @@ class RelationshipChip extends StatelessWidget {
                   backgroundColor: fillColor,
                   surfaceTintColor: Colors.transparent,
                   side: BorderSide(color: strokeColor, width: 0.5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  shape: const StadiumBorder(),
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 2),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
                 ),
