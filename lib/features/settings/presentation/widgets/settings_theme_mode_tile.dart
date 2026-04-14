@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:taigi_dict/core/core.dart';
 
 class SettingsThemeModeTile extends StatelessWidget {
@@ -17,20 +18,22 @@ class SettingsThemeModeTile extends StatelessWidget {
     final darkEnabled =
         value == AppThemePreference.dark || value == AppThemePreference.amoled;
 
-    return SwitchListTile(
-      secondary: const Icon(Icons.dark_mode_outlined),
-      title: Text(l10n.theme),
-      subtitle: Text(
-        darkEnabled
-            ? _themeLabel(AppThemePreference.dark, l10n)
-            : _themeLabel(AppThemePreference.light, l10n),
-      ),
-      value: darkEnabled,
-      onChanged: (enabled) {
-        onSelected(
-          enabled ? AppThemePreference.dark : AppThemePreference.light,
-        );
-      },
+      return AdaptiveListTile(
+        leading: const Icon(Icons.dark_mode_outlined),
+        title: Text(l10n.theme),
+        subtitle: Text(
+          darkEnabled
+              ? _themeLabel(AppThemePreference.dark, l10n)
+              : _themeLabel(AppThemePreference.light, l10n),
+        ),
+        trailing: AdaptiveSwitch(
+          value: darkEnabled,
+          onChanged: (enabled) {
+            onSelected(
+              enabled ? AppThemePreference.dark : AppThemePreference.light,
+            );
+          },
+        ),
     );
   }
 }

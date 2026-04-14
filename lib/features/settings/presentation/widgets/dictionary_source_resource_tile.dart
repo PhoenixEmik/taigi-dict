@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:taigi_dict/core/core.dart';
 import 'package:taigi_dict/features/audio/audio.dart';
 import 'package:taigi_dict/features/dictionary/dictionary.dart';
@@ -86,7 +87,7 @@ class DictionarySourceResourceTile extends StatelessWidget {
               snapshot.downloadedBytes,
               snapshot.totalBytes,
             ),
-            child: ListTile(
+             child: AdaptiveListTile(
               leading: const Icon(Icons.description_outlined),
               title: Text(l10n.dictionarySourceArchive),
               subtitle: subtitle,

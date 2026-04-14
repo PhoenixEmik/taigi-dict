@@ -1,3 +1,4 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:taigi_dict/core/core.dart';
 
@@ -18,27 +19,22 @@ class SearchWorkspaceCard extends StatelessWidget {
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: controller,
       builder: (context, value, child) {
-        return TextField(
+        return AdaptiveTextField(
           controller: controller,
           textInputAction: TextInputAction.search,
           onSubmitted: onSubmitted,
-          decoration: InputDecoration(
-            hintText: l10n.searchHint,
-            prefixIcon: const Icon(Icons.search),
-            suffixIcon: value.text.isEmpty
-                ? null
-                : IconButton(
-                    tooltip: l10n.clearSearch,
-                    onPressed: () {
-                      controller.clear();
-                      onSubmitted('');
-                    },
-                    icon: const Icon(Icons.close),
-                  ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
+          placeholder: l10n.searchHint,
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: value.text.isEmpty
+              ? null
+              : IconButton(
+                  tooltip: l10n.clearSearch,
+                  onPressed: () {
+                    controller.clear();
+                    onSubmitted('');
+                  },
+                  icon: const Icon(Icons.close),
+                ),
         );
       },
     );

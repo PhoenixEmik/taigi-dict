@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
+import 'package:flutter/widgets.dart';
 
 void showAppNotification(
   BuildContext context, {
@@ -10,7 +12,10 @@ void showAppNotification(
     return;
   }
 
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(message), duration: duration),
+  AdaptiveSnackBar.show(
+    context,
+    message: message,
+    type: isError ? AdaptiveSnackBarType.error : AdaptiveSnackBarType.info,
+    duration: duration,
   );
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:taigi_dict/core/core.dart';
 
 class SettingsTextScaleTile extends StatelessWidget {
@@ -22,42 +23,34 @@ class SettingsTextScaleTile extends StatelessWidget {
         )
         .toDouble();
 
-    return ListTile(
-      leading: const Icon(Icons.format_size),
-      title: Text(l10n.fontSize),
-      trailing: SizedBox(
-        width: 50,
-        child: Text(
+      return AdaptiveListTile(
+        leading: const Icon(Icons.format_size),
+        title: Text(l10n.fontSize),
+        trailing: Text(
           '${(sliderValue * 100).toInt()}%',
-          textAlign: TextAlign.right,
-          style: theme.textTheme.labelLarge?.copyWith(
-            fontWeight: FontWeight.w700,
+          style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AdaptiveSlider(
+                value: sliderValue,
+                min: AppPreferences.minReadingTextScale,
+                max: AppPreferences.maxReadingTextScale,
+                onChanged: _handleDiscreteValueChanged,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(l10n.small, style: theme.textTheme.bodySmall),
+                  Text(l10n.extraLarge, style: theme.textTheme.bodySmall),
+                ],
+              ),
+            ],
           ),
         ),
-      ),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Slider(
-              value: sliderValue,
-              min: AppPreferences.minReadingTextScale,
-              max: AppPreferences.maxReadingTextScale,
-              divisions: AppPreferences.readingTextScaleDivisions,
-              label: l10n.readingTextScaleLabel(sliderValue),
-              onChanged: _handleDiscreteValueChanged,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(l10n.small, style: theme.textTheme.bodySmall),
-                Text(l10n.extraLarge, style: theme.textTheme.bodySmall),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 

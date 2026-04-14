@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:taigi_dict/app/app_module.dart';
 import 'package:taigi_dict/core/core.dart';
 
@@ -40,24 +40,26 @@ class _HokkienDictionaryAppState extends State<HokkienDictionaryApp> {
         child: ListenableBuilder(
           listenable: Listenable.merge([_appPreferences, _localeProvider]),
           builder: (context, child) {
-            final applePlatform =
-                !kIsWeb &&
-                (defaultTargetPlatform == TargetPlatform.iOS ||
-                    defaultTargetPlatform == TargetPlatform.macOS);
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              onGenerateTitle: (context) =>
-                  AppLocalizations.of(context).appTitle,
-              locale: _localeProvider.locale,
-              supportedLocales: AppLocalizations.supportedLocales,
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              localeListResolutionCallback: AppLocalizations.resolveLocaleList,
-              theme: buildLightAppTheme(applePlatform: applePlatform),
-              darkTheme: _appPreferences.useAmoledTheme
-                  ? buildAmoledAppTheme(applePlatform: applePlatform)
-                  : buildDarkAppTheme(applePlatform: applePlatform),
-              themeMode: _appPreferences.materialThemeMode,
-              home: child,
+              return AdaptiveApp(
+                title: '台語字典',
+                onGenerateTitle: (context) =>
+                    AppLocalizations.of(context).appTitle,
+                locale: _localeProvider.locale,
+                supportedLocales: AppLocalizations.supportedLocales,
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                localeListResolutionCallback: AppLocalizations.resolveLocaleList,
+                themeMode: _appPreferences.materialThemeMode,
+                materialLightTheme: buildLightAppTheme(applePlatform: false),
+                materialDarkTheme: _appPreferences.useAmoledTheme
+                    ? buildAmoledAppTheme(applePlatform: false)
+                    : buildDarkAppTheme(applePlatform: false),
+                cupertinoLightTheme: const CupertinoThemeData(
+                  brightness: Brightness.light,
+                ),
+                cupertinoDarkTheme: const CupertinoThemeData(
+                  brightness: Brightness.dark,
+                ),
+                home: child,
             );
           },
           child: const MainScreen(),

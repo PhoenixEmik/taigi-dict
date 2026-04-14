@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:taigi_dict/core/core.dart';
 import 'package:taigi_dict/features/audio/audio.dart';
 
@@ -101,7 +102,7 @@ class AudioResourceTile extends StatelessWidget {
               snapshot.downloadedBytes,
               snapshot.totalBytes > 0 ? snapshot.totalBytes : type.archiveBytes,
             ),
-            child: ListTile(
+             child: AdaptiveListTile(
               leading: Icon(leadingIcon),
               title: Text(titleText),
               subtitle: subtitle,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taigi_dict/app/app_module.dart';
@@ -244,32 +245,35 @@ class _MainScreenState extends State<MainScreen> {
 
         final screens = _buildTabScreens();
 
-        return Scaffold(
-          body: IndexedStack(index: _selectedIndex, children: screens),
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (index) {
-              setState(() => _selectedIndex = index);
-            },
-            destinations: [
-              NavigationDestination(
-                icon: const Icon(Icons.menu_book_outlined),
-                selectedIcon: const Icon(Icons.menu_book),
-                label: l10n.dictionaryTab,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.bookmark_border),
-                selectedIcon: const Icon(Icons.bookmark),
-                label: l10n.bookmarksTab,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.settings_outlined),
-                selectedIcon: const Icon(Icons.settings),
-                label: l10n.settingsTab,
-              ),
-            ],
-          ),
-        );
+        return AdaptiveScaffold(
+            body: IndexedStack(index: _selectedIndex, children: screens),
+            bottomNavigationBar: AdaptiveBottomNavigationBar(
+              selectedIndex: _selectedIndex,
+              onTap: (index) => setState(() => _selectedIndex = index),
+              items: [
+                AdaptiveNavigationDestination(
+                  icon: PlatformInfo.isIOS ? 'book.fill' : Icons.menu_book,
+                  selectedIcon:
+                      PlatformInfo.isIOS ? 'book.fill' : Icons.menu_book,
+                  label: l10n.dictionaryTab,
+                ),
+                AdaptiveNavigationDestination(
+                  icon: PlatformInfo.isIOS ? 'bookmark.fill' : Icons.bookmark,
+                  selectedIcon:
+                      PlatformInfo.isIOS ? 'bookmark.fill' : Icons.bookmark,
+                  label: l10n.bookmarksTab,
+                ),
+                AdaptiveNavigationDestination(
+                  icon: PlatformInfo.isIOS
+                      ? 'gearshape'
+                      : Icons.settings_outlined,
+                  selectedIcon:
+                      PlatformInfo.isIOS ? 'gearshape.fill' : Icons.settings,
+                  label: l10n.settingsTab,
+                ),
+              ],
+            ),
+          );
       },
     );
   }
