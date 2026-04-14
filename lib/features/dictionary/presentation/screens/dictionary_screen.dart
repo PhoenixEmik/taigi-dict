@@ -9,7 +9,6 @@ import 'package:taigi_dict/features/dictionary/domain/dictionary_models.dart';
 import 'package:taigi_dict/features/dictionary/presentation/coordinators/word_detail_coordinator.dart';
 import 'package:taigi_dict/features/dictionary/presentation/widgets/entry_list_item.dart';
 import 'package:taigi_dict/features/dictionary/presentation/widgets/search_panel.dart';
-import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
 import 'package:taigi_dict/offline_audio.dart';
 
 class DictionaryScreen extends StatefulWidget {
@@ -89,7 +88,9 @@ class _DictionaryScreenState extends State<DictionaryScreen>
     super.build(context);
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final applePlatform = isApplePlatform(context);
+    final platform = Theme.of(context).platform;
+    final applePlatform =
+        platform == TargetPlatform.iOS || platform == TargetPlatform.macOS;
 
     return AnimatedBuilder(
       animation: _searchController,
@@ -124,100 +125,87 @@ class _DictionaryScreenState extends State<DictionaryScreen>
             final isSearching = _searchController.isSearching;
             final searchHistory = _searchController.searchHistory;
 
-            return LiquidGlassBackground(
-              child: SafeArea(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Align(
-                      alignment: Alignment.topCenter,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
-                        ),
-                        child: CustomScrollView(
-                          keyboardDismissBehavior:
-                              ScrollViewKeyboardDismissBehavior.onDrag,
-                          slivers: [
-                            SliverPadding(
-                              padding: EdgeInsets.fromLTRB(
-                                16,
-                                applePlatform ? 12 : 16,
-                                16,
-                                12,
-                              ),
-                              sliver: SliverToBoxAdapter(
-                                child: SearchWorkspaceCard(
-                                  controller:
-                                      _searchController.searchController,
-                                  onSubmitted: (_) {
-                                    unawaited(_searchController.submitQuery());
-                                  },
-                                ),
-                              ),
-                            ),
-                            if (!hasActiveQuery && searchHistory.isNotEmpty)
-                              SliverPadding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  16,
-                                  0,
-                                  16,
-                                  12,
-                                ),
-                                sliver: SliverToBoxAdapter(
-                                  child: SearchHistorySection(
-                                    history: searchHistory,
-                                    onHistoryTap:
-                                        _searchController.applyHistoryQuery,
-                                    onClearHistory:
-                                        _searchController.clearSearchHistory,
-                                  ),
-                                ),
-                              ),
-                            SliverPadding(
-                              padding: EdgeInsets.fromLTRB(
-                                16,
-                                0,
-                                16,
-                                applePlatform ? 140 : 28,
-                              ),
-                              sliver: !hasActiveQuery
-                                  ? SliverToBoxAdapter(
-                                      child: SelectionArea(
-                                        child: EmptyState(query: query),
-                                      ),
-                                    )
-                                  : isSearching
-                                  ? const SliverToBoxAdapter(
-                                      child: SearchLoadingState(),
-                                    )
-                                  : filteredResults.isEmpty
-                                  ? const SliverToBoxAdapter(
-                                      child: NoResultsState(),
-                                    )
-                                  : SliverList.separated(
-                                      itemCount: filteredResults.length,
-                                      itemBuilder: (context, index) {
-                                        return SelectionArea(
-                                          child: EntryListItem(
-                                            entry: filteredResults[index],
-                                            onTap: () => _showEntryDetails(
-                                              snapshot.data!,
-                                              filteredResults[index],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      separatorBuilder: (context, index) {
-                                        return const SizedBox(height: 10);
-                                      },
-                                    ),
-                            ),
-                          ],
-                        ),
+            return SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return Align(
+                    alignment: Alignment.topCenter,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
                       ),
-                    );
-                  },
-                ),
+                      child: CustomScrollView(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        slivers: [
+                          SliverPadding(
+                            padding: EdgeInsets.fromLTRB(
+                              16,
+                              applePlatform ? 12 : 16,
+                              16,
+                              12,
+                            ),
+                            sliver: SliverToBoxAdapter(
+                              child: SearchWorkspaceCard(
+                                controller: _searchController.searchController,
+                                onSubmitted: (_) {
+                                  unawaited(_searchController.submitQuery());
+                                },
+                              ),
+                            ),
+                          ),
+                          if (!hasActiveQuery && searchHistory.isNotEmpty)
+                            SliverPadding(
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                              sliver: SliverToBoxAdapter(
+                                child: SearchHistorySection(
+                                  history: searchHistory,
+                                  onHistoryTap:
+                                      _searchController.applyHistoryQuery,
+                                  onClearHistory:
+                                      _searchController.clearSearchHistory,
+                                ),
+                              ),
+                            ),
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
+                            sliver: !hasActiveQuery
+                                ? SliverToBoxAdapter(
+                                    child: SelectionArea(
+                                      child: EmptyState(query: query),
+                                    ),
+                                  )
+                                : isSearching
+                                ? const SliverToBoxAdapter(
+                                    child: SearchLoadingState(),
+                                  )
+                                : filteredResults.isEmpty
+                                ? const SliverToBoxAdapter(
+                                    child: NoResultsState(),
+                                  )
+                                : SliverList.separated(
+                                    itemCount: filteredResults.length,
+                                    itemBuilder: (context, index) {
+                                      return SelectionArea(
+                                        child: EntryListItem(
+                                          entry: filteredResults[index],
+                                          onTap: () => _showEntryDetails(
+                                            snapshot.data!,
+                                            filteredResults[index],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    separatorBuilder: (context, index) {
+                                      return const SizedBox(height: 10);
+                                    },
+                                  ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             );
           },

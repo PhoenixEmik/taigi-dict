@@ -12,7 +12,6 @@ import 'package:taigi_dict/features/settings/presentation/screens/advanced_setti
 import 'package:taigi_dict/features/settings/presentation/screens/reference_article_screen.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/audio_resource_tile.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/dictionary_source_resource_tile.dart';
-import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/settings_locale_tile.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/settings_theme_mode_tile.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/settings_text_scale_tile.dart';
@@ -80,8 +79,6 @@ class _SettingsScreenState extends State<SettingsScreen>
         localeProvider,
       ]),
       builder: (context, child) {
-        final applePlatform = isApplePlatform(context);
-        final appBrightness = Theme.of(context).brightness;
         final sectionBackground = Theme.of(context).colorScheme.surface;
         final offlineSection = [
           DictionarySourceResourceTile(
@@ -194,66 +191,49 @@ class _SettingsScreenState extends State<SettingsScreen>
           ),
         ];
 
-        final content = LiquidGlassBackground(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
-                  ),
-                  child: ListView(
-                    padding: EdgeInsets.fromLTRB(
-                      16,
-                      applePlatform ? 12 : 8,
-                      16,
-                      applePlatform ? 140 : 28,
-                    ),
-                    children: [
-                      AdaptiveFormSection.insetGrouped(
-                        backgroundColor: sectionBackground,
-                        header: Text(l10n.offlineResources),
-                        children: offlineSection,
-                      ),
-                      AdaptiveFormSection.insetGrouped(
-                        backgroundColor: sectionBackground,
-                        header: Text(l10n.appearance),
-                        children: appearanceSection,
-                      ),
-                      AdaptiveFormSection.insetGrouped(
-                        backgroundColor: sectionBackground,
-                        header: Text(l10n.about),
-                        children: aboutSection,
-                      ),
-                    ],
-                  ),
+        final content = LayoutBuilder(
+          builder: (context, constraints) {
+            return Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
                 ),
-              );
-            },
-          ),
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
+                  children: [
+                    AdaptiveFormSection.insetGrouped(
+                      backgroundColor: sectionBackground,
+                      header: Text(l10n.offlineResources),
+                      children: offlineSection,
+                    ),
+                    AdaptiveFormSection.insetGrouped(
+                      backgroundColor: sectionBackground,
+                      header: Text(l10n.appearance),
+                      children: appearanceSection,
+                    ),
+                    AdaptiveFormSection.insetGrouped(
+                      backgroundColor: sectionBackground,
+                      header: Text(l10n.about),
+                      children: aboutSection,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
 
         if (!widget.showOwnScaffold) {
-          return MediaQuery(
-            data: MediaQuery.of(
-              context,
-            ).copyWith(platformBrightness: appBrightness),
-            child: content,
-          );
+          return content;
         }
 
         return AdaptiveScaffold(
           appBar: AdaptiveAppBar(
             title: l10n.settingsTitle,
-            useNativeToolbar: true,
+            useNativeToolbar: false,
           ),
-          body: MediaQuery(
-            data: MediaQuery.of(
-              context,
-            ).copyWith(platformBrightness: appBrightness),
-            child: content,
-          ),
+          body: content,
         );
       },
     );

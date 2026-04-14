@@ -7,7 +7,6 @@ import 'package:taigi_dict/features/dictionary/data/dictionary_repository.dart';
 import 'package:taigi_dict/features/dictionary/domain/dictionary_models.dart';
 import 'package:taigi_dict/features/dictionary/presentation/coordinators/word_detail_coordinator.dart';
 import 'package:taigi_dict/features/dictionary/presentation/widgets/entry_list_item.dart';
-import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
 import 'package:taigi_dict/offline_audio.dart';
 
 class BookmarksScreen extends StatefulWidget {
@@ -64,7 +63,9 @@ class _BookmarksScreenState extends State<BookmarksScreen>
   Widget build(BuildContext context) {
     super.build(context);
     final l10n = AppLocalizations.of(context);
-    final applePlatform = isApplePlatform(context);
+    final platform = Theme.of(context).platform;
+    final applePlatform =
+        platform == TargetPlatform.iOS || platform == TargetPlatform.macOS;
 
     return AnimatedBuilder(
       animation: widget.bookmarkStore,
@@ -97,26 +98,24 @@ class _BookmarksScreenState extends State<BookmarksScreen>
                 .toList(growable: false)
               ..sort();
             if (bookmarkedIds.isEmpty) {
-              return LiquidGlassBackground(
-                child: SafeArea(
-                  top: false,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Align(
-                        alignment: Alignment.topCenter,
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
-                          ),
-                          child: bookmarkedContent(
-                            const [],
-                            snapshot.data!,
-                            applePlatform,
-                          ),
+              return SafeArea(
+                top: false,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Align(
+                      alignment: Alignment.topCenter,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
                         ),
-                      );
-                    },
-                  ),
+                        child: bookmarkedContent(
+                          const [],
+                          snapshot.data!,
+                          applePlatform,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               );
             }
@@ -130,52 +129,50 @@ class _BookmarksScreenState extends State<BookmarksScreen>
               );
             }
 
-            return LiquidGlassBackground(
-              child: SafeArea(
-                top: false,
-                child: FutureBuilder<List<DictionaryEntry>>(
-                  future: _entriesFuture,
-                  builder: (context, entriesSnapshot) {
-                    if (entriesSnapshot.hasError) {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Text(
-                            l10n.loadDataFailed('${entriesSnapshot.error}'),
-                            style: Theme.of(context).textTheme.titleMedium,
-                            textAlign: TextAlign.center,
+            return SafeArea(
+              top: false,
+              child: FutureBuilder<List<DictionaryEntry>>(
+                future: _entriesFuture,
+                builder: (context, entriesSnapshot) {
+                  if (entriesSnapshot.hasError) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                          l10n.loadDataFailed('${entriesSnapshot.error}'),
+                          style: Theme.of(context).textTheme.titleMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
+
+                  if (!entriesSnapshot.hasData) {
+                    return Center(
+                      child: applePlatform
+                          ? const CircularProgressIndicator.adaptive()
+                          : const CircularProgressIndicator(),
+                    );
+                  }
+
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Align(
+                        alignment: Alignment.topCenter,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
+                          ),
+                          child: bookmarkedContent(
+                            entriesSnapshot.data!,
+                            snapshot.data!,
+                            applePlatform,
                           ),
                         ),
                       );
-                    }
-
-                    if (!entriesSnapshot.hasData) {
-                      return Center(
-                        child: applePlatform
-                            ? const CircularProgressIndicator.adaptive()
-                            : const CircularProgressIndicator(),
-                      );
-                    }
-
-                    return LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Align(
-                          alignment: Alignment.topCenter,
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
-                            ),
-                            child: bookmarkedContent(
-                              entriesSnapshot.data!,
-                              snapshot.data!,
-                              applePlatform,
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
+                    },
+                  );
+                },
               ),
             );
           },
@@ -207,7 +204,7 @@ class _BookmarksScreenState extends State<BookmarksScreen>
           16,
           applePlatform ? 24 : 16,
           16,
-          applePlatform ? 140 : 28,
+          28,
         ),
         child: const BookmarkEmptyState(),
       );
@@ -218,7 +215,7 @@ class _BookmarksScreenState extends State<BookmarksScreen>
         16,
         applePlatform ? 12 : 16,
         16,
-        applePlatform ? 140 : 28,
+        28,
       ),
       itemCount: bookmarkedEntries.length,
       itemBuilder: (context, index) {

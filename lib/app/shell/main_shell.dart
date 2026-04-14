@@ -186,17 +186,6 @@ class _MainScreenState extends State<MainScreen> {
     return l10n.dictionaryDatabaseRebuildFailed('$error');
   }
 
-  AdaptiveAppBar? _buildRootAppBar(AppLocalizations l10n) {
-    switch (_selectedIndex) {
-      case 1:
-        return AdaptiveAppBar(title: l10n.bookmarksTitle);
-      case 2:
-        return AdaptiveAppBar(title: l10n.settingsTitle);
-      default:
-        return null;
-    }
-  }
-
   List<AdaptiveNavigationDestination> _buildNavigationDestinations(
     BuildContext context,
     AppLocalizations l10n,
@@ -284,7 +273,7 @@ class _MainScreenState extends State<MainScreen> {
         audioLibrary: _audioLibrary,
         bookmarkStore: _bookmarkStore,
         onActionResult: _showResult,
-        showOwnScaffold: false,
+        showOwnScaffold: true,
       ),
       SettingsScreen(
         audioLibrary: _audioLibrary,
@@ -292,7 +281,7 @@ class _MainScreenState extends State<MainScreen> {
         onDownloadArchive: _handleArchiveDownloadAction,
         onDownloadDictionarySource: _handleDictionarySourceDownloadAction,
         onRebuildDictionaryDatabase: _rebuildDictionaryDatabase,
-        showOwnScaffold: false,
+        showOwnScaffold: true,
       ),
     ];
     return _cachedScreens!;
@@ -331,7 +320,6 @@ class _MainScreenState extends State<MainScreen> {
         final screens = _buildTabScreens();
 
         return AdaptiveScaffold(
-          appBar: _buildRootAppBar(l10n),
           body: IndexedStack(index: _selectedIndex, children: screens),
           bottomNavigationBar: AdaptiveBottomNavigationBar(
             items: _buildNavigationDestinations(context, l10n),
