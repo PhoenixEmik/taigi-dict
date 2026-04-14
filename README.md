@@ -32,7 +32,7 @@ lookup, and downloads large offline resources directly to the user's device.
 - Localized UI for Traditional Chinese, Simplified Chinese, and English
 - Runtime Traditional/Simplified Chinese conversion using the native OpenCC engine with Taiwanese phrase-aware configs
 - Accessibility improvements for semantics labels, merged semantics on complex settings tiles, and localized tooltips
-- Platform-adaptive UI: Android keeps the app's branded Material palette, while iOS uses Cupertino navigation and Liquid Glass surfaces
+- Platform-adaptive UI: Android keeps the app's branded Material palette, while iOS uses Cupertino navigation with adaptive platform components
 - Reading text size adjustment and system-aware light / dark / AMOLED theme selection
 - Bundled `TauhuOo` fallback font for CJK Ext-C/D/E glyph coverage when the system font is missing characters
 
@@ -64,7 +64,7 @@ Important distribution note:
 - `dio` for resumable downloads
 - `just_audio` for offline audio playback
 - `flutter_open_chinese_convert` for runtime OpenCC conversion
-- `liquid_glass_widgets` for iOS-style Liquid Glass surfaces
+- `adaptive_platform_ui` for cross-platform adaptive Material/Cupertino components
 - `path` and `path_provider` for local file management
 - `shared_preferences` for user settings, bookmarks, and search history
 - `share_plus` for native sharing
@@ -103,7 +103,7 @@ The iOS project is configured with:
 
 - deployment target `iOS 13.0`
 - localized app metadata for `zh-Hant`, `zh-Hans`, and `en`
-- adaptive iOS UI surfaces using Cupertino navigation plus `liquid_glass_widgets`
+- adaptive iOS UI surfaces using Cupertino navigation plus `adaptive_platform_ui`
 
 After dependency or Pod changes:
 
@@ -131,7 +131,7 @@ Current release-build caveat:
 
 ## UI Notes
 
-- iOS uses adaptive Cupertino navigation, glass bottom bars, glass search bars, and glass settings sections.
+- iOS uses adaptive Cupertino navigation and platform-aware adaptive bars, search, and settings surfaces.
 - Android intentionally does not reuse the iOS palette; it keeps the app's warmer branded Material styling for better platform fit.
 
 ## Acknowledgments
@@ -139,7 +139,7 @@ Current release-build caveat:
 - Ministry of Education Taiwanese Hokkien Dictionary: `https://sutian.moe.edu.tw/`
 - Tauhu-oo (豆腐烏) 20.05 font for Taiwanese Hanzi and specific CJK Extension glyph coverage: `https://github.com/tauhu-tw/tauhu-oo`
 - jf open-huninn (jf open 粉圓) font used in the app icon artwork: `https://github.com/justfont/open-huninn-font`
-- Liquid Glass Widgets for iOS-style glass surfaces: `https://github.com/sdegenaar/liquid_glass_widgets`
+- adaptive_platform_ui for adaptive Material/Cupertino UI components: `https://github.com/berkaycatak/adaptive_platform_ui`
 - Open Chinese Convert for Flutter for runtime OpenCC conversion: `https://github.com/zonble/flutter_open_chinese_convert`
 
 ## License

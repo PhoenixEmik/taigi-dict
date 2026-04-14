@@ -29,7 +29,7 @@
 - 提供正體中文、簡體中文與英文介面
 - 使用原生 OpenCC 引擎做執行期繁簡轉換，並套用台灣詞彙轉換設定
 - 已補強語意標籤、複合設定列 merged semantics 與本地化 tooltip 的無障礙支援
-- 採用平台自適應 UI：Android 維持品牌化 Material 風格，iOS 使用 Cupertino 導覽與 Liquid Glass 視覺
+- 採用平台自適應 UI：Android 維持品牌化 Material 風格，iOS 使用 Cupertino 導覽與跨平台自適應元件
 - 支援閱讀字級調整，以及系統感知的淺色 / 深色 / AMOLED 主題
 - 內建 `TauhuOo` fallback font，用於補足系統字型缺少的 CJK Ext-C / D / E 字元
 
@@ -61,7 +61,7 @@ App 實際使用的正式環境離線資源端點：
 - `dio`：可續傳下載
 - `just_audio`：離線音訊播放
 - `flutter_open_chinese_convert`：執行期 OpenCC 繁簡轉換
-- `liquid_glass_widgets`：iOS 風格 Liquid Glass 介面
+- `adaptive_platform_ui`：跨平台 Material/Cupertino 自適應元件
 - `path`、`path_provider`：本機檔案管理
 - `shared_preferences`：使用者設定、書籤與搜尋紀錄
 - `share_plus`：原生分享
@@ -100,7 +100,7 @@ iOS 專案目前設定為：
 
 - deployment target：`iOS 13.0`
 - App metadata 已本地化：`zh-Hant`、`zh-Hans`、`en`
-- 使用 Cupertino 導覽與 `liquid_glass_widgets` 建立 iOS 自適應界面
+- 使用 Cupertino 導覽與 `adaptive_platform_ui` 建立 iOS 自適應界面
 
 當依賴或 Pods 更新後：
 
@@ -128,7 +128,7 @@ flutter build apk --release
 
 ## UI 說明
 
-- iOS 使用自適應的 Cupertino 導覽、glass bottom bar、glass search bar 與 glass settings section。
+- iOS 使用自適應的 Cupertino 導覽，以及平台感知的導覽列、搜尋列與設定區塊元件。
 - Android 不會沿用 iOS palette，而是維持較溫暖的品牌化 Material 風格，以保留平台適配性。
 
 ## 致謝
@@ -136,7 +136,7 @@ flutter build apk --release
 - 教育部臺灣台語常用詞辭典：`https://sutian.moe.edu.tw/`
 - Tauhu-oo（豆腐烏）20.05 字型，用於顯示台語漢字與特定 CJK Extension 字元：`https://github.com/tauhu-tw/tauhu-oo`
 - jf open-huninn（jf open 粉圓）字型，用於 App Icon 字樣：`https://github.com/justfont/open-huninn-font`
-- Liquid Glass Widgets，提供 iOS 風格的 glass 介面元件：`https://github.com/sdegenaar/liquid_glass_widgets`
+- adaptive_platform_ui，提供 Material/Cupertino 自適應介面元件：`https://github.com/berkaycatak/adaptive_platform_ui`
 - Open Chinese Convert for Flutter，提供執行期 OpenCC 繁簡轉換：`https://github.com/zonble/flutter_open_chinese_convert`
 
 ## 授權
