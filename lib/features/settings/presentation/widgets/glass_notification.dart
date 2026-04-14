@@ -12,8 +12,9 @@ void showGlassNotification(
     return;
   }
 
-  final rootContext = Navigator.maybeOf(context, rootNavigator: true)?.context;
-  final snackbarContext = rootContext ?? context;
+  final rootNavigator = Navigator.maybeOf(context, rootNavigator: true);
+  final overlayContext = rootNavigator?.overlay?.context;
+  final snackbarContext = overlayContext ?? context;
 
   AdaptiveSnackBar.show(
     snackbarContext,
