@@ -30,6 +30,9 @@ class _BookmarksScreenState extends State<BookmarksScreen>
   late final Future<DictionaryBundle> _bundleFuture;
   Future<List<DictionaryEntry>>? _entriesFuture;
   String _entriesFutureKey = '';
+  DictionaryBundle? _cachedBundle;
+  final Map<String, List<DictionaryEntry>> _entriesCacheByKey =
+      <String, List<DictionaryEntry>>{};
 
   @override
   bool get wantKeepAlive => true;
@@ -66,6 +69,11 @@ class _BookmarksScreenState extends State<BookmarksScreen>
         final content = FutureBuilder<DictionaryBundle>(
           future: _bundleFuture,
           builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              _cachedBundle = snapshot.data;
+            }
+            final bundle = snapshot.data ?? _cachedBundle;
+
             if (snapshot.hasError) {
               return Center(
                 child: Padding(
@@ -79,7 +87,7 @@ class _BookmarksScreenState extends State<BookmarksScreen>
               );
             }
 
-            if (!snapshot.hasData) {
+            if (bundle == null) {
               return Center(
                 child: const CircularProgressIndicator(),
               );
@@ -91,7 +99,7 @@ class _BookmarksScreenState extends State<BookmarksScreen>
             if (bookmarkedIds.isEmpty) {
               return bookmarkedContent(
                 const [],
-                snapshot.data!,
+                bundle,
               );
             }
 
@@ -99,10 +107,12 @@ class _BookmarksScreenState extends State<BookmarksScreen>
             if (_entriesFuture == null || _entriesFutureKey != entriesFutureKey) {
               _entriesFutureKey = entriesFutureKey;
               _entriesFuture = widget.repository.entriesByIdsAsync(
-                snapshot.data!,
+                bundle,
                 bookmarkedIds,
               );
             }
+
+            final cachedEntries = _entriesCacheByKey[entriesFutureKey];
 
             return FutureBuilder<List<DictionaryEntry>>(
               future: _entriesFuture,
@@ -120,15 +130,22 @@ class _BookmarksScreenState extends State<BookmarksScreen>
                   );
                 }
 
-                if (!entriesSnapshot.hasData) {
+                if (entriesSnapshot.hasData) {
+                  _entriesCacheByKey[entriesFutureKey] = entriesSnapshot.data!;
+                }
+
+                final resolvedEntries =
+                    entriesSnapshot.data ?? cachedEntries;
+
+                if (resolvedEntries == null) {
                   return Center(
                     child: const CircularProgressIndicator(),
                   );
                 }
 
                 return bookmarkedContent(
-                  entriesSnapshot.data!,
-                  snapshot.data!,
+                  resolvedEntries,
+                  bundle,
                 );
               },
             );

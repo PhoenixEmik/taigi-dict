@@ -28,6 +28,7 @@ class _DictionaryScreenState extends State<DictionaryScreen>
     with AutomaticKeepAliveClientMixin {
   late final DictionarySearchController _searchController;
   Locale? _lastResolvedLocale;
+  DictionaryBundle? _cachedBundle;
 
   @override
   bool get wantKeepAlive => true;
@@ -96,6 +97,11 @@ class _DictionaryScreenState extends State<DictionaryScreen>
         return FutureBuilder<DictionaryBundle>(
           future: _searchController.bundleFuture,
           builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              _cachedBundle = snapshot.data;
+            }
+            final bundle = snapshot.data ?? _cachedBundle;
+
             if (snapshot.hasError) {
               return Center(
                 child: Padding(
@@ -109,7 +115,7 @@ class _DictionaryScreenState extends State<DictionaryScreen>
               );
             }
 
-            if (!snapshot.hasData) {
+            if (bundle == null) {
               return Center(
                 child: applePlatform
                     ? const CircularProgressIndicator.adaptive()
@@ -194,7 +200,7 @@ class _DictionaryScreenState extends State<DictionaryScreen>
                                         child: EntryListItem(
                                           entry: filteredResults[index],
                                           onTap: () => _showEntryDetails(
-                                            snapshot.data!,
+                                            bundle,
                                             filteredResults[index],
                                           ),
                                         ),
