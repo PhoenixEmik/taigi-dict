@@ -1,14 +1,10 @@
 import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:taigi_dict/core/localization/app_localizations.dart';
-import 'package:taigi_dict/core/utils/dialog_utils.dart';
-import 'package:taigi_dict/features/dictionary/data/dictionary_database_builder_service.dart';
-import 'package:taigi_dict/features/settings/presentation/widgets/glass_notification.dart';
-import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
-import 'package:taigi_dict/features/settings/presentation/widgets/settings_section_header.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as glass;
+import 'package:taigi_dict/core/core.dart';
+import 'package:taigi_dict/features/dictionary/dictionary.dart';
+import 'package:taigi_dict/features/settings/settings.dart';
+
 
 class AdvancedSettingsScreen extends StatelessWidget {
   const AdvancedSettingsScreen({
@@ -18,26 +14,9 @@ class AdvancedSettingsScreen extends StatelessWidget {
 
   final Future<void> Function() onRebuildDictionaryDatabase;
 
-  glass.LiquidGlassSettings _sectionSettings(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-    return glass.LiquidGlassSettings(
-      blur: 28,
-      thickness: 34,
-      glassColor: brightness == Brightness.dark
-          ? Colors.black.withValues(alpha: 0.06)
-          : Colors.white.withValues(alpha: 0.12),
-      lightIntensity: brightness == Brightness.dark ? 0.44 : 0.62,
-      ambientStrength: brightness == Brightness.dark ? 0.08 : 0.03,
-      refractiveIndex: 1.16,
-      saturation: brightness == Brightness.dark ? 1.2 : 1.06,
-      chromaticAberration: 0.008,
-      specularSharpness: glass.GlassSpecularSharpness.medium,
-    );
-  }
-
   Future<void> _confirmAndRebuild(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showAdaptiveConfirmationDialog(
+    final confirmed = await showConfirmationDialog(
       context: context,
       title: l10n.confirmRebuildDictionaryTitle,
       content: l10n.confirmRebuildDictionaryBody,
@@ -54,27 +33,15 @@ class AdvancedSettingsScreen extends StatelessWidget {
 
   Future<void> _handleRebuildDictionaryDatabase(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
-    showDialog<void>(
+    final closeProgressDialog = await showAdaptiveBlockingProgressDialog(
       context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return PopScope(
-          canPop: false,
-          child: AlertDialog(
-            content: Row(
-              children: [
-                const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator.adaptive(strokeWidth: 2.5),
-                ),
-                const SizedBox(width: 16),
-                Expanded(child: Text(l10n.rebuildingDictionaryDatabase)),
-              ],
-            ),
-          ),
-        );
-      },
+      title: l10n.rebuildingDictionaryDatabase,
+      actionLabel: l10n.confirmAction,
+      icon: const SizedBox(
+        width: 24,
+        height: 24,
+        child: CircularProgressIndicator.adaptive(strokeWidth: 2.5),
+      ),
     );
 
     Object? error;
@@ -88,9 +55,11 @@ class AdvancedSettingsScreen extends StatelessWidget {
       return;
     }
 
-    Navigator.of(context, rootNavigator: true).pop();
+    if (context.mounted) {
+      closeProgressDialog();
+    }
 
-    showGlassNotification(
+    showAppNotification(
       context,
       message: error == null
           ? l10n.rebuildDictionaryDatabaseSuccess
@@ -108,127 +77,38 @@ class AdvancedSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
-    final applePlatform = isApplePlatform(context);
-    final sectionChildren = [
-      applePlatform
-          ? glass.GlassListTile(
-              showDivider: false,
-              leadingIconColor: resolveLiquidGlassTint(context),
-              titleStyle: resolveGlassListTileTitleStyle(context),
-              subtitleStyle: resolveGlassListTileSubtitleStyle(context),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 8,
-              ),
-              leading: const Icon(Icons.storage_outlined),
-              title: Text(l10n.rebuildDictionaryDatabase),
-              subtitle: Text(l10n.rebuildDictionaryDatabaseSubtitle),
-              trailing: glassChevron(context),
-              onTap: () {
-                unawaited(_confirmAndRebuild(context));
-              },
-            )
-          : ListTile(
-              leading: Icon(Icons.storage_outlined, color: colorScheme.primary),
-              title: Text(l10n.rebuildDictionaryDatabase),
-              subtitle: Text(l10n.rebuildDictionaryDatabaseSubtitle),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                unawaited(_confirmAndRebuild(context));
-              },
-            ),
-    ];
+    final topBodyInset = PlatformInfo.isIOS
+        ? MediaQuery.paddingOf(context).top + kToolbarHeight
+        : 0.0;
 
-    final body = Align(
-      alignment: Alignment.topCenter,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 720),
-        child: ListTileTheme(
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: applePlatform ? 20 : 24,
-          ),
-          child: ListView(
-            padding: EdgeInsets.fromLTRB(16, applePlatform ? 12 : 8, 16, 28),
-            children: [
-              SettingsSectionHeader(title: l10n.advancedSettings),
-              applePlatform
-                  ? _GlassSettingsGroup(
-                      settings: _sectionSettings(context),
-                      children: sectionChildren,
-                    )
-                  : Card(child: Column(children: sectionChildren)),
-            ],
-          ),
+    return AdaptiveScaffold(
+      appBar: AdaptiveAppBar(
+        title: l10n.advancedSettings,
+        useNativeToolbar: true,
+      ),
+      body: Padding(
+        padding: EdgeInsets.only(top: topBodyInset),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
+          children: [
+            AdaptiveFormSection.insetGrouped(
+              children: [
+                AdaptiveListTile(
+                  leading: const Icon(Icons.storage_outlined),
+                  title: Text(l10n.rebuildDictionaryDatabase),
+                  subtitle: Text(l10n.rebuildDictionaryDatabaseSubtitle),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    unawaited(_confirmAndRebuild(context));
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
-
-    return Scaffold(
-      backgroundColor: applePlatform
-          ? Colors.transparent
-          : Theme.of(context).scaffoldBackgroundColor,
-      appBar: applePlatform
-          ? glass.GlassAppBar(
-              useOwnLayer: true,
-              quality: glass.GlassQuality.premium,
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              leading: IconButton(
-                tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-                onPressed: () => Navigator.of(context).maybePop(),
-                icon: Icon(
-                  CupertinoIcons.back,
-                  color: resolveLiquidGlassTint(context),
-                  size: 22,
-                ),
-              ),
-              title: Text(
-                l10n.advancedSettings,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: resolveLiquidGlassForeground(context),
-                ),
-              ),
-            )
-          : AppBar(title: Text(l10n.advancedSettings)),
-      body: applePlatform ? LiquidGlassBackground(child: body) : body,
-    );
   }
 }
 
-class _GlassSettingsGroup extends StatelessWidget {
-  const _GlassSettingsGroup({required this.settings, required this.children});
 
-  final glass.LiquidGlassSettings settings;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return glass.GlassPanel(
-      useOwnLayer: true,
-      quality: glass.GlassQuality.standard,
-      settings: settings,
-      padding: EdgeInsets.zero,
-      margin: const EdgeInsets.only(bottom: 4),
-      shape: const glass.LiquidRoundedSuperellipse(borderRadius: 24),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          for (var index = 0; index < children.length; index++) ...[
-            children[index],
-            if (index < children.length - 1)
-              Divider(
-                height: 1,
-                thickness: 0.5,
-                indent: 72,
-                endIndent: 16,
-                color: Theme.of(
-                  context,
-                ).colorScheme.outlineVariant.withValues(alpha: 0.35),
-              ),
-          ],
-        ],
-      ),
-    );
-  }
-}

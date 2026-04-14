@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:taigi_dict/features/dictionary/presentation/widgets/audio_button.dart';
-import 'package:taigi_dict/features/dictionary/presentation/widgets/interactive_definition_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:taigi_dict/main.dart';
-import 'package:taigi_dict/offline_audio.dart';
+import 'package:taigi_dict/app/app_module.dart';
+import 'package:taigi_dict/core/core.dart';
+import 'package:taigi_dict/features/audio/audio.dart';
+import 'package:taigi_dict/features/bookmarks/bookmarks.dart';
+import 'package:taigi_dict/features/dictionary/dictionary.dart';
 
 void main() {
   final searchField = find.byType(EditableText);
@@ -485,7 +485,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 900));
 
-    expect(find.text('辭典'), findsOneWidget);
+    expect(find.text('辭典'), findsWidgets);
     expect(find.text('書籤'), findsOneWidget);
     expect(find.text('設定'), findsWidgets);
     expect(find.text('詞目'), findsNothing);

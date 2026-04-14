@@ -20,8 +20,8 @@ class AppLocalizations {
   static const localizationsDelegates = <LocalizationsDelegate<dynamic>>[
     AppLocalizationsDelegate(),
     GlobalMaterialLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
   ];
 
   static AppLocalizations of(BuildContext context) {

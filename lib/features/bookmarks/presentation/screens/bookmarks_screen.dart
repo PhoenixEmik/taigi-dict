@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:taigi_dict/core/localization/app_localizations.dart';
-import 'package:taigi_dict/features/bookmarks/application/bookmark_store.dart';
-import 'package:taigi_dict/features/bookmarks/presentation/widgets/bookmark_empty_state.dart';
-import 'package:taigi_dict/features/dictionary/data/dictionary_repository.dart';
-import 'package:taigi_dict/features/dictionary/domain/dictionary_models.dart';
-import 'package:taigi_dict/features/dictionary/presentation/coordinators/word_detail_coordinator.dart';
-import 'package:taigi_dict/features/dictionary/presentation/widgets/entry_list_item.dart';
-import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
-import 'package:taigi_dict/offline_audio.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
+import 'package:taigi_dict/core/core.dart';
+import 'package:taigi_dict/features/audio/audio.dart';
+import 'package:taigi_dict/features/bookmarks/bookmarks.dart';
+import 'package:taigi_dict/features/dictionary/dictionary.dart';
 
 class BookmarksScreen extends StatefulWidget {
   const BookmarksScreen({
@@ -29,8 +25,17 @@ class BookmarksScreen extends StatefulWidget {
   State<BookmarksScreen> createState() => _BookmarksScreenState();
 }
 
-class _BookmarksScreenState extends State<BookmarksScreen> {
+class _BookmarksScreenState extends State<BookmarksScreen>
+    with AutomaticKeepAliveClientMixin {
   late final Future<DictionaryBundle> _bundleFuture;
+  Future<List<DictionaryEntry>>? _entriesFuture;
+  String _entriesFutureKey = '';
+  DictionaryBundle? _cachedBundle;
+  final Map<String, List<DictionaryEntry>> _entriesCacheByKey =
+      <String, List<DictionaryEntry>>{};
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -55,8 +60,11 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final l10n = AppLocalizations.of(context);
-    final applePlatform = isApplePlatform(context);
+    final topBodyInset = PlatformInfo.isIOS
+        ? MediaQuery.paddingOf(context).top + kToolbarHeight
+        : 0.0;
 
     return AnimatedBuilder(
       animation: widget.bookmarkStore,
@@ -64,6 +72,11 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
         final content = FutureBuilder<DictionaryBundle>(
           future: _bundleFuture,
           builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              _cachedBundle = snapshot.data;
+            }
+            final bundle = snapshot.data ?? _cachedBundle;
+
             if (snapshot.hasError) {
               return Center(
                 child: Padding(
@@ -77,90 +90,67 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
               );
             }
 
-            if (!snapshot.hasData) {
+            if (bundle == null) {
               return Center(
-                child: applePlatform
-                    ? const CircularProgressIndicator.adaptive()
-                    : const CircularProgressIndicator(),
+                child: const CircularProgressIndicator(),
               );
             }
 
-            final bookmarkedIds = widget.bookmarkStore.bookmarkedIds;
+            final bookmarkedIds = widget.bookmarkStore.bookmarkedIds
+                .toList(growable: false)
+              ..sort();
             if (bookmarkedIds.isEmpty) {
-              return LiquidGlassBackground(
-                child: SafeArea(
-                  top: false,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Align(
-                        alignment: Alignment.topCenter,
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
-                          ),
-                          child: bookmarkedContent(
-                            const [],
-                            snapshot.data!,
-                            applePlatform,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+              return bookmarkedContent(
+                const [],
+                bundle,
               );
             }
 
-            return LiquidGlassBackground(
-              child: SafeArea(
-                top: false,
-                child: FutureBuilder<List<DictionaryEntry>>(
-                  future: widget.repository.entriesByIdsAsync(
-                    snapshot.data!,
-                    bookmarkedIds,
-                  ),
-                  builder: (context, entriesSnapshot) {
-                    if (entriesSnapshot.hasError) {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Text(
-                            l10n.loadDataFailed('${entriesSnapshot.error}'),
-                            style: Theme.of(context).textTheme.titleMedium,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      );
-                    }
+            final entriesFutureKey = bookmarkedIds.join(',');
+            if (_entriesFuture == null || _entriesFutureKey != entriesFutureKey) {
+              _entriesFutureKey = entriesFutureKey;
+              _entriesFuture = widget.repository.entriesByIdsAsync(
+                bundle,
+                bookmarkedIds,
+              );
+            }
 
-                    if (!entriesSnapshot.hasData) {
-                      return Center(
-                        child: applePlatform
-                            ? const CircularProgressIndicator.adaptive()
-                            : const CircularProgressIndicator(),
-                      );
-                    }
+            final cachedEntries = _entriesCacheByKey[entriesFutureKey];
 
-                    return LayoutBuilder(
-                      builder: (context, constraints) {
-                        return Align(
-                          alignment: Alignment.topCenter,
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
-                            ),
-                            child: bookmarkedContent(
-                              entriesSnapshot.data!,
-                              snapshot.data!,
-                              applePlatform,
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
+            return FutureBuilder<List<DictionaryEntry>>(
+              future: _entriesFuture,
+              builder: (context, entriesSnapshot) {
+                if (entriesSnapshot.hasError) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        l10n.loadDataFailed('${entriesSnapshot.error}'),
+                        style: Theme.of(context).textTheme.titleMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }
+
+                if (entriesSnapshot.hasData) {
+                  _entriesCacheByKey[entriesFutureKey] = entriesSnapshot.data!;
+                }
+
+                final resolvedEntries =
+                    entriesSnapshot.data ?? cachedEntries;
+
+                if (resolvedEntries == null) {
+                  return Center(
+                    child: const CircularProgressIndicator(),
+                  );
+                }
+
+                return bookmarkedContent(
+                  resolvedEntries,
+                  bundle,
+                );
+              },
             );
           },
         );
@@ -169,9 +159,17 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
           return content;
         }
 
-        return Scaffold(
-          appBar: AppBar(title: Text(l10n.bookmarksTitle)),
-          body: content,
+        return AdaptiveScaffold(
+          appBar: AdaptiveAppBar(
+            title: l10n.bookmarksTitle,
+            useNativeToolbar: true,
+          ),
+          extendBodyBehindAppBar: false,
+          useHeroBackButton: false,
+          body: Padding(
+            padding: EdgeInsets.only(top: topBodyInset),
+            child: content,
+          ),
         );
       },
     );
@@ -180,27 +178,20 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
   Widget bookmarkedContent(
     List<DictionaryEntry> bookmarkedEntries,
     DictionaryBundle bundle,
-    bool applePlatform,
   ) {
+    final bottomInset = PlatformInfo.isIOS
+        ? MediaQuery.paddingOf(context).bottom + kBottomNavigationBarHeight + 16
+        : 16.0;
+
     if (bookmarkedEntries.isEmpty) {
       return Padding(
-        padding: EdgeInsets.fromLTRB(
-          16,
-          applePlatform ? 24 : 16,
-          16,
-          applePlatform ? 140 : 28,
-        ),
+        padding: EdgeInsets.fromLTRB(16, 16, 16, bottomInset),
         child: const BookmarkEmptyState(),
       );
     }
 
     return ListView.builder(
-      padding: EdgeInsets.fromLTRB(
-        16,
-        applePlatform ? 12 : 16,
-        16,
-        applePlatform ? 140 : 28,
-      ),
+      padding: EdgeInsets.fromLTRB(16, 12, 16, bottomInset),
       itemCount: bookmarkedEntries.length,
       itemBuilder: (context, index) {
         return Padding(

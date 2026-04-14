@@ -1,16 +1,11 @@
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:taigi_dict/core/localization/app_localizations.dart';
-import 'package:taigi_dict/features/bookmarks/application/bookmark_store.dart';
-import 'package:taigi_dict/features/dictionary/application/dictionary_search_controller.dart';
-import 'package:taigi_dict/features/dictionary/data/dictionary_repository.dart';
-import 'package:taigi_dict/features/dictionary/domain/dictionary_models.dart';
-import 'package:taigi_dict/features/dictionary/presentation/coordinators/word_detail_coordinator.dart';
-import 'package:taigi_dict/features/dictionary/presentation/widgets/entry_list_item.dart';
-import 'package:taigi_dict/features/dictionary/presentation/widgets/search_panel.dart';
-import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
-import 'package:taigi_dict/offline_audio.dart';
+import 'package:taigi_dict/core/core.dart';
+import 'package:taigi_dict/features/audio/audio.dart';
+import 'package:taigi_dict/features/bookmarks/bookmarks.dart';
+import 'package:taigi_dict/features/dictionary/dictionary.dart';
+
 
 class DictionaryScreen extends StatefulWidget {
   const DictionaryScreen({
@@ -19,20 +14,27 @@ class DictionaryScreen extends StatefulWidget {
     required this.audioLibrary,
     required this.bookmarkStore,
     required this.onActionResult,
+    this.showOwnScaffold = false,
   });
 
   final DictionaryRepository repository;
   final OfflineAudioLibrary audioLibrary;
   final BookmarkStore bookmarkStore;
   final ValueChanged<AudioActionResult> onActionResult;
+  final bool showOwnScaffold;
 
   @override
   State<DictionaryScreen> createState() => _DictionaryScreenState();
 }
 
-class _DictionaryScreenState extends State<DictionaryScreen> {
+class _DictionaryScreenState extends State<DictionaryScreen>
+    with AutomaticKeepAliveClientMixin {
   late final DictionarySearchController _searchController;
   Locale? _lastResolvedLocale;
+  DictionaryBundle? _cachedBundle;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -82,16 +84,30 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final applePlatform = isApplePlatform(context);
+    final platform = Theme.of(context).platform;
+    final applePlatform =
+        platform == TargetPlatform.iOS || platform == TargetPlatform.macOS;
+    final topBodyInset = PlatformInfo.isIOS
+      ? MediaQuery.paddingOf(context).top + kToolbarHeight
+      : 0.0;
+    final bottomContentPadding = platform == TargetPlatform.iOS
+      ? MediaQuery.paddingOf(context).bottom + 88
+      : 28.0;
 
     return AnimatedBuilder(
       animation: _searchController,
       builder: (context, child) {
-        return FutureBuilder<DictionaryBundle>(
+        final content = FutureBuilder<DictionaryBundle>(
           future: _searchController.bundleFuture,
           builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              _cachedBundle = snapshot.data;
+            }
+            final bundle = snapshot.data ?? _cachedBundle;
+
             if (snapshot.hasError) {
               return Center(
                 child: Padding(
@@ -105,7 +121,7 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
               );
             }
 
-            if (!snapshot.hasData) {
+            if (bundle == null) {
               return Center(
                 child: applePlatform
                     ? const CircularProgressIndicator.adaptive()
@@ -119,103 +135,113 @@ class _DictionaryScreenState extends State<DictionaryScreen> {
             final isSearching = _searchController.isSearching;
             final searchHistory = _searchController.searchHistory;
 
-            return LiquidGlassBackground(
-              child: SafeArea(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Align(
-                      alignment: Alignment.topCenter,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
-                        ),
-                        child: CustomScrollView(
-                          keyboardDismissBehavior:
-                              ScrollViewKeyboardDismissBehavior.onDrag,
-                          slivers: [
-                            SliverPadding(
-                              padding: EdgeInsets.fromLTRB(
-                                16,
-                                applePlatform ? 12 : 16,
-                                16,
-                                12,
-                              ),
-                              sliver: SliverToBoxAdapter(
-                                child: SearchWorkspaceCard(
-                                  controller:
-                                      _searchController.searchController,
-                                  onSubmitted: (_) {
-                                    unawaited(_searchController.submitQuery());
-                                  },
-                                ),
-                              ),
-                            ),
-                            if (!hasActiveQuery && searchHistory.isNotEmpty)
-                              SliverPadding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  16,
-                                  0,
-                                  16,
-                                  12,
-                                ),
-                                sliver: SliverToBoxAdapter(
-                                  child: SearchHistorySection(
-                                    history: searchHistory,
-                                    onHistoryTap:
-                                        _searchController.applyHistoryQuery,
-                                    onClearHistory:
-                                        _searchController.clearSearchHistory,
-                                  ),
-                                ),
-                              ),
-                            SliverPadding(
-                              padding: EdgeInsets.fromLTRB(
-                                16,
-                                0,
-                                16,
-                                applePlatform ? 140 : 28,
-                              ),
-                              sliver: !hasActiveQuery
-                                  ? SliverToBoxAdapter(
-                                      child: SelectionArea(
-                                        child: EmptyState(query: query),
-                                      ),
-                                    )
-                                  : isSearching
-                                  ? const SliverToBoxAdapter(
-                                      child: SearchLoadingState(),
-                                    )
-                                  : filteredResults.isEmpty
-                                  ? const SliverToBoxAdapter(
-                                      child: NoResultsState(),
-                                    )
-                                  : SliverList.separated(
-                                      itemCount: filteredResults.length,
-                                      itemBuilder: (context, index) {
-                                        return SelectionArea(
-                                          child: EntryListItem(
-                                            entry: filteredResults[index],
-                                            onTap: () => _showEntryDetails(
-                                              snapshot.data!,
-                                              filteredResults[index],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      separatorBuilder: (context, index) {
-                                        return const SizedBox(height: 10);
-                                      },
-                                    ),
-                            ),
-                          ],
-                        ),
+            return SafeArea(
+              top: false,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return Align(
+                    alignment: Alignment.topCenter,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: constraints.maxWidth >= 900 ? 920 : 720,
                       ),
-                    );
-                  },
-                ),
+                      child: CustomScrollView(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        slivers: [
+                          SliverPadding(
+                            padding: EdgeInsets.fromLTRB(
+                              16,
+                              applePlatform ? 12 : 16,
+                              16,
+                              12,
+                            ),
+                            sliver: SliverToBoxAdapter(
+                              child: SearchWorkspaceCard(
+                                controller: _searchController.searchController,
+                                onSubmitted: (_) {
+                                  unawaited(_searchController.submitQuery());
+                                },
+                              ),
+                            ),
+                          ),
+                          if (!hasActiveQuery && searchHistory.isNotEmpty)
+                            SliverPadding(
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                              sliver: SliverToBoxAdapter(
+                                child: SearchHistorySection(
+                                  history: searchHistory,
+                                  onHistoryTap:
+                                      _searchController.applyHistoryQuery,
+                                  onClearHistory:
+                                      _searchController.clearSearchHistory,
+                                ),
+                              ),
+                            ),
+                          SliverPadding(
+                            padding: EdgeInsets.fromLTRB(
+                              16,
+                              0,
+                              16,
+                              bottomContentPadding,
+                            ),
+                            sliver: !hasActiveQuery
+                                ? SliverToBoxAdapter(
+                                    child: SelectionArea(
+                                      child: EmptyState(query: query),
+                                    ),
+                                  )
+                                : isSearching
+                                ? const SliverToBoxAdapter(
+                                    child: SearchLoadingState(),
+                                  )
+                                : filteredResults.isEmpty
+                                ? const SliverToBoxAdapter(
+                                    child: NoResultsState(),
+                                  )
+                                : SliverList.separated(
+                                    itemCount: filteredResults.length,
+                                    itemBuilder: (context, index) {
+                                      return SelectionArea(
+                                        child: EntryListItem(
+                                          entry: filteredResults[index],
+                                          onTap: () => _showEntryDetails(
+                                            bundle,
+                                            filteredResults[index],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    separatorBuilder: (context, index) {
+                                      return const SizedBox(height: 10);
+                                    },
+                                  ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
               ),
             );
           },
+        );
+
+        if (!widget.showOwnScaffold) {
+          return content;
+        }
+
+        return AdaptiveScaffold(
+          appBar: AdaptiveAppBar(
+            title: l10n.dictionaryTab,
+            useNativeToolbar: true,
+          ),
+          extendBodyBehindAppBar: false,
+          useHeroBackButton: false,
+          body: Padding(
+            padding: EdgeInsets.only(top: topBodyInset),
+            child: content,
+          ),
         );
       },
     );

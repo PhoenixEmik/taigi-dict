@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as glass;
-import 'package:taigi_dict/core/localization/app_localizations.dart';
-import 'package:taigi_dict/core/preferences/app_preferences.dart';
-import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
-import 'package:taigi_dict/features/settings/presentation/widgets/settings_glass_option_menu.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
+import 'package:taigi_dict/core/core.dart';
 
 class SettingsThemeModeTile extends StatelessWidget {
   const SettingsThemeModeTile({
@@ -18,52 +15,40 @@ class SettingsThemeModeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
-    final applePlatform = isApplePlatform(context);
-    final trailing = applePlatform
-        ? SettingsGlassOptionMenu<AppThemePreference>(
-            value: value,
-            label: _themeLabel(value, l10n),
-            items: AppThemePreference.values,
-            itemLabel: (mode) => _themeLabel(mode, l10n),
-            onSelected: onSelected,
-          )
-        : DropdownButtonHideUnderline(
-            child: DropdownButton<AppThemePreference>(
-              value: value,
-              icon: const Icon(Icons.arrow_drop_down),
-              onChanged: (selection) {
-                if (selection != null) {
-                  onSelected(selection);
-                }
-              },
-              items: AppThemePreference.values
-                  .map((mode) {
-                    return DropdownMenuItem<AppThemePreference>(
-                      value: mode,
-                      child: Text(_themeLabel(mode, l10n)),
-                    );
-                  })
-                  .toList(growable: false),
-            ),
-          );
 
-    if (applePlatform) {
-      return glass.GlassListTile(
-        showDivider: false,
-        leadingIconColor: resolveLiquidGlassTint(context),
-        titleStyle: resolveGlassListTileTitleStyle(context),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        leading: const Icon(Icons.palette),
-        title: Text(l10n.theme),
-        trailing: trailing,
-      );
-    }
-
-    return ListTile(
-      leading: Icon(Icons.palette, color: colorScheme.primary),
+    return AdaptiveListTile(
+      leading: const Icon(Icons.dark_mode_outlined),
       title: Text(l10n.theme),
-      trailing: trailing,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(_themeLabel(value, l10n)),
+          AdaptivePopupMenuButton.icon<AppThemePreference>(
+            icon: PlatformInfo.isIOS
+                ? 'chevron.up.chevron.down'
+                : Icons.arrow_drop_down,
+            items: const [
+              AppThemePreference.system,
+              AppThemePreference.light,
+              AppThemePreference.dark,
+              AppThemePreference.amoled,
+            ]
+                .map(
+                  (preference) => AdaptivePopupMenuItem<AppThemePreference>(
+                    label: _themeLabel(preference, l10n),
+                    value: preference,
+                  ),
+                )
+                .toList(growable: false),
+            onSelected: (index, entry) {
+              final selectedPreference = entry.value;
+              if (selectedPreference != null) {
+                onSelected(selectedPreference);
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 }
