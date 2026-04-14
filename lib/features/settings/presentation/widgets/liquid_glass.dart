@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -212,34 +213,18 @@ class AdaptiveSettingsActionButton extends StatelessWidget {
     }
 
     final tint = resolveLiquidGlassTint(context);
-    final buttonSettings = glass.LiquidGlassSettings(
-      blur: 18,
-      thickness: 16,
-      glassColor: Theme.of(context).brightness == Brightness.dark
-          ? Colors.white.withValues(alpha: 0.14)
-          : Colors.white.withValues(alpha: 0.36),
-      lightIntensity: 0.72,
-      ambientStrength: 0.24,
-      refractiveIndex: 1.16,
-      saturation: 1.15,
-      chromaticAberration: 0.01,
-    );
 
     return Tooltip(
       message: tooltip,
-      child: glass.GlassButton(
-        label: tooltip,
-        icon: Icon(icon),
-        onTap: onPressed ?? () {},
+      child: AdaptiveButton.child(
+        style: AdaptiveButtonStyle.glass,
+        color: tint,
+        minSize: const Size(36, 36),
+        padding: EdgeInsets.zero,
+        useSmoothRectangleBorder: false,
+        onPressed: onPressed ?? () {},
         enabled: onPressed != null,
-        width: 36,
-        height: 36,
-        iconSize: 20,
-        iconColor: tint,
-        settings: buttonSettings,
-        useOwnLayer: false,
-        quality: glass.GlassQuality.standard,
-        shape: const glass.LiquidOval(),
+        child: Icon(icon, size: 20),
       ),
     );
   }
@@ -281,19 +266,15 @@ class AdaptiveCircleButton extends StatelessWidget {
 
     return Tooltip(
       message: tooltip,
-      child: CupertinoButton(
+      child: AdaptiveButton.child(
+        style: AdaptiveButtonStyle.filled,
+        color: backgroundColor,
+        minSize: Size(size, size),
         padding: EdgeInsets.zero,
-        minimumSize: Size.zero,
+        useSmoothRectangleBorder: false,
         onPressed: enabled ? onPressed : null,
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            shape: BoxShape.circle,
-          ),
-          child: Center(child: buttonChild),
-        ),
+        enabled: enabled,
+        child: buttonChild,
       ),
     );
   }
