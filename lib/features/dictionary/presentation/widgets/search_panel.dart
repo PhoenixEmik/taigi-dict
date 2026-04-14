@@ -1,10 +1,10 @@
 import 'dart:ui';
 
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:taigi_dict/core/localization/app_localizations.dart';
 import 'package:taigi_dict/features/settings/presentation/widgets/liquid_glass.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart' as glass;
 
 class SearchWorkspaceCard extends StatelessWidget {
   const SearchWorkspaceCard({
@@ -19,44 +19,21 @@ class SearchWorkspaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final applePlatform = isApplePlatform(context);
-
-    if (applePlatform) {
-      return glass.GlassSearchBar(
-        controller: controller,
-        placeholder: l10n.searchHint,
-        onSubmitted: onSubmitted,
-        onChanged: (_) {},
-        useOwnLayer: true,
-        quality: glass.GlassQuality.standard,
-        searchIconColor: resolveLiquidGlassSecondaryForeground(context),
-        clearIconColor: resolveLiquidGlassSecondaryForeground(context),
-        cancelButtonColor: resolveLiquidGlassTint(context),
-        textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-          color: resolveLiquidGlassForeground(context),
-          fontWeight: FontWeight.w600,
-        ),
-        placeholderStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
-          color: resolveLiquidGlassSecondaryForeground(context),
-        ),
-      );
-    }
-
-    return SearchBar(
+    return AdaptiveTextField(
       controller: controller,
-      hintText: l10n.searchHint,
-      leading: const Icon(Icons.search),
-      trailing: controller.text.isEmpty
+      placeholder: l10n.searchHint,
+      textInputAction: TextInputAction.search,
+      prefixIcon: const Icon(Icons.search),
+      suffix: controller.text.isEmpty
           ? null
-          : [
-              IconButton(
-                tooltip: l10n.clearSearch,
-                onPressed: () {
-                  controller.clear();
-                },
-                icon: const Icon(Icons.close),
-              ),
-            ],
+          : IconButton(
+              tooltip: l10n.clearSearch,
+              onPressed: () {
+                controller.clear();
+              },
+              icon: const Icon(Icons.close),
+            ),
+      onChanged: (_) {},
       onSubmitted: onSubmitted,
     );
   }
