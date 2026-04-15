@@ -29,7 +29,8 @@ class AdvancedSettingsScreen extends StatelessWidget {
       title: '${l10n.redownload} ${l10n.dictionarySourceArchive}',
       content: l10n.dictionarySourceSubtitle,
       cancelLabel: l10n.cancelAction,
-      confirmLabel: l10n.confirmAction,
+      confirmLabel: l10n.redownload,
+      icon: const Icon(Icons.description_outlined, size: 28),
     );
     if (confirmed != true || !context.mounted) {
       return;
@@ -55,7 +56,13 @@ class AdvancedSettingsScreen extends StatelessWidget {
       title: '${l10n.redownload} $archiveLabel',
       content: l10n.downloadApproximateSize(formatBytes(type.archiveBytes)),
       cancelLabel: l10n.cancelAction,
-      confirmLabel: l10n.confirmAction,
+      confirmLabel: l10n.redownload,
+      icon: Icon(
+        type == AudioArchiveType.word
+            ? Icons.record_voice_over_outlined
+            : Icons.chat_bubble_outline,
+        size: 28,
+      ),
     );
     if (confirmed != true || !context.mounted) {
       return;
@@ -76,6 +83,7 @@ class AdvancedSettingsScreen extends StatelessWidget {
       content: l10n.confirmRebuildDictionaryBody,
       cancelLabel: l10n.cancelAction,
       confirmLabel: l10n.confirmAction,
+      icon: const Icon(Icons.storage_outlined, size: 28),
     );
 
     if (confirmed != true || !context.mounted) {
@@ -99,19 +107,20 @@ class AdvancedSettingsScreen extends StatelessWidget {
           return PopScope(
             canPop: false,
             child: AlertDialog(
-              content: Row(
+              contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(
                     width: 24,
                     height: 24,
                     child: CircularProgressIndicator.adaptive(strokeWidth: 2.5),
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Text(
-                      l10n.rebuildingDictionaryDatabase,
-                      style: Theme.of(dialogContext).textTheme.titleMedium,
-                    ),
+                  const SizedBox(height: 14),
+                  Text(
+                    l10n.rebuildingDictionaryDatabase,
+                    style: Theme.of(dialogContext).textTheme.titleMedium,
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),

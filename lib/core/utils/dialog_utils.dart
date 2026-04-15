@@ -10,6 +10,7 @@ Future<bool?> showConfirmationDialog({
   required String confirmLabel,
   bool barrierDismissible = true,
   bool isDestructiveAction = false,
+  dynamic icon,
 }) async {
   final result = Completer<bool>();
 
@@ -17,6 +18,7 @@ Future<bool?> showConfirmationDialog({
     context: context,
     title: title,
     message: content,
+    icon: icon,
     actions: [
       AlertAction(
         title: cancelLabel,
