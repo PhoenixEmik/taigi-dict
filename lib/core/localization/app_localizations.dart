@@ -112,6 +112,7 @@ class AppLocalizations {
       'advancedSettings': 'Advanced Settings',
       'advancedSettingsSubtitle':
           'Manage maintenance and database rebuild actions.',
+      'offlineResourceMaintenance': 'Offline Resource Maintenance',
       'languageSetting': 'Language / 語言',
       'theme': 'Theme',
       'displayMode': 'Display mode',
@@ -231,6 +232,7 @@ class AppLocalizations {
       'about': '关于',
       'advancedSettings': '进阶设置',
       'advancedSettingsSubtitle': '管理维护动作与词典资料库重建。',
+      'offlineResourceMaintenance': '离线资源维护',
       'languageSetting': 'Language / 語言',
       'theme': '主题',
       'displayMode': '显示模式',
@@ -338,6 +340,7 @@ class AppLocalizations {
       'about': '關於',
       'advancedSettings': '進階設定',
       'advancedSettingsSubtitle': '管理維護動作與詞典資料庫重建。',
+      'offlineResourceMaintenance': '離線資源維護',
       'languageSetting': 'Language / 語言',
       'theme': '主題',
       'displayMode': '顯示模式',
@@ -461,6 +464,7 @@ class AppLocalizations {
   String get about => _text('about');
   String get advancedSettings => _text('advancedSettings');
   String get advancedSettingsSubtitle => _text('advancedSettingsSubtitle');
+  String get offlineResourceMaintenance => _text('offlineResourceMaintenance');
   String get languageSetting => _text('languageSetting');
   String get theme => _text('theme');
   String get displayMode => _text('displayMode');

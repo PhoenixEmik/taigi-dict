@@ -177,6 +177,7 @@ class AdvancedSettingsScreen extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 24),
           children: [
             AdaptiveFormSection.insetGrouped(
+              header: Text(l10n.offlineResourceMaintenance),
               children: [
                 AdaptiveListTile(
                   leading: const Icon(Icons.description_outlined),
@@ -224,6 +225,11 @@ class AdvancedSettingsScreen extends StatelessWidget {
                     );
                   },
                 ),
+              ],
+            ),
+            AdaptiveFormSection.insetGrouped(
+              header: Text(l10n.rebuildDictionaryDatabase),
+              children: [
                 AdaptiveListTile(
                   leading: const Icon(Icons.storage_outlined),
                   title: Text(l10n.rebuildDictionaryDatabase),
