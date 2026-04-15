@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taigi_dict/core/core.dart';
 import 'package:taigi_dict/features/dictionary/dictionary.dart';
 
-
 class DictionarySearchController extends ChangeNotifier {
   DictionarySearchController({
     required DictionaryRepository repository,
@@ -170,10 +169,8 @@ class DictionarySearchController extends ChangeNotifier {
     late final List<DictionaryEntry> filteredResults;
     try {
       final results = await _repository.searchAsync(bundle, normalizedQuery);
-      filteredResults = await _translationService.translateEntriesForDisplay(
-        results,
-        locale: _displayLocale,
-      );
+      filteredResults = await _translationService
+          .translateEntriesForSearchResults(results, locale: _displayLocale);
     } catch (_) {
       if (_disposed || requestId != _searchRequestId) {
         return;
