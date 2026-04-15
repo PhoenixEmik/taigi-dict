@@ -104,26 +104,23 @@ class AdvancedSettingsScreen extends StatelessWidget {
         barrierDismissible: false,
         useRootNavigator: true,
         builder: (dialogContext) {
-          return PopScope(
-            canPop: false,
-            child: AlertDialog(
-              contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator.adaptive(strokeWidth: 2.5),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    l10n.rebuildingDictionaryDatabase,
-                    style: Theme.of(dialogContext).textTheme.titleMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
+          return AlertDialog(
+            contentPadding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator.adaptive(strokeWidth: 2.5),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  l10n.rebuildingDictionaryDatabase,
+                  style: Theme.of(dialogContext).textTheme.titleMedium,
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           );
         },
@@ -145,13 +142,13 @@ class AdvancedSettingsScreen extends StatelessWidget {
       await onRebuildDictionaryDatabase();
     } catch (caught) {
       error = caught;
+    } finally {
+      closeProgressDialog();
     }
 
     if (!context.mounted) {
       return;
     }
-
-    closeProgressDialog();
 
     showAppNotification(
       context,
