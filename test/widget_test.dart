@@ -512,7 +512,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 900));
 
-    await tester.tap(find.byIcon(Icons.settings_outlined));
+    await tester.tap(find.text('設定').last);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
@@ -583,7 +583,7 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('版本'), findsOneWidget);
-    expect(find.text('1.1.2+1'), findsOneWidget);
+    expect(find.text('1.1.3'), findsOneWidget);
     expect(find.text('作者'), findsOneWidget);
     expect(find.text('PhoenixEmik'), findsOneWidget);
     expect(find.text('GitHub'), findsOneWidget);
