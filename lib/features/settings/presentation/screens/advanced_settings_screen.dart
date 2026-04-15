@@ -22,12 +22,25 @@ class AdvancedSettingsScreen extends StatelessWidget {
   final Future<void> Function() onDownloadDictionarySource;
   final Future<void> Function() onRebuildDictionaryDatabase;
 
+  String _dictionarySourceApproximateSize(AppLocalizations l10n) {
+    final snapshot = dictionaryLibrary.downloadSnapshot;
+    final bytes = snapshot.totalBytes > 0
+        ? snapshot.totalBytes
+        : snapshot.downloadedBytes;
+    if (bytes <= 0) {
+      return l10n.unknownSize;
+    }
+    return formatBytes(bytes);
+  }
+
   Future<void> _redownloadDictionarySource(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
     final confirmed = await showConfirmationDialog(
       context: context,
       title: l10n.redownloadConfirmationTitle(l10n.dictionarySourceArchive),
-      content: '',
+      content: l10n.redownloadConfirmationBody(
+        _dictionarySourceApproximateSize(l10n),
+      ),
       cancelLabel: l10n.cancelAction,
       confirmLabel: l10n.redownload,
     );
@@ -53,7 +66,9 @@ class AdvancedSettingsScreen extends StatelessWidget {
     final confirmed = await showConfirmationDialog(
       context: context,
       title: l10n.redownloadConfirmationTitle(archiveLabel),
-      content: '',
+      content: l10n.redownloadConfirmationBody(
+        formatBytes(type.archiveBytes),
+      ),
       cancelLabel: l10n.cancelAction,
       confirmLabel: l10n.redownload,
     );

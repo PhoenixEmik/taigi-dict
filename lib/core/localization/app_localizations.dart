@@ -169,6 +169,7 @@ class AppLocalizations {
       'resume': 'Resume',
       'retry': 'Retry',
       'redownload': 'Re-download',
+      'unknownSize': 'unknown size',
       'downloadReady': 'Downloaded and ready for offline playback',
       'downloadApproxPrefix': 'About',
       'tailoGuide': 'Tai-lo Orthography Guide',
@@ -281,6 +282,7 @@ class AppLocalizations {
       'resume': '继续',
       'retry': '重试',
       'redownload': '重新下载',
+      'unknownSize': '未知大小',
       'downloadReady': '已下载，可离线播放',
       'downloadApproxPrefix': '大小约',
       'tailoGuide': '台罗标注说明',
@@ -389,6 +391,7 @@ class AppLocalizations {
       'resume': '繼續',
       'retry': '重試',
       'redownload': '重新下載',
+      'unknownSize': '未知大小',
       'downloadReady': '已下載，可離線播放',
       'downloadApproxPrefix': '大小約',
       'tailoGuide': '臺羅標注說明',
@@ -516,6 +519,7 @@ class AppLocalizations {
   String get resume => _text('resume');
   String get retry => _text('retry');
   String get redownload => _text('redownload');
+  String get unknownSize => _text('unknownSize');
   String get downloadReady => _text('downloadReady');
   String get tailoGuide => _text('tailoGuide');
   String get tailoGuideSubtitle => _text('tailoGuideSubtitle');
@@ -763,6 +767,12 @@ class AppLocalizations {
     'Confirm re-download of $label?',
     '确认要重新下载 $label？',
     '確認要重新下載 $label？',
+  );
+
+  String redownloadConfirmationBody(String size) => _selectText(
+    'About $size. This may take some time. Are you sure you want to continue?',
+    '大小约 $size，这将花费一些时间。您确定要继续吗？',
+    '大小約 $size，這將花費一些時間。您確定要繼續嗎？',
   );
 
   String audioArchiveDownloadFailed(String label, String error) => _selectText(
