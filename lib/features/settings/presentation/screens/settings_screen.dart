@@ -182,6 +182,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                 AdaptiveListTile(
                   leading: const Icon(Icons.info_outline),
                   title: Text(l10n.aboutApp),
+                  subtitle: Text(l10n.aboutAppSubtitle),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     Navigator.of(context).push(

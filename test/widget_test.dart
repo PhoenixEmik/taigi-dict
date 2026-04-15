@@ -570,6 +570,7 @@ void main() {
 
     expect(find.text('關於'), findsOneWidget);
     expect(find.text('關於台語辭典'), findsOneWidget);
+    expect(find.text('作者、版本、授權與專案資訊。'), findsOneWidget);
     expect(find.text('開源授權'), findsNothing);
 
     await tester.tap(find.text('關於台語辭典'));

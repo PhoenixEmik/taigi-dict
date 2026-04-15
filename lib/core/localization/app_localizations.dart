@@ -177,6 +177,7 @@ class AppLocalizations {
       'hanjiGuideSubtitle':
           'Read a summary of the ministry guide and character selection rules.',
       'aboutApp': 'About Hokkien Dictionary',
+      'aboutAppSubtitle': 'Author, version, licenses, and project information.',
       'aboutDescription':
           'Hokkien Dictionary provides offline bidirectional lookup between Taiwanese and Mandarin, with downloadable ministry audio for words and examples.',
       'aboutVersion': 'Version',
@@ -198,7 +199,6 @@ class AppLocalizations {
       'flutterLicenses': 'Flutter and package licenses',
       'flutterLicensesDescription':
           'View detailed open-source licenses bundled by Flutter.',
-      'copiedToClipboard': 'Copied to clipboard',
       'referencePage': 'Reference page',
       'shareEntry': 'Share entry',
       'addBookmark': 'Add bookmark',
@@ -286,6 +286,7 @@ class AppLocalizations {
       'hanjiGuide': '汉字用字原则',
       'hanjiGuideSubtitle': '查看教育部页面的重点整理与辞典汉字选用方式。',
       'aboutApp': '关于台语辞典',
+      'aboutAppSubtitle': '作者、版本、授权与项目资讯。',
       'aboutDescription': '台语辞典提供离线的台语与华语双向查询，并支持下载教育部词目与例句音档。',
       'aboutVersion': '版本',
       'aboutAuthor': '作者',
@@ -305,7 +306,6 @@ class AppLocalizations {
       'ministryCopyrightNote': '教育部版权说明',
       'flutterLicenses': 'Flutter 与套件授权',
       'flutterLicensesDescription': '查看 Flutter 汇整的开源套件详细授权。',
-      'copiedToClipboard': '已复制到剪贴簿',
       'referencePage': '参考页面',
       'shareEntry': '分享词条',
       'addBookmark': '加入书签',
@@ -393,6 +393,7 @@ class AppLocalizations {
       'hanjiGuide': '漢字用字原則',
       'hanjiGuideSubtitle': '查看教育部頁面的重點整理與辭典漢字選用方式。',
       'aboutApp': '關於台語辭典',
+      'aboutAppSubtitle': '作者、版本、授權與專案資訊。',
       'aboutDescription': '台語辭典提供離線的台語與華語雙向查詢，並支援下載教育部詞目與例句音檔。',
       'aboutVersion': '版本',
       'aboutAuthor': '作者',
@@ -412,7 +413,6 @@ class AppLocalizations {
       'ministryCopyrightNote': '教育部著作權說明',
       'flutterLicenses': 'Flutter 與套件授權',
       'flutterLicensesDescription': '查看 Flutter 彙整的開源套件詳細授權。',
-      'copiedToClipboard': '已複製到剪貼簿',
       'referencePage': '參考頁面',
       'shareEntry': '分享詞條',
       'addBookmark': '加入書籤',
@@ -518,6 +518,7 @@ class AppLocalizations {
   String get hanjiGuide => _text('hanjiGuide');
   String get hanjiGuideSubtitle => _text('hanjiGuideSubtitle');
   String get aboutApp => _text('aboutApp');
+  String get aboutAppSubtitle => _text('aboutAppSubtitle');
   String get aboutDescription => _text('aboutDescription');
   String get aboutVersion => _text('aboutVersion');
   String get aboutAuthor => _text('aboutAuthor');
@@ -537,7 +538,6 @@ class AppLocalizations {
   String get ministryCopyrightNote => _text('ministryCopyrightNote');
   String get flutterLicenses => _text('flutterLicenses');
   String get flutterLicensesDescription => _text('flutterLicensesDescription');
-  String get copiedToClipboard => _text('copiedToClipboard');
   String get referencePage => _text('referencePage');
   String get shareEntry => _text('shareEntry');
   String get addBookmark => _text('addBookmark');

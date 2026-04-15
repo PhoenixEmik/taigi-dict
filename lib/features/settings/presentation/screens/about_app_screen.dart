@@ -1,19 +1,12 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:taigi_dict/core/core.dart';
 
-import '../widgets/notification.dart';
 import 'license_summary_screen.dart';
 
 class AboutAppScreen extends StatelessWidget {
   const AboutAppScreen({super.key});
-
-  void _copyRepositoryUrl(BuildContext context, AppLocalizations l10n) {
-    Clipboard.setData(const ClipboardData(text: AppConstants.appRepositoryUrl));
-    showAppNotification(context, message: l10n.copiedToClipboard);
-  }
 
   void _openLicenseSummary(BuildContext context) {
     Navigator.of(context).push(
@@ -62,23 +55,29 @@ class AboutAppScreen extends StatelessWidget {
                   leading: const Icon(Icons.code_outlined),
                   title: Text(l10n.aboutRepository),
                   subtitle: const Text(AppConstants.appRepositoryUrl),
-                  trailing: const Icon(Icons.copy_outlined),
-                  onTap: () {
-                    _copyRepositoryUrl(context, l10n);
-                  },
                 ),
               ],
             ),
             AdaptiveFormSection.insetGrouped(
               children: [
-                AdaptiveListTile(
-                  leading: const Icon(Icons.gavel_outlined),
-                  title: Text(l10n.aboutLicenses),
-                  subtitle: Text(l10n.flutterLicensesDescription),
-                  trailing: const Icon(Icons.chevron_right),
+                Semantics(
+                  label:
+                      '${l10n.aboutLicenses}。${l10n.flutterLicensesDescription}',
+                  button: true,
                   onTap: () {
                     _openLicenseSummary(context);
                   },
+                  child: ExcludeSemantics(
+                    child: AdaptiveListTile(
+                      leading: const Icon(Icons.gavel_outlined),
+                      title: Text(l10n.aboutLicenses),
+                      subtitle: Text(l10n.flutterLicensesDescription),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        _openLicenseSummary(context);
+                      },
+                    ),
+                  ),
                 ),
               ],
             ),

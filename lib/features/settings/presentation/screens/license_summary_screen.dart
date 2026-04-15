@@ -67,14 +67,24 @@ class LicenseSummaryScreen extends StatelessWidget {
             ),
             AdaptiveFormSection.insetGrouped(
               children: [
-                AdaptiveListTile(
-                  leading: const Icon(Icons.flutter_dash_outlined),
-                  title: Text(l10n.flutterLicenses),
-                  subtitle: Text(l10n.flutterLicensesDescription),
-                  trailing: const Icon(Icons.chevron_right),
+                Semantics(
+                  label:
+                      '${l10n.flutterLicenses}。${l10n.flutterLicensesDescription}',
+                  button: true,
                   onTap: () {
                     _openFlutterLicenses(context, l10n);
                   },
+                  child: ExcludeSemantics(
+                    child: AdaptiveListTile(
+                      leading: const Icon(Icons.flutter_dash_outlined),
+                      title: Text(l10n.flutterLicenses),
+                      subtitle: Text(l10n.flutterLicensesDescription),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        _openFlutterLicenses(context, l10n);
+                      },
+                    ),
+                  ),
                 ),
               ],
             ),
