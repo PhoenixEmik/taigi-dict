@@ -5,10 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class LicenseOverviewScreen extends StatefulWidget {
-  const LicenseOverviewScreen({
-    super.key,
-    required this.applicationName,
-  });
+  const LicenseOverviewScreen({super.key, required this.applicationName});
 
   final String applicationName;
 
@@ -34,19 +31,22 @@ class _LicenseOverviewScreenState extends State<LicenseOverviewScreen> {
 
       final licenseText = paragraphs.join('\n\n');
       for (final package in entry.packages) {
-        licensesByPackage.putIfAbsent(package, () => <String>[]).add(licenseText);
+        licensesByPackage
+            .putIfAbsent(package, () => <String>[])
+            .add(licenseText);
       }
     }
 
-    final groups = licensesByPackage.entries
-        .map(
-          (entry) => _PackageLicenseGroup(
-            package: entry.key,
-            licenses: List<String>.unmodifiable(entry.value),
-          ),
-        )
-        .toList(growable: false)
-      ..sort((a, b) => a.package.compareTo(b.package));
+    final groups =
+        licensesByPackage.entries
+            .map(
+              (entry) => _PackageLicenseGroup(
+                package: entry.key,
+                licenses: List<String>.unmodifiable(entry.value),
+              ),
+            )
+            .toList(growable: false)
+          ..sort((a, b) => a.package.compareTo(b.package));
 
     return groups;
   }
@@ -54,10 +54,10 @@ class _LicenseOverviewScreenState extends State<LicenseOverviewScreen> {
   void _openPackageLicense(BuildContext context, _PackageLicenseGroup group) {
     final route = Theme.of(context).platform == TargetPlatform.iOS
         ? CupertinoPageRoute<void>(
-            builder: (_) => PackageLicenseDetailScreen(group: group),
+            builder: (_) => _PackageLicenseDetailScreen(group: group),
           )
         : MaterialPageRoute<void>(
-            builder: (_) => PackageLicenseDetailScreen(group: group),
+            builder: (_) => _PackageLicenseDetailScreen(group: group),
           );
     Navigator.of(context).push(route);
   }
@@ -109,20 +109,22 @@ class _LicenseOverviewScreenState extends State<LicenseOverviewScreen> {
                   ],
                 ),
                 AdaptiveFormSection.insetGrouped(
-                  children: groups.map((group) {
-                    return AdaptiveListTile(
-                      title: Text(group.package),
-                      subtitle: Text(
-                        materialL10n.licensesPackageDetailText(
-                          group.licenses.length,
-                        ),
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        _openPackageLicense(context, group);
-                      },
-                    );
-                  }).toList(growable: false),
+                  children: groups
+                      .map((group) {
+                        return AdaptiveListTile(
+                          title: Text(group.package),
+                          subtitle: Text(
+                            materialL10n.licensesPackageDetailText(
+                              group.licenses.length,
+                            ),
+                          ),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () {
+                            _openPackageLicense(context, group);
+                          },
+                        );
+                      })
+                      .toList(growable: false),
                 ),
               ],
             );
@@ -133,11 +135,8 @@ class _LicenseOverviewScreenState extends State<LicenseOverviewScreen> {
   }
 }
 
-class PackageLicenseDetailScreen extends StatelessWidget {
-  const PackageLicenseDetailScreen({
-    super.key,
-    required this.group,
-  });
+class _PackageLicenseDetailScreen extends StatelessWidget {
+  const _PackageLicenseDetailScreen({required this.group});
 
   final _PackageLicenseGroup group;
 
@@ -148,10 +147,7 @@ class PackageLicenseDetailScreen extends StatelessWidget {
         : 0.0;
 
     return AdaptiveScaffold(
-      appBar: AdaptiveAppBar(
-        title: group.package,
-        useNativeToolbar: true,
-      ),
+      appBar: AdaptiveAppBar(title: group.package, useNativeToolbar: true),
       body: Padding(
         padding: EdgeInsets.only(top: topBodyInset),
         child: ListView.builder(
@@ -174,10 +170,7 @@ class PackageLicenseDetailScreen extends StatelessWidget {
 }
 
 class _PackageLicenseGroup {
-  const _PackageLicenseGroup({
-    required this.package,
-    required this.licenses,
-  });
+  const _PackageLicenseGroup({required this.package, required this.licenses});
 
   final String package;
   final List<String> licenses;

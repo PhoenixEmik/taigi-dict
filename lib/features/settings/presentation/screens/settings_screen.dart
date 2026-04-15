@@ -7,7 +7,6 @@ import 'package:taigi_dict/features/audio/audio.dart';
 import 'package:taigi_dict/features/dictionary/dictionary.dart';
 import 'package:taigi_dict/features/settings/settings.dart';
 
-
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
     super.key,
@@ -67,8 +66,8 @@ class _SettingsScreenState extends State<SettingsScreen>
     final localeProvider = LocaleProviderScope.of(context);
     final l10n = AppLocalizations.of(context);
     final topBodyInset = PlatformInfo.isIOS
-      ? MediaQuery.paddingOf(context).top + kToolbarHeight
-      : 0.0;
+        ? MediaQuery.paddingOf(context).top + kToolbarHeight
+        : 0.0;
     final bottomBodyInset = PlatformInfo.isIOS
         ? MediaQuery.paddingOf(context).bottom + kBottomNavigationBarHeight + 24
         : 24.0;
@@ -199,12 +198,14 @@ class _SettingsScreenState extends State<SettingsScreen>
                     unawaited(
                       AdaptiveAlertDialog.show(
                         context: context,
-                        title: l10n.aboutApp,
+                        title: l10n.appTitle,
                         message: aboutMessage,
                         icon: Icons.info_outline,
                         actions: [
                           AlertAction(
-                            title: MaterialLocalizations.of(context).viewLicensesButtonLabel,
+                            title: MaterialLocalizations.of(
+                              context,
+                            ).viewLicensesButtonLabel,
                             style: AlertActionStyle.info,
                             onPressed: () {
                               if (!shouldOpenLicenses.isCompleted) {

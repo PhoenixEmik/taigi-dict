@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:taigi_dict/core/core.dart';
 import 'package:taigi_dict/features/audio/audio.dart';
 import 'package:taigi_dict/features/bookmarks/bookmarks.dart';
 import 'package:taigi_dict/features/dictionary/dictionary.dart';
-
 
 class WordDetailScreen extends StatelessWidget {
   const WordDetailScreen({
@@ -63,7 +61,9 @@ class WordDetailScreen extends StatelessWidget {
 
         return AdaptiveScaffold(
           appBar: AdaptiveAppBar(
-            title: entry.hanji.isEmpty ? l10n.wordDetailFallbackTitle : entry.hanji,
+            title: entry.hanji.isEmpty
+                ? l10n.wordDetailFallbackTitle
+                : entry.hanji,
             useNativeToolbar: true,
             tintColor: Theme.of(context).colorScheme.primary,
             actions: [
@@ -76,9 +76,7 @@ class WordDetailScreen extends StatelessWidget {
               ),
               AdaptiveAppBarAction(
                 iosSymbol: isBookmarked ? 'bookmark.fill' : 'bookmark',
-                icon: isBookmarked
-                    ? Icons.bookmark
-                    : Icons.bookmark_border,
+                icon: isBookmarked ? Icons.bookmark : Icons.bookmark_border,
                 onPressed: () {
                   unawaited(bookmarkStore.toggleBookmark(entry.id));
                 },
