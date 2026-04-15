@@ -37,9 +37,9 @@ class DictionarySourceResourceTile extends StatelessWidget {
         final actionIcon = switch (snapshot.state) {
           DownloadState.downloading => Icons.pause_circle_filled,
           DownloadState.completed => Icons.check_circle,
-          DownloadState.idle ||
-          DownloadState.paused ||
-          DownloadState.error => Icons.play_circle_fill,
+          DownloadState.idle => Icons.download_rounded,
+          DownloadState.paused => Icons.play_circle_fill,
+          DownloadState.error => Icons.download_rounded,
         };
 
         final actionTooltip = switch (snapshot.state) {
