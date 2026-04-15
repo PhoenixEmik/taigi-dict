@@ -1,17 +1,28 @@
+import 'dart:async';
+import 'dart:collection';
+import 'dart:developer' as developer;
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_open_chinese_convert/flutter_open_chinese_convert.dart';
 import 'package:taigi_dict/core/core.dart';
 import 'package:taigi_dict/features/dictionary/dictionary.dart';
-
+import 'opencc_input_guard.dart';
 
 class ChineseTranslationService {
   ChineseTranslationService._();
+
+  static const int _maxConversionCacheEntries = 4000;
 
   static final ChineseTranslationService instance =
       ChineseTranslationService._();
 
   Future<void>? _initializeFuture;
+  Future<void> _conversionTail = Future<void>.value();
+  final LinkedHashMap<String, String> _conversionCache =
+      LinkedHashMap<String, String>();
+  final Map<String, Future<String>> _inFlightConversions =
+      <String, Future<String>>{};
 
   Future<void> initialize() {
     return _initializeFuture ??= _warmUp();
@@ -30,6 +41,10 @@ class ChineseTranslationService {
     if (trimmed.isEmpty || !shouldUseSimplifiedDisplay(locale)) {
       return trimmed;
     }
+    if (!OpenccInputGuard.shouldConvert(trimmed)) {
+      _logSkippedConversion('unsafe-or-non-han-query', trimmed);
+      return trimmed;
+    }
 
     // In simplified mode, normalize Han text toward Taiwanese Traditional so
     // the SQLite search index remains stable while still honoring phrase-level
@@ -42,6 +57,10 @@ class ChineseTranslationService {
     required Locale locale,
   }) async {
     if (text.trim().isEmpty || !shouldUseSimplifiedDisplay(locale)) {
+      return text;
+    }
+    if (!OpenccInputGuard.shouldConvert(text)) {
+      _logSkippedConversion('unsafe-or-non-han-display', text);
       return text;
     }
     return _convertOrOriginal(text, TW2Sp());
@@ -188,7 +207,9 @@ class ChineseTranslationService {
 
   Future<void> _warmUp() async {
     try {
-      await ChineseConverter.convert('網路', TW2Sp(), inBackground: true);
+      await _runSerializedConversion(
+        () => ChineseConverter.convert('網路', TW2Sp(), inBackground: false),
+      );
     } on MissingPluginException {
       // Widget tests and unsupported hosts can safely fall back to pass-through.
     } on PlatformException {
@@ -197,13 +218,78 @@ class ChineseTranslationService {
   }
 
   Future<String> _convertOrOriginal(String text, ConverterOption option) async {
+    final cacheKey = _cacheKey(option, text);
+    final cached = _conversionCache[cacheKey];
+    if (cached != null) {
+      return cached;
+    }
+
+    final inFlight = _inFlightConversions[cacheKey];
+    if (inFlight != null) {
+      return inFlight;
+    }
+
+    final conversionFuture = _runConversionWithFallback(
+      text: text,
+      option: option,
+      cacheKey: cacheKey,
+    );
+    _inFlightConversions[cacheKey] = conversionFuture;
+
+    return conversionFuture.whenComplete(() {
+      _inFlightConversions.remove(cacheKey);
+    });
+  }
+
+  Future<String> _runConversionWithFallback({
+    required String text,
+    required ConverterOption option,
+    required String cacheKey,
+  }) async {
     try {
       await initialize();
-      return await ChineseConverter.convert(text, option, inBackground: true);
+      final converted = await _runSerializedConversion(
+        () => ChineseConverter.convert(text, option, inBackground: false),
+      );
+      _putCache(cacheKey, converted);
+      return converted;
     } on MissingPluginException {
+      _putCache(cacheKey, text);
       return text;
     } on PlatformException {
+      _putCache(cacheKey, text);
       return text;
     }
+  }
+
+  String _cacheKey(ConverterOption option, String text) {
+    return '${option.id}\u0000$text';
+  }
+
+  void _putCache(String key, String value) {
+    if (_conversionCache.length >= _maxConversionCacheEntries) {
+      _conversionCache.remove(_conversionCache.keys.first);
+    }
+    _conversionCache[key] = value;
+  }
+
+  Future<String> _runSerializedConversion(Future<String> Function() task) {
+    final previous = _conversionTail;
+    final tailCompleter = Completer<void>();
+    _conversionTail = tailCompleter.future;
+
+    return previous.then((_) => task()).whenComplete(() {
+      tailCompleter.complete();
+    });
+  }
+
+  void _logSkippedConversion(String reason, String text) {
+    if (!kDebugMode) {
+      return;
+    }
+    developer.log(
+      'Skipping OpenCC conversion: reason=$reason len=${text.length}',
+      name: 'ChineseTranslationService',
+    );
   }
 }
