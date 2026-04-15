@@ -7,7 +7,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:taigi_dict/core/core.dart';
 import 'package:taigi_dict/features/audio/audio.dart';
 
-
 class OfflineAudioLibrary extends ChangeNotifier {
   OfflineAudioLibrary() {
     for (final type in AudioArchiveType.values) {
@@ -224,6 +223,51 @@ class OfflineAudioLibrary extends ChangeNotifier {
         isError: true,
       );
     }
+  }
+
+  Future<void> invalidateArchive(AudioArchiveType type) async {
+    await initialize();
+    final storage = _storage;
+    if (storage == null) {
+      throw StateError('Audio storage is not initialized.');
+    }
+
+    _downloadServices[type]?.pause();
+
+    final archive = storage.archiveFile(type);
+    final index = storage.indexFile(type);
+    final tempFile = storage.downloadTempFile(type);
+    final cacheDirectory = storage.cacheDirectory(type);
+
+    if (await archive.exists()) {
+      await archive.delete();
+    }
+    if (await index.exists()) {
+      await index.delete();
+    }
+    if (await tempFile.exists()) {
+      await tempFile.delete();
+    }
+    if (await cacheDirectory.exists()) {
+      await cacheDirectory.delete(recursive: true);
+    }
+
+    _indexes[type] = <String, ZipEntryLocation>{};
+    _isReady[type] = false;
+
+    final typePrefix = '${type.name}:';
+    if (_loadingClipKey?.startsWith(typePrefix) ?? false) {
+      _loadingClipKey = null;
+    }
+    if (_playingClipKey?.startsWith(typePrefix) ?? false) {
+      await _player.stop();
+      _playingClipKey = null;
+    }
+
+    _downloadServices[type]?.seed(
+      DownloadSnapshot.idle(totalBytes: type.archiveBytes),
+    );
+    notifyListeners();
   }
 
   Future<AudioActionResult> playClip(

@@ -142,12 +142,22 @@ class _SettingsScreenState extends State<SettingsScreen>
                       PlatformInfo.isIOS
                           ? CupertinoPageRoute<void>(
                               builder: (_) => AdvancedSettingsScreen(
+                                audioLibrary: widget.audioLibrary,
+                                dictionaryLibrary: widget.dictionaryLibrary,
+                                onDownloadArchive: widget.onDownloadArchive,
+                                onDownloadDictionarySource:
+                                    widget.onDownloadDictionarySource,
                                 onRebuildDictionaryDatabase:
                                     widget.onRebuildDictionaryDatabase,
                               ),
                             )
                           : MaterialPageRoute<void>(
                               builder: (_) => AdvancedSettingsScreen(
+                                audioLibrary: widget.audioLibrary,
+                                dictionaryLibrary: widget.dictionaryLibrary,
+                                onDownloadArchive: widget.onDownloadArchive,
+                                onDownloadDictionarySource:
+                                    widget.onDownloadDictionarySource,
                                 onRebuildDictionaryDatabase:
                                     widget.onRebuildDictionaryDatabase,
                               ),
