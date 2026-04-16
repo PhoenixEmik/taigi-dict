@@ -15,7 +15,7 @@ dynamic _normalizeAdaptiveDialogIcon(dynamic icon) {
 AlertActionStyle _cancelActionStyle(BuildContext context) {
   final platform = Theme.of(context).platform;
   if (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
-    return AlertActionStyle.secondary;
+    return AlertActionStyle.defaultAction;
   }
   return AlertActionStyle.cancel;
 }
