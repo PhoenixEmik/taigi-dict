@@ -188,18 +188,18 @@ class DownloadService {
           }
           lastSampleBytes = receivedBytes;
           lastSampleAt = elapsed;
-        }
 
-        final trueDownloaded = resumedBytes + receivedBytes;
-        _emit(
-          DownloadSnapshot(
-            state: DownloadState.downloading,
-            downloadedBytes: trueDownloaded,
-            totalBytes: totalBytes,
-            speedBytesPerSecond: speedBytesPerSecond,
-          ),
-          sessionId: sessionId,
-        );
+          final trueDownloaded = resumedBytes + receivedBytes;
+          _emit(
+            DownloadSnapshot(
+              state: DownloadState.downloading,
+              downloadedBytes: trueDownloaded,
+              totalBytes: totalBytes,
+              speedBytesPerSecond: speedBytesPerSecond,
+            ),
+            sessionId: sessionId,
+          );
+        }
       }
 
       await sink.flush();
