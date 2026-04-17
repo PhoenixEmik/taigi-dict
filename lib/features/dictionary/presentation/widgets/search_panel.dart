@@ -17,20 +17,21 @@ class SearchWorkspaceCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final borderRadius = BorderRadius.circular(12);
+    final borderColor = theme.colorScheme.outline.withOpacity(
+      isDark ? 0.55 : 0.4,
+    );
 
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: controller,
       builder: (context, value, child) {
         return Container(
+          clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: isDark
                 ? theme.colorScheme.surface
                 : theme.colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: theme.colorScheme.outline.withOpacity(0.3),
-              width: 1,
-            ),
+            borderRadius: borderRadius,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(isDark ? 0.2 : 0.06),
@@ -38,6 +39,10 @@ class SearchWorkspaceCard extends StatelessWidget {
                 offset: const Offset(0, 2),
               ),
             ],
+          ),
+          foregroundDecoration: BoxDecoration(
+            borderRadius: borderRadius,
+            border: Border.all(color: borderColor, width: 1.2),
           ),
           child: AdaptiveTextField(
             controller: controller,
