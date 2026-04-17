@@ -148,8 +148,8 @@ Generated artifact:
 ## Acknowledgments
 
 - Ministry of Education Taiwanese Hokkien Dictionary: `https://sutian.moe.edu.tw/`
-- Tauhu-oo (豆腐烏) 20.05 font for Taiwanese Hanzi and specific CJK Extension glyph coverage: `https://github.com/tauhu-tw/tauhu-oo`
-- jf open-huninn (jf open 粉圓) font used in the app icon artwork: `https://github.com/justfont/open-huninn-font`
+- Tauhu-oo 20.05 font for Taiwanese Hanzi and specific CJK Extension glyph coverage: `https://github.com/tauhu-tw/tauhu-oo`
+- jf open-huninn font used in the app icon artwork: `https://github.com/justfont/open-huninn-font`
 - Adaptive Platform UI for adaptive Material/Cupertino UI components: `https://github.com/berkaycatak/adaptive_platform_ui`
 - Open Chinese Convert for Flutter for runtime OpenCC conversion: `https://github.com/zonble/flutter_open_chinese_convert`
 

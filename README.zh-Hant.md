@@ -144,8 +144,8 @@ flutter build apk --release
 ## 致謝
 
 - 教育部臺灣台語常用詞辭典：`https://sutian.moe.edu.tw/`
-- Tauhu-oo（豆腐烏）20.05 字型，用於顯示台語漢字與特定 CJK Extension 字元：`https://github.com/tauhu-tw/tauhu-oo`
-- jf open-huninn（jf open 粉圓）字型，用於 App Icon 字樣：`https://github.com/justfont/open-huninn-font`
+- 豆腐烏 Tauhu-oo 20.05 字型，用於顯示台語漢字與特定 CJK Extension 字元：`https://github.com/tauhu-tw/tauhu-oo`
+- jf open 粉圓字型，用於 App Icon 字樣：`https://github.com/justfont/open-huninn-font`
 - Adaptive Platform UI，提供 Material/Cupertino 自適應介面元件：`https://github.com/berkaycatak/adaptive_platform_ui`
 - Open Chinese Convert for Flutter，提供執行期 OpenCC 繁簡轉換：`https://github.com/zonble/flutter_open_chinese_convert`
 
