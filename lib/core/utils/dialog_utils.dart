@@ -15,6 +15,10 @@ dynamic _normalizeAdaptiveDialogIcon(dynamic icon) {
 AlertActionStyle _cancelActionStyle(BuildContext context) {
   final platform = Theme.of(context).platform;
   if (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (isDark) {
+      return AlertActionStyle.secondary;
+    }
     return AlertActionStyle.defaultAction;
   }
   return AlertActionStyle.cancel;
@@ -30,6 +34,10 @@ AlertActionStyle _confirmActionStyle(
 
   final platform = Theme.of(context).platform;
   if (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (isDark) {
+      return AlertActionStyle.primary;
+    }
     return AlertActionStyle.defaultAction;
   }
   return AlertActionStyle.primary;
