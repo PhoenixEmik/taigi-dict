@@ -15,13 +15,25 @@ class SettingsLocaleTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final isIOS = PlatformInfo.isIOS;
+    final titleStyle = isIOS
+        ? null
+        : theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600);
+    final valueStyle = isIOS
+        ? null
+        : theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurfaceVariant,
+          );
+
     return AdaptiveListTile(
       leading: const Icon(Icons.language),
-      title: Text(l10n.languageSetting),
+      title: Text(l10n.languageSetting, style: titleStyle),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(l10n.localeLabel(value)),
+          Text(l10n.localeLabel(value), style: valueStyle),
           AdaptivePopupMenuButton.icon<Locale>(
             icon: PlatformInfo.isIOS
                 ? 'chevron.up.chevron.down'

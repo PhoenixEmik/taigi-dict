@@ -15,8 +15,18 @@ class SettingsThemeModeTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     final isApplePlatform =
         PlatformInfo.isIOS || Theme.of(context).platform == TargetPlatform.macOS;
+    final titleStyle = isApplePlatform
+        ? null
+        : theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600);
+    final valueStyle = isApplePlatform
+        ? null
+        : theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurfaceVariant,
+          );
     final availablePreferences = isApplePlatform
         ? const [
             AppThemePreference.system,
@@ -32,11 +42,14 @@ class SettingsThemeModeTile extends StatelessWidget {
 
     return AdaptiveListTile(
       leading: const Icon(Icons.dark_mode_outlined),
-      title: Text(l10n.theme),
+      title: Text(l10n.theme, style: titleStyle),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(_themeLabel(value, l10n, isApplePlatform: isApplePlatform)),
+          Text(
+            _themeLabel(value, l10n, isApplePlatform: isApplePlatform),
+            style: valueStyle,
+          ),
           AdaptivePopupMenuButton.icon<AppThemePreference>(
             icon: PlatformInfo.isIOS
                 ? 'chevron.up.chevron.down'
