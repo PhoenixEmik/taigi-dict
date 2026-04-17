@@ -69,6 +69,9 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: assets/icon/taigi_dict.png
+  image_path_ios: assets/icon/taigi_dict.png
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: assets/icon/taigi_dict_foreground.png
   remove_alpha_ios: true
 
 # For information on the generic Dart part of this file, see the
