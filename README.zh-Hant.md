@@ -141,6 +141,10 @@ flutter build apk --release
 
 - `build/app/outputs/flutter-apk/app-release.apk`
 
+## 隱私權政策
+
+- 中英雙語：`PRIVACY_POLICY.md`
+
 ## 致謝
 
 - 教育部臺灣台語常用詞辭典：`https://sutian.moe.edu.tw/`

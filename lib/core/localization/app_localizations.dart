@@ -188,6 +188,9 @@ class AppLocalizations {
       'aboutRepositorySubtitle': 'Source code and releases',
       'aboutResources': 'References',
       'aboutLicenses': 'Licenses',
+      'privacyPolicy': 'Privacy Policy',
+      'privacyPolicySubtitle':
+          'Read how the app stores local data, uses network access, and handles sharing.',
       'licenseInformation': 'License Information',
       'appCodeLicense': 'App code',
       'appCodeLicenseDescription': 'MIT License',
@@ -298,6 +301,8 @@ class AppLocalizations {
       'aboutRepositorySubtitle': '原始码与发行版本',
       'aboutResources': '参考资料',
       'aboutLicenses': '授权资讯',
+      'privacyPolicy': '隐私政策',
+      'privacyPolicySubtitle': '查看 App 如何保存本地资料、使用网路，以及处理分享行为。',
       'licenseInformation': '授权资讯',
       'appCodeLicense': 'App 程式码',
       'appCodeLicenseDescription': 'MIT 授权',
@@ -407,6 +412,8 @@ class AppLocalizations {
       'aboutRepositorySubtitle': '原始碼與發行版本',
       'aboutResources': '參考資料',
       'aboutLicenses': '授權資訊',
+      'privacyPolicy': '隱私權政策',
+      'privacyPolicySubtitle': '查看 App 如何保存本機資料、使用網路，以及處理分享行為。',
       'licenseInformation': '授權資訊',
       'appCodeLicense': 'App 程式碼',
       'appCodeLicenseDescription': 'MIT 授權',
@@ -534,6 +541,8 @@ class AppLocalizations {
   String get aboutRepositorySubtitle => _text('aboutRepositorySubtitle');
   String get aboutResources => _text('aboutResources');
   String get aboutLicenses => _text('aboutLicenses');
+  String get privacyPolicy => _text('privacyPolicy');
+  String get privacyPolicySubtitle => _text('privacyPolicySubtitle');
   String get licenseInformation => _text('licenseInformation');
   String get appCodeLicense => _text('appCodeLicense');
   String get appCodeLicenseDescription => _text('appCodeLicenseDescription');

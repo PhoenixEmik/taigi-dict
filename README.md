@@ -145,6 +145,10 @@ Generated artifact:
 
 - `build/app/outputs/flutter-apk/app-release.apk`
 
+## Privacy Policy
+
+- Bilingual English / Traditional Chinese: `PRIVACY_POLICY.md`
+
 ## Acknowledgments
 
 - Ministry of Education Taiwanese Hokkien Dictionary: `https://sutian.moe.edu.tw/`

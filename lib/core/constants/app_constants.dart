@@ -5,6 +5,8 @@ class AppConstants {
   static const String appAuthor = 'PhoenixEmik';
   static const String appRepositoryUrl =
       'https://github.com/PhoenixEmik/taigi-dict';
+  static const String privacyPolicyUrl =
+      'https://github.com/PhoenixEmik/taigi-dict/blob/main/PRIVACY_POLICY.md';
 
   static const String audioWordArchiveUrl =
       'https://app.taigidict.org/assets/sutiau-mp3.zip';

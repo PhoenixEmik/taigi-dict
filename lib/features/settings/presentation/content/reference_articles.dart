@@ -15,6 +15,149 @@ class LocalizedReferenceArticle {
   final String sourceUrl;
 }
 
+LocalizedReferenceArticle buildPrivacyPolicyArticle(AppLocalizations l10n) {
+  final locale = AppLocalizations.resolveLocale(l10n.locale);
+
+  if (locale == AppLocalizations.englishLocale) {
+    return const LocalizedReferenceArticle(
+      title: 'Privacy Policy',
+      introduction:
+          'This page summarizes how Hokkien Dictionary stores local data, uses network access, and handles user-initiated sharing. It reflects the app behavior described in the project privacy policy.',
+      sections: [
+        ReferenceArticleSection(
+          title: 'Data Stored On Device',
+          paragraphs: [
+            'The app stores preferences such as language, theme, and reading text size on the device.',
+            'It also stores bookmarks, recent search history, downloaded dictionary source files, generated local SQLite database files, and offline audio archives so the app can work offline after setup.',
+          ],
+        ),
+        ReferenceArticleSection(
+          title: 'Network Use',
+          paragraphs: [
+            'The app uses network access to download the dictionary source file, download offline audio archives, and open external links selected by the user.',
+            'The current production resource host used by the app is https://app.taigidict.org/assets/.',
+          ],
+        ),
+        ReferenceArticleSection(
+          title: 'Permissions',
+          paragraphs: [
+            'On Android, the current release build uses normal permissions such as INTERNET and ACCESS_NETWORK_STATE.',
+            'The app does not request high-risk Android permissions such as location, camera, microphone, contacts, SMS, call logs, or photo and media library access.',
+          ],
+        ),
+        ReferenceArticleSection(
+          title: 'Sharing And External Services',
+          paragraphs: [
+            'The app does not sell personal information or share personal information for advertising or cross-app tracking.',
+            'If you choose to share a dictionary entry through the system share sheet or open an external website, the receiving app or website will handle that request under its own terms and privacy practices.',
+          ],
+        ),
+        ReferenceArticleSection(
+          title: 'Removal And Contact',
+          paragraphs: [
+            'Most app data can be removed by uninstalling the app, clearing app storage, or deleting downloaded resources inside app settings.',
+            'For the latest full policy text and project contact details, refer to the project repository and issue tracker.',
+          ],
+        ),
+      ],
+      sourceUrl:
+          'https://github.com/PhoenixEmik/taigi-dict/blob/main/PRIVACY_POLICY.md',
+    );
+  }
+
+  if (locale == AppLocalizations.simplifiedChineseLocale) {
+    return const LocalizedReferenceArticle(
+      title: '隐私政策',
+      introduction:
+          '本页摘要说明台语辞典如何保存本地资料、使用网路，以及处理用户主动分享行为。内容与项目中的隐私政策文件一致。',
+      sections: [
+        ReferenceArticleSection(
+          title: '存储在设备上的信息',
+          paragraphs: [
+            'App 会在设备上保存语言、主题、字号等偏好设置。',
+            'App 也会保存书签、最近搜索记录、已下载的词典原始文件、生成的本地 SQLite 数据库文件，以及离线音频资源，以便初始化后可离线使用。',
+          ],
+        ),
+        ReferenceArticleSection(
+          title: '网络使用',
+          paragraphs: [
+            'App 会使用网络下载词典原始文件、下载离线音频资源，以及打开用户主动点击的外部链接。',
+            'App 当前使用的正式资源主机为 https://app.taigidict.org/assets/。',
+          ],
+        ),
+        ReferenceArticleSection(
+          title: '权限',
+          paragraphs: [
+            'Android 当前 release 版本会使用 INTERNET 与 ACCESS_NETWORK_STATE 等普通权限。',
+            'App 不会请求位置、相机、麦克风、通讯录、短信、通话记录、相册或媒体库等高风险 Android 权限。',
+          ],
+        ),
+        ReferenceArticleSection(
+          title: '分享与外部服务',
+          paragraphs: [
+            'App 不会出售个人信息，也不会为了广告或跨 App 跟踪而共享个人信息。',
+            '如果你主动通过系统分享面板分享词条内容，或打开外部网站，接收该请求的 App 或网站会按照其自身条款与隐私实践处理数据。',
+          ],
+        ),
+        ReferenceArticleSection(
+          title: '删除与联系',
+          paragraphs: [
+            '大多数 App 数据都可以通过卸载 App、清除 App 存储，或在设置中删除已下载资源来移除。',
+            '完整政策与项目联系方式请以项目 repo 与 issue tracker 中的最新版本为准。',
+          ],
+        ),
+      ],
+      sourceUrl:
+          'https://github.com/PhoenixEmik/taigi-dict/blob/main/PRIVACY_POLICY.md',
+    );
+  }
+
+  return const LocalizedReferenceArticle(
+    title: '隱私權政策',
+    introduction:
+        '本頁摘要說明台語辭典如何保存本機資料、使用網路，以及處理使用者主動分享行為。內容與專案中的隱私權政策文件一致。',
+    sections: [
+      ReferenceArticleSection(
+        title: '儲存在裝置上的資料',
+        paragraphs: [
+          'App 會在裝置上保存語言、主題、字級等偏好設定。',
+          'App 也會保存書籤、最近搜尋紀錄、已下載的詞典原始檔、產生出的本機 SQLite 資料庫檔案，以及離線音檔資源，讓初始化完成後可以離線使用。',
+        ],
+      ),
+      ReferenceArticleSection(
+        title: '網路使用',
+        paragraphs: [
+          'App 會使用網路下載詞典原始檔、下載離線音檔資源，以及開啟使用者主動點選的外部連結。',
+          'App 目前使用的正式資源主機為 https://app.taigidict.org/assets/。',
+        ],
+      ),
+      ReferenceArticleSection(
+        title: '權限',
+        paragraphs: [
+          'Android 目前 release 版本會使用 INTERNET 與 ACCESS_NETWORK_STATE 等一般權限。',
+          'App 不會要求位置、相機、麥克風、聯絡人、簡訊、通話紀錄、相簿或媒體庫等高風險 Android 權限。',
+        ],
+      ),
+      ReferenceArticleSection(
+        title: '分享與外部服務',
+        paragraphs: [
+          'App 不會販售個人資料，也不會為了廣告或跨 App 追蹤而分享個人資料。',
+          '如果你主動透過系統分享面板分享詞條內容，或開啟外部網站，接收該請求的 App 或網站會依其自身條款與隱私實務處理資料。',
+        ],
+      ),
+      ReferenceArticleSection(
+        title: '刪除與聯絡方式',
+        paragraphs: [
+          '多數 App 資料都可以透過解除安裝 App、清除 App 儲存空間，或在設定中刪除已下載資源來移除。',
+          '完整政策與專案聯絡方式請以專案 repo 與 issue tracker 中的最新版本為準。',
+        ],
+      ),
+    ],
+    sourceUrl:
+        'https://github.com/PhoenixEmik/taigi-dict/blob/main/PRIVACY_POLICY.md',
+  );
+}
+
 LocalizedReferenceArticle buildTailoReferenceArticle(AppLocalizations l10n) {
   final locale = AppLocalizations.resolveLocale(l10n.locale);
 

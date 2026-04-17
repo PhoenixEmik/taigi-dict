@@ -21,6 +21,7 @@ void main() {
       expect(find.text('作者'), findsOneWidget);
       expect(find.text('GitHub'), findsOneWidget);
       expect(find.text('授權資訊'), findsOneWidget);
+      expect(find.text('隱私權政策'), findsOneWidget);
       expect(find.text(AppConstants.appVersion), findsOneWidget);
       expect(find.text(AppConstants.appAuthor), findsOneWidget);
       expect(find.text(AppConstants.appRepositoryUrl), findsOneWidget);
@@ -40,6 +41,7 @@ void main() {
       expect(find.text('Version'), findsOneWidget);
       expect(find.text('Author'), findsOneWidget);
       expect(find.text('Licenses'), findsOneWidget);
+      expect(find.text('Privacy Policy'), findsOneWidget);
       expect(find.text('關於台語辭典'), findsNothing);
       expect(find.text('授權資訊'), findsNothing);
     });
@@ -114,6 +116,16 @@ void main() {
               hasTapAction: true,
             ),
           );
+          expect(
+            tester.getSemantics(
+              find.bySemanticsLabel('隱私權政策。查看 App 如何保存本機資料、使用網路，以及處理分享行為。'),
+            ),
+            matchesSemantics(
+              label: '隱私權政策。查看 App 如何保存本機資料、使用網路，以及處理分享行為。',
+              isButton: true,
+              hasTapAction: true,
+            ),
+          );
         } finally {
           semanticsHandle.dispose();
         }
@@ -172,6 +184,28 @@ void main() {
       await tester.pump(const Duration(milliseconds: 700));
 
       expect(find.text('Powered by Flutter'), findsOneWidget);
+    });
+
+    testWidgets('privacy policy navigation opens the policy article', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildLocalizedTestApp(
+          locale: AppLocalizations.traditionalChineseLocale,
+          home: const AboutAppScreen(),
+        ),
+      );
+
+      await tester.tap(find.text('隱私權政策'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(find.text('隱私權政策'), findsWidgets);
+      expect(find.text('儲存在裝置上的資料'), findsOneWidget);
+      expect(
+        find.textContaining('內容與專案中的隱私權政策文件一致'),
+        findsOneWidget,
+      );
     });
   });
 }

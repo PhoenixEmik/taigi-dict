@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:taigi_dict/core/core.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../content/reference_articles.dart';
 import 'license_summary_screen.dart';
+import 'reference_article_screen.dart';
 
 class AboutAppScreen extends StatelessWidget {
   const AboutAppScreen({super.key});
@@ -26,6 +28,31 @@ class AboutAppScreen extends StatelessWidget {
             )
           : MaterialPageRoute<void>(
               builder: (_) => const LicenseSummaryScreen(),
+            ),
+    );
+  }
+
+  void _openReferenceArticle(
+    BuildContext context, {
+    required LocalizedReferenceArticle article,
+  }) {
+    Navigator.of(context).push(
+      PlatformInfo.isIOS
+          ? CupertinoPageRoute<void>(
+              builder: (_) => ReferenceArticleScreen(
+                title: article.title,
+                introduction: article.introduction,
+                sections: article.sections,
+                sourceUrl: article.sourceUrl,
+              ),
+            )
+          : MaterialPageRoute<void>(
+              builder: (_) => ReferenceArticleScreen(
+                title: article.title,
+                introduction: article.introduction,
+                sections: article.sections,
+                sourceUrl: article.sourceUrl,
+              ),
             ),
     );
   }
@@ -99,6 +126,31 @@ class AboutAppScreen extends StatelessWidget {
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
                         _openLicenseSummary(context);
+                      },
+                    ),
+                  ),
+                ),
+                Semantics(
+                  label:
+                      '${l10n.privacyPolicy}。${l10n.privacyPolicySubtitle}',
+                  button: true,
+                  onTap: () {
+                    _openReferenceArticle(
+                      context,
+                      article: buildPrivacyPolicyArticle(l10n),
+                    );
+                  },
+                  child: ExcludeSemantics(
+                    child: AdaptiveListTile(
+                      leading: const Icon(Icons.privacy_tip_outlined),
+                      title: Text(l10n.privacyPolicy),
+                      subtitle: Text(l10n.privacyPolicySubtitle),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        _openReferenceArticle(
+                          context,
+                          article: buildPrivacyPolicyArticle(l10n),
+                        );
                       },
                     ),
                   ),
