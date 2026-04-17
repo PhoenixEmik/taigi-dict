@@ -7,13 +7,16 @@
 這是一個支援 Android 與 iOS 的 Flutter 台語 / 華語辭典 App。
 專案以教育部辭典資料為核心，支援離線查詢，並將大型離線資源直接下載到使用者裝置上。
 
-## 目前狀態
+## App 目前內容
 
-- 目前 App 版本：`1.1.4`
-- Android 與 iOS 版本都在同一套 Flutter 程式碼中持續維護
-- 目前 repository 狀態可通過 `flutter analyze` 與 `flutter test`
-- 正式執行流程會先下載 `kautian.ods`，再於使用者裝置上建立本機 SQLite 詞典資料庫
-- 最近已針對 iOS 與 Android 的搜尋框做過平台化樣式修整
+App 目前主要由三個分頁構成：
+
+- `辭典`：查詢台語詞目、台羅拼音與華語釋義，保留搜尋紀錄，並可進入詞條詳細頁
+- `書籤`：集中查看已收藏詞條，並以相同的詳細頁體驗重新開啟
+- `設定`：管理離線資源、外觀、語言、參考資料與 App 資訊
+
+首次使用流程也屬於 App 體驗的一部分。App 可以先下載教育部 ODS
+原始檔，在裝置上建立本機 SQLite 詞典資料庫，之後再以該資料庫提供離線查詢。
 
 ## 專案識別
 
@@ -24,23 +27,25 @@
 - 官方網站：`https://taigidict.org`
 - 正式環境資產來源：`https://app.taigidict.org/assets/`
 
-## 目前功能
+## 功能
 
 - 支援台語詞目、台羅拼音、華語釋義的離線查詢
 - 支援加權搜尋排序，並可選擇使用 background isolate 執行搜尋
-- 提供書籤頁面保存詞條
-- 使用 `shared_preferences` 儲存搜尋紀錄
+- 提供搜尋紀錄保存、重用與清除
 - 提供獨立的詞條詳細頁與原生分享功能
 - 支援在釋義中點擊關聯詞並直接開啟對應詞條
+- 提供書籤頁面保存詞條
 - 支援詞目音檔與例句音檔的離線下載
 - 透過 `dio` 與 HTTP range requests 支援大型 ZIP 的暫停、續傳與斷點續傳
 - 支援下載離線詞典原始檔 `kautian.ods`
 - 使用 `spreadsheet_decoder` 與 `sqflite` 在裝置上把 ODS 建成 SQLite 詞典資料庫
 - 提供正體中文、簡體中文與英文介面
 - 使用原生 OpenCC 引擎做執行期繁簡轉換，並套用台灣詞彙轉換設定
+- 支援閱讀字級調整，以及淺色 / 深色 / AMOLED 主題切換
+- 內建台羅與漢字說明文章頁面
+- 提供關於、授權摘要與 Flutter 套件授權畫面
+- 採用平台自適應 UI：Android 維持品牌化 Material 風格，iOS 使用 Cupertino 導覽與自適應元件
 - 已補強語意標籤、複合設定列 merged semantics 與本地化 tooltip 的無障礙支援
-- 採用平台自適應 UI：Android 維持品牌化 Material 風格，iOS 使用 Cupertino 導覽與跨平台自適應元件
-- 支援閱讀字級調整，以及系統感知的淺色 / 深色 / AMOLED 主題
 - 內建 `TauhuOo` fallback font，用於補足系統字型缺少的 CJK Ext-C / D / E 字元
 
 ## 資料與授權
@@ -82,6 +87,8 @@ App 實際使用的正式環境離線資源端點：
 
 - `lib/main.dart`：App 進入點
 - `lib/app/`：App shell、導覽與主題初始化
+- `lib/app/initialization/`：首次下載與詞典建庫的啟動流程
+- `lib/app/shell/`：三分頁主畫面結構
 - `lib/core/`：常數、本地化、翻譯與共享偏好設定
 - `lib/features/dictionary/`：詞典模型、搜尋、SQLite 建置 / 載入與 UI
 - `lib/features/audio/`：離線音檔下載、索引與播放
@@ -89,6 +96,13 @@ App 實際使用的正式環境離線資源端點：
 - `lib/features/settings/`：設定 UI、離線資源控制與本地化參考文章
 - `lib/features/settings/presentation/content/reference_articles.dart`：台羅與漢字說明文章內容
 - `tool/build_dictionary_asset.py`：保留作為參考的 Python 轉換腳本，對照 Dart 端 ODS 到 SQLite 的映射邏輯
+
+## 離線資源流程
+
+- App 不會直接內建預先建好的 SQLite 詞典資料庫
+- App 會先下載原始 `kautian.ods`，再於裝置端建立本機詞典資料庫
+- 詞典音檔與例句音檔則分別以 ZIP 離線資源管理
+- 設定頁提供重新下載離線資源與重建本機詞典資料庫的維護操作
 
 ## 執行
 
@@ -103,8 +117,6 @@ flutter run
 flutter analyze
 flutter test
 ```
-
-本 README 更新當下，以上兩個指令都可在目前 repository 狀態下乾淨通過。
 
 ## iOS 設定
 
@@ -141,8 +153,9 @@ flutter build apk --release
 
 ## UI 說明
 
-- iOS 使用自適應的 Cupertino 導覽，以及平台感知的導覽列、搜尋列與設定區塊元件。
-- Android 不會沿用 iOS palette，而是維持較溫暖的品牌化 Material 風格，以保留平台適配性。
+- iOS 使用自適應的 Cupertino 導覽，以及平台感知的搜尋、設定與詞條畫面元件
+- Android 不沿用 iOS palette，而是維持較溫暖的品牌化 Material 風格
+- App shell 目前以 `辭典`、`書籤`、`設定` 三個分頁為核心
 
 ## 致謝
 

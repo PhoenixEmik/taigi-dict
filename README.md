@@ -10,13 +10,17 @@ Flutter dictionary app for Taiwanese Hokkien and Mandarin on Android and iOS.
 The app is built around the Ministry of Education dataset, supports offline
 lookup, and downloads large offline resources directly to the user's device.
 
-## Current Status
+## What The App Includes
 
-- Current app version: `1.1.4`
-- Android and iOS builds are both maintained in the same Flutter codebase
-- The current repository state passes `flutter analyze` and `flutter test`
-- Production runtime builds the local SQLite dictionary from the downloaded `kautian.ods` source on the user's device
-- Recent UI polish includes platform-specific search field fixes for both iOS and Android
+The app is organized around three primary tabs:
+
+- `Dictionary`: search Taiwanese headwords, Tailo romanization, and Mandarin definitions; reuse recent searches; open a dedicated detail page for each entry
+- `Bookmarks`: keep saved entries in a separate list and reopen them with the same localized detail view
+- `Settings`: manage offline resources, appearance, language, reference material, and app information
+
+The first-run experience is also part of the product flow. The app can
+download the ministry ODS source, build a local SQLite dictionary on-device,
+and then use that database for subsequent offline lookup.
 
 ## App Identity
 
@@ -27,24 +31,24 @@ lookup, and downloads large offline resources directly to the user's device.
 - Official project domain: `https://taigidict.org`
 - Production asset host: `https://app.taigidict.org/assets/`
 
-## Current Features
+## Features
 
-- Offline dictionary lookup for Taiwanese headwords, Tailo romanization, and Mandarin definitions
+- Offline search across Taiwanese headwords, Tailo romanization, and Mandarin definitions
 - Weighted search ranking with optional background-isolate execution
-- Bookmark tab for saved entries
-- Search history stored locally with `shared_preferences`
-- Dedicated word detail screen with native share support
-- Interactive linked definitions that can open referenced entries inline
-- Offline audio archive downloads for 詞目音檔 and 例句音檔
-- Pause / resume / breakpoint-resume downloads for large ZIP files using `dio` + HTTP range requests
-- Offline dictionary source download for `kautian.ods`
-- On-device SQLite database build from the downloaded ODS file using `spreadsheet_decoder` and `sqflite`
-- Localized UI for Traditional Chinese, Simplified Chinese, and English
-- Runtime Traditional/Simplified Chinese conversion using the native OpenCC engine with Taiwanese phrase-aware configs
-- Accessibility improvements for semantics labels, merged semantics on complex settings tiles, and localized tooltips
-- Platform-adaptive UI: Android keeps the app's branded Material palette, while iOS uses Cupertino navigation with adaptive platform components
-- Reading text size adjustment and system-aware light / dark / AMOLED theme selection
-- Bundled `TauhuOo` fallback font for CJK Ext-C/D/E glyph coverage when the system font is missing characters
+- Recent search history with one-tap reuse and clearing
+- Dedicated entry detail screens with share support
+- Interactive linked definitions that open referenced entries
+- Bookmark storage with a separate bookmarked-entry tab
+- Offline ministry audio downloads for word clips and example clips
+- Pause, resume, and breakpoint-resume downloads for large ZIP archives
+- On-device build of the local SQLite dictionary from the downloaded `kautian.ods` source
+- Traditional Chinese, Simplified Chinese, and English UI
+- Runtime Traditional/Simplified Chinese conversion using native OpenCC with Taiwan phrase-aware configs
+- Reading text scale adjustment and theme selection including AMOLED mode
+- Built-in reference article pages for Tailo and Hanji usage guidance
+- About, license summary, and Flutter package license screens
+- Platform-adaptive UI with Cupertino-style navigation on iOS and branded Material styling on Android
+- Accessibility work on semantics labels, merged semantics, and localized tooltips
 
 ## Data And Licensing
 
@@ -85,6 +89,8 @@ Important distribution note:
 
 - `lib/main.dart`: app entry point
 - `lib/app/`: app shell, navigation, and theme bootstrap
+- `lib/app/initialization/`: first-run download and dictionary build gating flow
+- `lib/app/shell/`: main three-tab app shell
 - `lib/core/`: constants, localization, translation, and shared preferences
 - `lib/features/dictionary/`: dictionary models, search, SQLite build/load logic, and UI
 - `lib/features/audio/`: offline audio archive download, indexing, and playback
@@ -92,6 +98,13 @@ Important distribution note:
 - `lib/features/settings/`: settings UI, offline resource controls, and localized reference articles
 - `lib/features/settings/presentation/content/reference_articles.dart`: localized Tailo and Hanji reference article content
 - `tool/build_dictionary_asset.py`: Python conversion script kept as a reference for the Dart-side ODS-to-SQLite mapping logic
+
+## Offline Resource Flow
+
+- The app does not ship a prebuilt SQLite dictionary database.
+- It downloads the raw `kautian.ods` source and builds the local database on the device.
+- Dictionary audio is managed separately as downloadable ZIP archives for word audio and sentence audio.
+- Settings includes maintenance actions for re-downloading archives and rebuilding the local dictionary database.
 
 ## Run
 
@@ -106,9 +119,6 @@ flutter run
 flutter analyze
 flutter test
 ```
-
-At the time of this README update, both commands run clean in the current
-repository state.
 
 ## iOS Setup
 
@@ -145,8 +155,9 @@ Generated artifact:
 
 ## UI Notes
 
-- iOS uses adaptive Cupertino navigation and platform-aware adaptive bars, search, and settings surfaces.
-- Android intentionally does not reuse the iOS palette; it keeps the app's warmer branded Material styling for better platform fit.
+- iOS uses adaptive Cupertino navigation plus platform-aware search, settings, and detail surfaces.
+- Android keeps a warmer branded Material look instead of mirroring the iOS palette.
+- The app shell is centered around three tabs: dictionary, bookmarks, and settings.
 
 ## Acknowledgments
 
