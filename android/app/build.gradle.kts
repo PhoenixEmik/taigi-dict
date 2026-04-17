@@ -31,6 +31,23 @@ fun sanitizePackagedResources(project: Project) {
         }
 }
 
+fun sanitizeGeneratedArtifacts(project: Project) {
+    val buildDir = project.layout.buildDirectory.get().asFile
+    if (!buildDir.exists()) {
+        return
+    }
+
+    buildDir
+        .walkTopDown()
+        .filter { file ->
+            file.isFile && Regex(""".+ \d+\.[^.]+$""").matches(file.name)
+        }
+        .forEach { file ->
+            project.logger.lifecycle("Deleting duplicate generated artifact ${file.absolutePath}")
+            file.delete()
+        }
+}
+
 android {
     namespace = "org.taigidict.app"
     compileSdk = flutter.compileSdkVersion
@@ -99,5 +116,36 @@ tasks.matching { task ->
 }.configureEach {
     doFirst {
         sanitizePackagedResources(project)
+    }
+}
+
+tasks.matching { task ->
+    task.name.startsWith("dexBuilder")
+}.configureEach {
+    doFirst {
+        sanitizeGeneratedArtifacts(project)
+    }
+    doLast {
+        sanitizeGeneratedArtifacts(project)
+    }
+}
+
+tasks.matching { task ->
+    task.name.startsWith("merge") && task.name.contains("Dex")
+}.configureEach {
+    doFirst {
+        sanitizeGeneratedArtifacts(project)
+    }
+}
+
+tasks.matching { task ->
+    task.name.startsWith("copyFlutterAssets") ||
+        (task.name.startsWith("merge") && task.name.contains("Assets"))
+}.configureEach {
+    doFirst {
+        sanitizeGeneratedArtifacts(project)
+    }
+    doLast {
+        sanitizeGeneratedArtifacts(project)
     }
 }
