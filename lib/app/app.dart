@@ -55,9 +55,17 @@ class _HokkienDictionaryAppState extends State<HokkienDictionaryApp> {
                     : buildDarkAppTheme(applePlatform: false),
                 cupertinoLightTheme: const CupertinoThemeData(
                   brightness: Brightness.light,
+                  primaryColor: CupertinoColors.systemBlue,
+                  scaffoldBackgroundColor:
+                      CupertinoColors.systemGroupedBackground,
+                  barBackgroundColor: CupertinoColors.systemBackground,
                 ),
                 cupertinoDarkTheme: const CupertinoThemeData(
                   brightness: Brightness.dark,
+                  primaryColor: CupertinoColors.systemBlue,
+                  scaffoldBackgroundColor:
+                      CupertinoColors.systemGroupedBackground,
+                  barBackgroundColor: CupertinoColors.systemBackground,
                 ),
                 home: child,
             );

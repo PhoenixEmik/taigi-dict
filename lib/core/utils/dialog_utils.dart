@@ -21,40 +21,55 @@ Future<bool?> showConfirmationDialog({
   bool barrierDismissible = true,
   bool isDestructiveAction = false,
   dynamic icon,
-  double iconSize = 28,
+  double? iconSize,
   Color? iconColor,
 }) async {
   final result = Completer<bool>();
+  final normalizedIcon = _normalizeAdaptiveDialogIcon(icon);
 
-  await AdaptiveAlertDialog.show(
-    context: context,
-    title: title,
-    message: content,
-    icon: _normalizeAdaptiveDialogIcon(icon),
-    iconSize: iconSize,
-    iconColor: iconColor,
-    actions: [
-      AlertAction(
-        title: cancelLabel,
-        onPressed: () {
-          if (!result.isCompleted) {
-            result.complete(false);
-          }
-        },
-      ),
-      AlertAction(
-        title: confirmLabel,
-        style: isDestructiveAction
-            ? AlertActionStyle.destructive
-            : AlertActionStyle.defaultAction,
-        onPressed: () {
-          if (!result.isCompleted) {
-            result.complete(true);
-          }
-        },
-      ),
-    ],
-  );
+  final actions = [
+    AlertAction(
+      title: cancelLabel,
+      style: isDestructiveAction
+          ? AlertActionStyle.primary
+          : AlertActionStyle.cancel,
+      onPressed: () {
+        if (!result.isCompleted) {
+          result.complete(false);
+        }
+      },
+    ),
+    AlertAction(
+      title: confirmLabel,
+      style: isDestructiveAction
+          ? AlertActionStyle.destructive
+          : AlertActionStyle.primary,
+      onPressed: () {
+        if (!result.isCompleted) {
+          result.complete(true);
+        }
+      },
+    ),
+  ];
+
+  if (normalizedIcon != null) {
+    await AdaptiveAlertDialog.show(
+      context: context,
+      title: title,
+      message: content,
+      icon: normalizedIcon,
+      iconSize: iconSize,
+      iconColor: iconColor,
+      actions: actions,
+    );
+  } else {
+    await AdaptiveAlertDialog.show(
+      context: context,
+      title: title,
+      message: content,
+      actions: actions,
+    );
+  }
 
   if (!result.isCompleted) {
     return false;
@@ -69,30 +84,44 @@ Future<VoidCallback> showAdaptiveBlockingProgressDialog({
   String? message,
   required String actionLabel,
   dynamic icon,
-  double iconSize = 24,
+  double? iconSize,
   Color? iconColor,
 }) async {
   final navigator = Navigator.of(context, rootNavigator: true);
   var closed = false;
+  final normalizedIcon = _normalizeAdaptiveDialogIcon(icon);
 
-  unawaited(
-    AdaptiveAlertDialog.show(
-      context: context,
-      title: title,
-      message: message,
-      icon: _normalizeAdaptiveDialogIcon(icon),
-      iconSize: iconSize,
-      iconColor: iconColor,
-      actions: [
-        AlertAction(
-          title: actionLabel,
-          enabled: false,
-          style: AlertActionStyle.disabled,
-          onPressed: () {},
-        ),
-      ],
+  final actions = [
+    AlertAction(
+      title: actionLabel,
+      enabled: false,
+      style: AlertActionStyle.disabled,
+      onPressed: () {},
     ),
-  );
+  ];
+
+  if (normalizedIcon != null) {
+    unawaited(
+      AdaptiveAlertDialog.show(
+        context: context,
+        title: title,
+        message: message,
+        icon: normalizedIcon,
+        iconSize: iconSize,
+        iconColor: iconColor,
+        actions: actions,
+      ),
+    );
+  } else {
+    unawaited(
+      AdaptiveAlertDialog.show(
+        context: context,
+        title: title,
+        message: message,
+        actions: actions,
+      ),
+    );
+  }
 
   await Future<void>.delayed(Duration.zero);
 
