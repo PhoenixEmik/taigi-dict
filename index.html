@@ -245,146 +245,206 @@
         font-size: 0.92rem;
       }
 
-      .mockup-wrap {
-        position: relative;
-        display: flex;
-        justify-content: center;
+      .hero-visual {
+        display: grid;
+        gap: 14px;
+        align-content: center;
       }
 
-      .device-frame {
-        width: min(100%, 360px);
-        aspect-ratio: 0.5;
-        padding: 12px;
-        border-radius: 42px;
-        background: linear-gradient(180deg, #243b37 0%, #0e1a18 100%);
-        box-shadow:
-          0 30px 64px rgba(17, 34, 30, 0.18),
-          inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-      }
-
-      .device-screen {
-        height: 100%;
-        border-radius: 32px;
+      .hero-shot {
         overflow: hidden;
-        background:
-          linear-gradient(180deg, rgba(47, 127, 99, 0.12), rgba(47, 127, 99, 0.03)),
-          var(--bg-soft);
-        position: relative;
-        border: 1px solid rgba(255, 255, 255, 0.28);
+        border-radius: 24px;
+        background: transparent;
+        box-shadow: 0 24px 50px rgba(19, 43, 39, 0.12);
       }
 
-      .device-notch {
-        width: 38%;
-        height: 28px;
-        background: #111;
-        border-radius: 0 0 18px 18px;
-        margin: 0 auto;
+      .hero-shot img {
+        width: 100%;
+        aspect-ratio: 0.84;
+        object-fit: cover;
+        object-position: top center;
+        display: block;
       }
 
-      .screen-content {
-        height: calc(100% - 28px);
-        padding: 26px 22px 24px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+      .hero-visual-note {
+        color: var(--muted);
+        font-size: 0.92rem;
+        line-height: 1.7;
       }
 
-      .screen-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+      .platform-tabs {
+        display: inline-flex;
+        gap: 8px;
+        padding: 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.78);
+        border: 1px solid var(--line);
         margin-bottom: 18px;
       }
 
-      .screen-title {
-        font-weight: 800;
-        font-size: 1.2rem;
-      }
-
-      .screen-pill {
-        padding: 8px 12px;
+      .platform-tab {
+        min-height: 42px;
+        padding: 10px 18px;
         border-radius: 999px;
-        font-size: 0.78rem;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font: inherit;
         font-weight: 700;
-        background: rgba(47, 127, 99, 0.12);
-        color: var(--accent-strong);
+        cursor: pointer;
+        transition:
+          background-color 180ms ease,
+          color 180ms ease,
+          transform 180ms ease;
       }
 
-      .screen-preview {
-        flex: 1;
-        border-radius: 24px;
-        overflow: hidden;
-        position: relative;
-        background: #efe8da;
-        border: 1px solid rgba(24, 53, 49, 0.08);
+      .platform-tab:hover {
+        transform: translateY(-1px);
       }
 
-      .screen-preview img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+      .platform-tab.is-active {
+        background: var(--accent);
+        color: #fff;
       }
 
-      .screen-preview-badge {
-        position: absolute;
-        left: 14px;
-        bottom: 14px;
-        padding: 8px 12px;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.84);
-        backdrop-filter: blur(10px);
-        color: var(--text);
-        font-size: 0.78rem;
-        font-weight: 700;
-        border: 1px solid rgba(24, 53, 49, 0.08);
-      }
-
-      .showcase-strip {
+      .slider-shell {
         display: grid;
-        gap: 14px;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        margin-top: 18px;
+        gap: 16px;
       }
 
-      .showcase-card {
+      .slider-panel {
+        display: none;
+      }
+
+      .slider-panel.is-active {
+        display: block;
+      }
+
+      .slider-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .slider-title {
+        font-size: 1rem;
+        font-weight: 800;
+      }
+
+      .slider-description {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.6;
+      }
+
+      .slider-controls {
+        display: inline-flex;
+        gap: 8px;
+      }
+
+      .slider-control {
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.82);
+        color: var(--text);
+        font: inherit;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition:
+          transform 180ms ease,
+          border-color 180ms ease,
+          background-color 180ms ease;
+      }
+
+      .slider-control:hover {
+        transform: translateY(-2px);
+        border-color: rgba(47, 127, 99, 0.24);
+        background: #fff;
+      }
+
+      .slider-track {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(78%, 78%);
+        gap: 14px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+      }
+
+      .slider-track::-webkit-scrollbar {
+        display: none;
+      }
+
+      .slide-card {
+        scroll-snap-align: start;
         border-radius: 24px;
         overflow: hidden;
         background: rgba(255, 255, 255, 0.76);
         border: 1px solid var(--line);
         box-shadow: var(--shadow);
-        transform: translateY(0);
         transition:
           transform 180ms ease,
           border-color 180ms ease;
       }
 
-      .showcase-card:hover {
+      .slide-card:hover {
         transform: translateY(-4px);
         border-color: rgba(47, 127, 99, 0.24);
       }
 
-      .showcase-card figure {
+      .slide-card figure {
         margin: 0;
       }
 
-      .showcase-card img {
+      .slide-card img,
+      .slide-placeholder {
         width: 100%;
         aspect-ratio: 9 / 18.5;
         object-fit: cover;
         object-position: top center;
+        display: block;
         background: #ece5d8;
       }
 
-      .showcase-card figcaption {
+      .slide-placeholder {
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(242, 235, 220, 0.96));
+        text-align: center;
+      }
+
+      .slide-placeholder strong {
+        display: block;
+        font-size: 1rem;
+      }
+
+      .slide-placeholder span {
+        display: block;
+        margin-top: 8px;
+        font-size: 0.9rem;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .slide-card figcaption {
         padding: 12px 14px 14px;
       }
 
-      .showcase-card strong {
+      .slide-card strong {
         display: block;
         font-size: 0.98rem;
       }
 
-      .showcase-card span {
+      .slide-card span {
         display: block;
         margin-top: 4px;
         color: var(--muted);
@@ -585,8 +645,8 @@
           grid-template-columns: repeat(3, minmax(0, 1fr));
         }
 
-        .showcase-strip {
-          grid-template-columns: repeat(4, minmax(0, 1fr));
+        .slider-track {
+          grid-auto-columns: minmax(31%, 31%);
         }
 
         .footer-inner {
@@ -660,27 +720,16 @@
               </p>
             </div>
 
-            <div class="mockup-wrap reveal">
-              <div class="device-frame" aria-label="Phone mockup placeholder">
-                <div class="device-screen">
-                  <div class="device-notch"></div>
-                  <div class="screen-content">
-                    <div>
-                      <div class="screen-head">
-                        <div class="screen-title">台語辭典</div>
-                        <div class="screen-pill">Offline</div>
-                      </div>
-                    </div>
-                    <div class="screen-preview">
-                      <img
-                        src="assets/site/android-home.png"
-                        alt="台語辭典 Android 首頁畫面"
-                      />
-                      <div class="screen-preview-badge">Android 首頁</div>
-                    </div>
-                  </div>
-                </div>
+            <div class="hero-visual reveal">
+              <div class="hero-shot">
+                <img
+                  src="assets/site/android-search.png"
+                  alt="台語辭典 Android 搜尋畫面"
+                />
               </div>
+              <p class="hero-visual-note">
+                先從 Android 版本查看實際查詢節奏，iOS 畫面會在後續補上。
+              </p>
             </div>
           </div>
         </section>
@@ -731,64 +780,167 @@
         <section>
           <div class="section-inner">
             <div class="section-header reveal">
-              <h2>Android 畫面展示</h2>
+              <h2>畫面展示</h2>
               <p>
-                從搜尋、詞條詳細頁到書籤與設定，維持一致的乾淨排版與低干擾閱讀節奏。
+                分別查看 Android 與 iOS 版本的畫面。iOS 截圖之後可直接補進同一套 slider 結構。
               </p>
             </div>
 
-            <div class="showcase-strip">
-              <article class="showcase-card reveal">
-                <figure>
-                  <img
-                    src="assets/site/android-home.png"
-                    alt="台語辭典 Android 首頁"
-                  />
-                  <figcaption>
-                    <strong>首頁</strong>
-                    <span>直接開始搜尋與離線查詢。</span>
-                  </figcaption>
-                </figure>
-              </article>
+            <div class="reveal">
+              <div class="platform-tabs" role="tablist" aria-label="Platform screenshots">
+                <button
+                  class="platform-tab is-active"
+                  type="button"
+                  role="tab"
+                  aria-selected="true"
+                  data-platform-tab="android"
+                >
+                  Android
+                </button>
+                <button
+                  class="platform-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  data-platform-tab="ios"
+                >
+                  iOS
+                </button>
+              </div>
 
-              <article class="showcase-card reveal">
-                <figure>
-                  <img
-                    src="assets/site/android-search.png"
-                    alt="台語辭典 Android 搜尋結果"
-                  />
-                  <figcaption>
-                    <strong>搜尋結果</strong>
-                    <span>快速列出詞目、台羅與簡要釋義。</span>
-                  </figcaption>
-                </figure>
-              </article>
+              <div class="slider-shell">
+                <div class="slider-panel is-active" data-platform-panel="android">
+                  <div class="slider-head">
+                    <div>
+                      <div class="slider-title">Android</div>
+                      <div class="slider-description">目前使用實機截圖展示搜尋、詞條與書籤流程。</div>
+                    </div>
+                    <div class="slider-controls">
+                      <button class="slider-control" type="button" data-slider-prev="android" aria-label="Previous Android screenshot">‹</button>
+                      <button class="slider-control" type="button" data-slider-next="android" aria-label="Next Android screenshot">›</button>
+                    </div>
+                  </div>
+                  <div class="slider-track" data-slider-track="android">
+                    <article class="slide-card">
+                      <figure>
+                        <img
+                          src="assets/site/android-home.png"
+                          alt="台語辭典 Android 首頁"
+                        />
+                        <figcaption>
+                          <strong>首頁</strong>
+                          <span>直接開始搜尋與離線查詢。</span>
+                        </figcaption>
+                      </figure>
+                    </article>
 
-              <article class="showcase-card reveal">
-                <figure>
-                  <img
-                    src="assets/site/android-detail.png"
-                    alt="台語辭典 Android 詞條詳細頁"
-                  />
-                  <figcaption>
-                    <strong>詞條詳細頁</strong>
-                    <span>閱讀釋義、音標與關聯內容。</span>
-                  </figcaption>
-                </figure>
-              </article>
+                    <article class="slide-card">
+                      <figure>
+                        <img
+                          src="assets/site/android-search.png"
+                          alt="台語辭典 Android 搜尋結果"
+                        />
+                        <figcaption>
+                          <strong>搜尋結果</strong>
+                          <span>快速列出詞目、台羅與簡要釋義。</span>
+                        </figcaption>
+                      </figure>
+                    </article>
 
-              <article class="showcase-card reveal">
-                <figure>
-                  <img
-                    src="assets/site/android-bookmarks.png"
-                    alt="台語辭典 Android 書籤頁"
-                  />
-                  <figcaption>
-                    <strong>書籤</strong>
-                    <span>保留常用詞條並快速重開。</span>
-                  </figcaption>
-                </figure>
-              </article>
+                    <article class="slide-card">
+                      <figure>
+                        <img
+                          src="assets/site/android-detail.png"
+                          alt="台語辭典 Android 詞條詳細頁"
+                        />
+                        <figcaption>
+                          <strong>詞條詳細頁</strong>
+                          <span>閱讀釋義、音標與關聯內容。</span>
+                        </figcaption>
+                      </figure>
+                    </article>
+
+                    <article class="slide-card">
+                      <figure>
+                        <img
+                          src="assets/site/android-bookmarks.png"
+                          alt="台語辭典 Android 書籤頁"
+                        />
+                        <figcaption>
+                          <strong>書籤</strong>
+                          <span>保留常用詞條並快速重開。</span>
+                        </figcaption>
+                      </figure>
+                    </article>
+                  </div>
+                </div>
+
+                <div class="slider-panel" data-platform-panel="ios">
+                  <div class="slider-head">
+                    <div>
+                      <div class="slider-title">iOS</div>
+                      <div class="slider-description">目前使用 iPhone 17 模擬器截圖展示搜尋、詞條與書籤流程。</div>
+                    </div>
+                    <div class="slider-controls">
+                      <button class="slider-control" type="button" data-slider-prev="ios" aria-label="Previous iOS screenshot">‹</button>
+                      <button class="slider-control" type="button" data-slider-next="ios" aria-label="Next iOS screenshot">›</button>
+                    </div>
+                  </div>
+                  <div class="slider-track" data-slider-track="ios">
+                    <article class="slide-card">
+                      <figure>
+                        <img
+                          src="assets/site/ios-home.png"
+                          alt="台語辭典 iOS 首頁"
+                        />
+                        <figcaption>
+                          <strong>首頁</strong>
+                          <span>保留離線搜尋的第一個進入點與簡潔首頁節奏。</span>
+                        </figcaption>
+                      </figure>
+                    </article>
+
+                    <article class="slide-card">
+                      <figure>
+                        <img
+                          src="assets/site/ios-search.png"
+                          alt="台語辭典 iOS 搜尋結果"
+                        />
+                        <figcaption>
+                          <strong>搜尋結果</strong>
+                          <span>快速列出詞目、台羅與簡要釋義。</span>
+                        </figcaption>
+                      </figure>
+                    </article>
+
+                    <article class="slide-card">
+                      <figure>
+                        <img
+                          src="assets/site/ios-detail.png"
+                          alt="台語辭典 iOS 詞條詳細頁"
+                        />
+                        <figcaption>
+                          <strong>詞條詳細頁</strong>
+                          <span>閱讀釋義、音標與關聯內容。</span>
+                        </figcaption>
+                      </figure>
+                    </article>
+
+                    <article class="slide-card">
+                      <figure>
+                        <img
+                          src="assets/site/ios-bookmarks.png"
+                          alt="台語辭典 iOS 書籤頁"
+                        />
+                        <figcaption>
+                          <strong>書籤</strong>
+                          <span>保留常用詞條並快速重開。</span>
+                        </figcaption>
+                      </figure>
+                    </article>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -887,6 +1039,49 @@
         if (!node.classList.contains("is-visible")) {
           observer.observe(node);
         }
+      });
+
+      const tabs = document.querySelectorAll("[data-platform-tab]");
+      const panels = document.querySelectorAll("[data-platform-panel]");
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const target = tab.dataset.platformTab;
+
+          tabs.forEach((button) => {
+            const active = button.dataset.platformTab === target;
+            button.classList.toggle("is-active", active);
+            button.setAttribute("aria-selected", String(active));
+          });
+
+          panels.forEach((panel) => {
+            panel.classList.toggle(
+              "is-active",
+              panel.dataset.platformPanel === target
+            );
+          });
+        });
+      });
+
+      const scrollSlider = (platform, direction) => {
+        const track = document.querySelector(`[data-slider-track="${platform}"]`);
+        if (!track) return;
+        const card = track.querySelector(".slide-card");
+        const gap = 14;
+        const width = card ? card.getBoundingClientRect().width + gap : 320;
+        track.scrollBy({ left: width * direction, behavior: "smooth" });
+      };
+
+      document.querySelectorAll("[data-slider-prev]").forEach((button) => {
+        button.addEventListener("click", () => {
+          scrollSlider(button.dataset.sliderPrev, -1);
+        });
+      });
+
+      document.querySelectorAll("[data-slider-next]").forEach((button) => {
+        button.addEventListener("click", () => {
+          scrollSlider(button.dataset.sliderNext, 1);
+        });
       });
     </script>
   </body>
