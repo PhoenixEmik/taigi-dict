@@ -111,12 +111,12 @@
         font-weight: 600;
       }
 
-      .brand-mark {
-        width: 14px;
-        height: 14px;
-        border-radius: 999px;
-        background: var(--accent);
-        box-shadow: 0 0 0 6px rgba(47, 127, 99, 0.12);
+      .brand-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        object-fit: cover;
+        flex-shrink: 0;
       }
 
       .github-link {
@@ -247,29 +247,53 @@
 
       .hero-visual {
         display: grid;
-        gap: 14px;
         align-content: center;
       }
 
-      .hero-shot {
-        overflow: hidden;
-        border-radius: 24px;
-        background: transparent;
-        box-shadow: 0 24px 50px rgba(19, 43, 39, 0.12);
+      .hero-banner {
+        display: grid;
+        grid-template-columns: minmax(116px, 0.52fr) minmax(0, 1fr);
+        align-items: center;
+        gap: 18px;
       }
 
-      .hero-shot img {
+      .hero-banner-icon {
         width: 100%;
-        aspect-ratio: 0.84;
-        object-fit: cover;
-        object-position: top center;
+        max-width: 220px;
+        aspect-ratio: 1;
+        object-fit: contain;
         display: block;
       }
 
-      .hero-visual-note {
-        color: var(--muted);
-        font-size: 0.92rem;
-        line-height: 1.7;
+      .hero-banner-copy {
+        display: grid;
+        gap: 8px;
+      }
+
+      .hero-banner-copy strong,
+      .hero-banner-copy span {
+        display: block;
+        line-height: 0.92;
+        letter-spacing: 0;
+        font-weight: 500;
+      }
+
+      .hero-banner-copy strong {
+        font-size: clamp(2rem, 5.3vw, 4.7rem);
+        color: #111111;
+      }
+
+      .hero-banner-copy span {
+        font-size: clamp(2.3rem, 6.2vw, 5.5rem);
+        color: #243f6c;
+      }
+
+      .showcase-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
       }
 
       .platform-tabs {
@@ -320,29 +344,10 @@
         display: block;
       }
 
-      .slider-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 14px;
-      }
-
-      .slider-title {
-        font-size: 1rem;
-        font-weight: 800;
-      }
-
-      .slider-description {
-        margin-top: 4px;
-        color: var(--muted);
-        font-size: 0.9rem;
-        line-height: 1.6;
-      }
-
       .slider-controls {
         display: inline-flex;
         gap: 8px;
+        flex-shrink: 0;
       }
 
       .slider-control {
@@ -380,6 +385,16 @@
 
       .slider-track::-webkit-scrollbar {
         display: none;
+      }
+
+      @media (max-width: 520px) {
+        .showcase-toolbar {
+          flex-wrap: nowrap;
+        }
+
+        .platform-tabs {
+          min-width: 0;
+        }
       }
 
       .slide-card {
@@ -444,14 +459,6 @@
         font-size: 0.98rem;
       }
 
-      .slide-card span {
-        display: block;
-        margin-top: 4px;
-        color: var(--muted);
-        font-size: 0.88rem;
-        line-height: 1.5;
-      }
-
       section {
         padding: 24px 0;
       }
@@ -487,7 +494,8 @@
         min-height: 220px;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: flex-start;
+        gap: 22px;
         transition:
           transform 180ms ease,
           border-color 180ms ease;
@@ -503,13 +511,11 @@
       }
 
       .feature-card h3 {
-        margin-top: 24px;
         font-size: 1.3rem;
         line-height: 1.18;
       }
 
       .feature-card p {
-        margin-top: 12px;
         color: var(--muted);
         line-height: 1.7;
       }
@@ -632,6 +638,11 @@
           gap: 46px;
         }
 
+        .hero-banner {
+          grid-template-columns: minmax(180px, 0.56fr) minmax(0, 1fr);
+          gap: 22px;
+        }
+
         .cta-row {
           flex-direction: row;
           flex-wrap: wrap;
@@ -662,7 +673,12 @@
       <header class="site-nav">
         <div class="nav-inner">
           <a class="brand-lockup" href="#top" aria-label="台語辭典 Taigi Dict Home">
-            <span class="brand-mark" aria-hidden="true"></span>
+            <img
+              class="brand-icon"
+              src="assets/icon/taigi_dict.png"
+              alt=""
+              aria-hidden="true"
+            />
             <span class="brand-text">
               <strong>台語辭典</strong>
               <span>Taigi Dict</span>
@@ -716,20 +732,22 @@
                 </a>
               </div>
               <p class="hero-note">
-                以教育部資料為基礎，在裝置端建立本機離線詞庫。
+                以教育部《教育部臺灣台語常用詞辭典》為基礎，依原始資料授權提供詞典內容；支援離線語音，需另外下載語音檔案。
               </p>
             </div>
 
             <div class="hero-visual reveal">
-              <div class="hero-shot">
+              <div class="hero-banner" aria-label="台語辭典 Taigi Dict banner">
                 <img
-                  src="assets/site/android-search.png"
-                  alt="台語辭典 Android 搜尋畫面"
+                  class="hero-banner-icon"
+                  src="assets/icon/taigi_dict.png"
+                  alt="台語辭典 app icon"
                 />
+                <div class="hero-banner-copy" aria-hidden="true">
+                  <strong>Tâi-gí Dict</strong>
+                  <span>台語辭典</span>
+                </div>
               </div>
-              <p class="hero-visual-note">
-                先從 Android 版本查看實際查詢節奏，iOS 畫面會在後續補上。
-              </p>
             </div>
           </div>
         </section>
@@ -738,9 +756,6 @@
           <div class="section-inner">
             <div class="section-header reveal">
               <h2>把查字這件事，留給學習本身</h2>
-              <p>
-                台語辭典 Taigi Dict 以乾淨、快速、可離線為核心，不把注意力浪費在多餘介面與商業干擾上。
-              </p>
             </div>
 
             <div class="features-grid">
@@ -749,7 +764,7 @@
                 <div>
                   <h3>極速離線搜尋</h3>
                   <p>
-                    不需網路也能秒查。首次準備完成後，台語詞目、台羅拼音與華語釋義都能在本機即時搜尋。
+                    不需網路也能快速查詢詞目、台羅與釋義。
                   </p>
                 </div>
               </article>
@@ -759,7 +774,7 @@
                 <div>
                   <h3>極簡無干擾</h3>
                   <p>
-                    沒有任何廣告，也沒有多餘資訊噪音。把介面收斂到查詢、收藏、離線資源與閱讀本身。
+                    無廣告，介面只保留查詢、收藏與閱讀本身。
                   </p>
                 </div>
               </article>
@@ -769,7 +784,7 @@
                 <div>
                   <h3>開源與社群</h3>
                   <p>
-                    基於開源力量打造，原始碼公開，資料流程透明，讓學習工具能持續被改進、檢視與延續。
+                    原始碼公開，資料流程透明，可持續改進與延續。
                   </p>
                 </div>
               </article>
@@ -781,45 +796,38 @@
           <div class="section-inner">
             <div class="section-header reveal">
               <h2>畫面展示</h2>
-              <p>
-                分別查看 Android 與 iOS 版本的畫面。iOS 截圖之後可直接補進同一套 slider 結構。
-              </p>
             </div>
 
             <div class="reveal">
-              <div class="platform-tabs" role="tablist" aria-label="Platform screenshots">
-                <button
-                  class="platform-tab is-active"
-                  type="button"
-                  role="tab"
-                  aria-selected="true"
-                  data-platform-tab="android"
-                >
-                  Android
-                </button>
-                <button
-                  class="platform-tab"
-                  type="button"
-                  role="tab"
-                  aria-selected="false"
-                  data-platform-tab="ios"
-                >
-                  iOS
-                </button>
+              <div class="showcase-toolbar">
+                <div class="platform-tabs" role="tablist" aria-label="Platform screenshots">
+                  <button
+                    class="platform-tab is-active"
+                    type="button"
+                    role="tab"
+                    aria-selected="true"
+                    data-platform-tab="android"
+                  >
+                    Android
+                  </button>
+                  <button
+                    class="platform-tab"
+                    type="button"
+                    role="tab"
+                    aria-selected="false"
+                    data-platform-tab="ios"
+                  >
+                    iOS
+                  </button>
+                </div>
+                <div class="slider-controls">
+                  <button class="slider-control" type="button" data-slider-prev aria-label="Previous screenshot">‹</button>
+                  <button class="slider-control" type="button" data-slider-next aria-label="Next screenshot">›</button>
+                </div>
               </div>
 
               <div class="slider-shell">
                 <div class="slider-panel is-active" data-platform-panel="android">
-                  <div class="slider-head">
-                    <div>
-                      <div class="slider-title">Android</div>
-                      <div class="slider-description">目前使用實機截圖展示搜尋、詞條與書籤流程。</div>
-                    </div>
-                    <div class="slider-controls">
-                      <button class="slider-control" type="button" data-slider-prev="android" aria-label="Previous Android screenshot">‹</button>
-                      <button class="slider-control" type="button" data-slider-next="android" aria-label="Next Android screenshot">›</button>
-                    </div>
-                  </div>
                   <div class="slider-track" data-slider-track="android">
                     <article class="slide-card">
                       <figure>
@@ -829,7 +837,6 @@
                         />
                         <figcaption>
                           <strong>首頁</strong>
-                          <span>直接開始搜尋與離線查詢。</span>
                         </figcaption>
                       </figure>
                     </article>
@@ -842,7 +849,6 @@
                         />
                         <figcaption>
                           <strong>搜尋結果</strong>
-                          <span>快速列出詞目、台羅與簡要釋義。</span>
                         </figcaption>
                       </figure>
                     </article>
@@ -855,7 +861,6 @@
                         />
                         <figcaption>
                           <strong>詞條詳細頁</strong>
-                          <span>閱讀釋義、音標與關聯內容。</span>
                         </figcaption>
                       </figure>
                     </article>
@@ -868,7 +873,6 @@
                         />
                         <figcaption>
                           <strong>書籤</strong>
-                          <span>保留常用詞條並快速重開。</span>
                         </figcaption>
                       </figure>
                     </article>
@@ -876,16 +880,6 @@
                 </div>
 
                 <div class="slider-panel" data-platform-panel="ios">
-                  <div class="slider-head">
-                    <div>
-                      <div class="slider-title">iOS</div>
-                      <div class="slider-description">目前使用 iPhone 17 模擬器截圖展示搜尋、詞條與書籤流程。</div>
-                    </div>
-                    <div class="slider-controls">
-                      <button class="slider-control" type="button" data-slider-prev="ios" aria-label="Previous iOS screenshot">‹</button>
-                      <button class="slider-control" type="button" data-slider-next="ios" aria-label="Next iOS screenshot">›</button>
-                    </div>
-                  </div>
                   <div class="slider-track" data-slider-track="ios">
                     <article class="slide-card">
                       <figure>
@@ -895,7 +889,6 @@
                         />
                         <figcaption>
                           <strong>首頁</strong>
-                          <span>保留離線搜尋的第一個進入點與簡潔首頁節奏。</span>
                         </figcaption>
                       </figure>
                     </article>
@@ -908,7 +901,6 @@
                         />
                         <figcaption>
                           <strong>搜尋結果</strong>
-                          <span>快速列出詞目、台羅與簡要釋義。</span>
                         </figcaption>
                       </figure>
                     </article>
@@ -921,7 +913,6 @@
                         />
                         <figcaption>
                           <strong>詞條詳細頁</strong>
-                          <span>閱讀釋義、音標與關聯內容。</span>
                         </figcaption>
                       </figure>
                     </article>
@@ -934,7 +925,6 @@
                         />
                         <figcaption>
                           <strong>書籤</strong>
-                          <span>保留常用詞條並快速重開。</span>
                         </figcaption>
                       </figure>
                     </article>
@@ -949,16 +939,13 @@
           <div class="section-inner">
             <div class="download-panel reveal">
               <div class="section-header">
-                <h2>立即取得 台語辭典 Taigi Dict</h2>
-                <p>
-                  先用 GitHub 版本開始使用，後續也能延伸到更多發佈渠道。
-                </p>
+                <h2>立即取得</h2>
               </div>
 
               <div class="store-badge-row">
                 <span class="store-badge is-disabled" aria-disabled="true">
                   <img
-                    src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83"
+                    src="assets/site/app-store-badge.svg"
                     alt="Download on the App Store"
                   />
                   <span class="store-badge-label">Coming soon</span>
@@ -966,23 +953,11 @@
 
                 <span class="store-badge is-disabled" aria-disabled="true">
                   <img
-                    src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png"
+                    src="assets/site/google-play-badge.png"
                     alt="Get it on Google Play"
                   />
                   <span class="store-badge-label">Coming soon</span>
                 </span>
-
-                <span class="store-badge is-disabled" aria-disabled="true">
-                  <img
-                    src="https://f-droid.org/badge/get-it-on.png"
-                    alt="Get it on F-Droid"
-                  />
-                  <span class="store-badge-label">Coming soon</span>
-                </span>
-              </div>
-
-              <div class="download-note">
-                <div style="margin-bottom: 12px;">或直接從 GitHub 取得 Universal APK</div>
                 <a
                   class="store-badge github-badge"
                   href="https://github.com/PhoenixEmik/taigi-dict/releases/latest"
@@ -1063,6 +1038,9 @@
         });
       });
 
+      const getActivePlatform = () =>
+        document.querySelector("[data-platform-tab].is-active")?.dataset.platformTab;
+
       const scrollSlider = (platform, direction) => {
         const track = document.querySelector(`[data-slider-track="${platform}"]`);
         if (!track) return;
@@ -1074,13 +1052,15 @@
 
       document.querySelectorAll("[data-slider-prev]").forEach((button) => {
         button.addEventListener("click", () => {
-          scrollSlider(button.dataset.sliderPrev, -1);
+          const platform = getActivePlatform();
+          if (platform) scrollSlider(platform, -1);
         });
       });
 
       document.querySelectorAll("[data-slider-next]").forEach((button) => {
         button.addEventListener("click", () => {
-          scrollSlider(button.dataset.sliderNext, 1);
+          const platform = getActivePlatform();
+          if (platform) scrollSlider(platform, 1);
         });
       });
     </script>
