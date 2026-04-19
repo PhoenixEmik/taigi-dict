@@ -19,8 +19,8 @@ The app is organized around three primary tabs:
 - `Settings`: manage offline resources, appearance, language, reference material, and app information
 
 The first-run experience is also part of the product flow. The app can
-download the ministry ODS source, build a local SQLite dictionary on-device,
-and then use that database for subsequent offline lookup.
+restore a bundled `kautian.ods` source file, build a local SQLite dictionary
+on-device, and then use that database for subsequent offline lookup.
 
 ## App Identity
 
@@ -37,7 +37,7 @@ and then use that database for subsequent offline lookup.
 - Open dedicated entry detail pages with interactive linked definitions and share support
 - Save entries to bookmarks and reopen them from a separate tab
 - Download ministry word audio and example audio for offline playback
-- Download `kautian.ods` and build the local SQLite dictionary on-device
+- Build the local SQLite dictionary on-device from the bundled `kautian.ods` source and optionally re-download that source later
 - Switch UI language, theme, and reading text size
 - Read built-in Tailo and Hanji reference pages plus about and license screens
 - Use adaptive iOS/Android UI with accessibility-focused semantics and localized tooltips
@@ -61,8 +61,9 @@ Production offline resource endpoints used by the app:
 Important distribution note:
 
 - Because the upstream raw data is under `CC BY-ND 3.0 TW`, the app does not ship a preconverted SQLite database.
-- Instead, the app downloads the raw `kautian.ods` file and builds the local SQLite database on the user's device.
-- Runtime dictionary loading now prefers the locally built SQLite database in the app support directory. The old packaged dictionary asset is no longer used by the production app runtime.
+- Instead, the app ships the raw `kautian.ods` source as a bundled asset and builds the local SQLite database on the user's device.
+- Users can still re-download `kautian.ods` from the production asset host to refresh or repair the local source file.
+- Runtime dictionary loading prefers the locally built SQLite database in the app support directory.
 
 ## Tech Stack
 
@@ -81,7 +82,7 @@ Important distribution note:
 
 - `lib/main.dart`: app entry point
 - `lib/app/`: app shell, navigation, and theme bootstrap
-- `lib/app/initialization/`: first-run download and dictionary build gating flow
+- `lib/app/initialization/`: first-run bundled-source restore and dictionary build gating flow
 - `lib/app/shell/`: main three-tab app shell
 - `lib/core/`: constants, localization, translation, and shared preferences
 - `lib/features/dictionary/`: dictionary models, search, SQLite build/load logic, and UI
@@ -94,7 +95,8 @@ Important distribution note:
 ## Offline Resource Flow
 
 - The app does not ship a prebuilt SQLite dictionary database.
-- It downloads the raw `kautian.ods` source and builds the local database on the device.
+- It ships the raw `kautian.ods` source as an app asset and builds the local database on the device.
+- Settings can re-download `kautian.ods` from the production asset host when the user wants newer source data or needs to repair the local copy.
 - Dictionary audio is managed separately as downloadable ZIP archives for word audio and sentence audio.
 - Settings includes maintenance actions for re-downloading archives and rebuilding the local dictionary database.
 
