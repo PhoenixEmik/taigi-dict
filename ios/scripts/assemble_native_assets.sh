@@ -19,14 +19,12 @@ copy_framework_to_app_bundle() {
   fi
 
   mkdir -p "${APP_FRAMEWORKS_DIR}"
+  rm -rf "${APP_BUNDLE_DIR}/objective_c.framework"
 
   if [ "${source_framework}" != "${APP_FRAMEWORKS_DIR}/objective_c.framework" ]; then
     rm -rf "${APP_FRAMEWORKS_DIR}/objective_c.framework"
     cp -R "${source_framework}" "${APP_FRAMEWORKS_DIR}/"
   fi
-
-  rm -rf "${APP_BUNDLE_DIR}/objective_c.framework"
-  cp -R "${APP_FRAMEWORKS_DIR}/objective_c.framework" "${APP_BUNDLE_DIR}/"
 }
 
 if [ -d "${APP_FRAMEWORKS_DIR}/objective_c.framework" ]; then
