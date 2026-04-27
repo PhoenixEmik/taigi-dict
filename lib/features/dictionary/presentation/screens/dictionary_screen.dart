@@ -526,21 +526,22 @@ class _TabletDetailPane extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 180),
-        child: isLoading
-            ? const Center(
-                key: ValueKey('tablet-detail-loading'),
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 180),
+      child: isLoading
+          ? const SizedBox.expand(
+              key: ValueKey('tablet-detail-loading'),
+              child: Center(
                 child: Padding(
                   padding: EdgeInsets.all(24),
                   child: CircularProgressIndicator.adaptive(),
                 ),
-              )
-            : detail == null
-            ? Padding(
-                key: const ValueKey('tablet-detail-empty'),
+              ),
+            )
+          : detail == null
+          ? SizedBox.expand(
+              key: const ValueKey('tablet-detail-empty'),
+              child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 40,
                   vertical: 32,
@@ -578,38 +579,35 @@ class _TabletDetailPane extends StatelessWidget {
                     ),
                   ),
                 ),
-              )
-            : Column(
-                key: ValueKey('tablet-detail-${detail!.resolvedEntryId}'),
-                children: [
-                  _TabletDetailToolbar(
-                    entry: detail!.entry,
-                    bookmarkStore: bookmarkStore,
-                    onShare: onShare,
-                  ),
-                  const Divider(height: 1),
-                  Expanded(
-                    child: AnimatedBuilder(
-                      animation: Listenable.merge([
-                        bookmarkStore,
-                        audioLibrary,
-                      ]),
-                      builder: (context, child) {
-                        return WordDetailBody(
-                          entry: detail!.entry,
-                          audioLibrary: audioLibrary,
-                          onPlayClip: onPlayClip,
-                          onWordTapped: onWordTapped,
-                          canOpenWord: detail!.canOpenWord,
-                          maxContentWidth: 860,
-                          padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
-                        );
-                      },
-                    ),
-                  ),
-                ],
               ),
-      ),
+            )
+          : Column(
+              key: ValueKey('tablet-detail-${detail!.resolvedEntryId}'),
+              children: [
+                _TabletDetailToolbar(
+                  entry: detail!.entry,
+                  bookmarkStore: bookmarkStore,
+                  onShare: onShare,
+                ),
+                const Divider(height: 1),
+                Expanded(
+                  child: AnimatedBuilder(
+                    animation: Listenable.merge([bookmarkStore, audioLibrary]),
+                    builder: (context, child) {
+                      return WordDetailBody(
+                        entry: detail!.entry,
+                        audioLibrary: audioLibrary,
+                        onPlayClip: onPlayClip,
+                        onWordTapped: onWordTapped,
+                        canOpenWord: detail!.canOpenWord,
+                        maxContentWidth: 860,
+                        padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }
