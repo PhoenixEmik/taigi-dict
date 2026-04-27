@@ -124,8 +124,11 @@ class SearchHistorySection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final cardColor = _searchPanelCardSurface(theme);
 
     return Card(
+      color: cardColor,
+      surfaceTintColor: Colors.transparent,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -202,6 +205,7 @@ class _IOSSearchHistoryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final fillColor = _searchHistoryChipFill(theme);
 
     return IntrinsicWidth(
       child: AdaptiveButton.child(
@@ -210,7 +214,7 @@ class _IOSSearchHistoryChip extends StatelessWidget {
         padding: EdgeInsets.zero,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest,
+            color: fillColor,
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
               color: theme.colorScheme.outlineVariant.withValues(alpha: 0.75),
@@ -252,12 +256,15 @@ class EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    final cardColor = _searchPanelCardSurface(theme);
     final title = query.trim().isEmpty ? l10n.startSearch : l10n.noResultsTitle;
     final body = query.trim().isEmpty
         ? l10n.startSearchBody
         : l10n.noResultsBody;
 
     return Card(
+      color: cardColor,
+      surfaceTintColor: Colors.transparent,
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -317,4 +324,18 @@ class SearchLoadingState extends StatelessWidget {
       ),
     );
   }
+}
+
+Color _searchPanelCardSurface(ThemeData theme) {
+  if (PlatformInfo.isIOS && theme.brightness == Brightness.light) {
+    return Colors.white;
+  }
+  return theme.colorScheme.surface;
+}
+
+Color _searchHistoryChipFill(ThemeData theme) {
+  if (PlatformInfo.isIOS && theme.brightness == Brightness.light) {
+    return theme.colorScheme.surfaceContainerLow;
+  }
+  return theme.colorScheme.surfaceContainerHighest;
 }

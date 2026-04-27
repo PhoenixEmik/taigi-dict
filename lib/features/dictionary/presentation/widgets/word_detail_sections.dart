@@ -25,6 +25,7 @@ class WordDetailHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final cardColor = _detailCardSurface(theme);
     final l10n = AppLocalizations.of(context);
     final subtitle = [
       if (entry.type.isNotEmpty) entry.type,
@@ -116,6 +117,8 @@ class WordDetailHeader extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.only(bottom: 20),
+      color: cardColor,
+      surfaceTintColor: Colors.transparent,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
         child: Row(
@@ -283,7 +286,7 @@ class ExampleListTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = AppLocalizations.of(context);
-    final useNeutralAndroidLightColors = _useNeutralAndroidLightColors(theme);
+    final cardColor = _detailCardSurface(theme);
     final mergedSemanticsLabel = [
       if (example.hanji.isNotEmpty) example.hanji,
       if (example.romanization.isNotEmpty)
@@ -351,9 +354,8 @@ class ExampleListTile extends StatelessWidget {
     return Card.outlined(
       clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.only(bottom: 8),
-      color: useNeutralAndroidLightColors
-          ? _androidLightDetailSurface(colorScheme)
-          : colorScheme.surfaceContainerLow,
+      color: cardColor,
+      surfaceTintColor: Colors.transparent,
       child: AdaptiveListTile(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         title: content,
@@ -694,6 +696,7 @@ class DetailNoteCard extends StatelessWidget {
     }
 
     final theme = Theme.of(context);
+    final cardColor = _detailCardSurface(theme);
     final content = Padding(
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
       child: SizedBox(
@@ -739,6 +742,8 @@ class DetailNoteCard extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       margin: const EdgeInsets.only(bottom: 16),
+      color: cardColor,
+      surfaceTintColor: Colors.transparent,
       child: content,
     );
   }
@@ -777,6 +782,17 @@ TextStyle? scaledTextStyle(TextStyle? style, double scale) {
 
 bool _useNeutralAndroidLightColors(ThemeData theme) {
   return !PlatformInfo.isIOS && theme.brightness == Brightness.light;
+}
+
+Color _detailCardSurface(ThemeData theme) {
+  final colorScheme = theme.colorScheme;
+  if (PlatformInfo.isIOS && theme.brightness == Brightness.light) {
+    return Colors.white;
+  }
+  if (_useNeutralAndroidLightColors(theme)) {
+    return _androidLightDetailSurface(colorScheme);
+  }
+  return colorScheme.surfaceContainerLow;
 }
 
 Color _androidLightDetailSurface(ColorScheme colorScheme) {
