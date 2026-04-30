@@ -4,16 +4,20 @@ import TaigiDictCore
 struct DictionaryDetailView: View {
     var sourceEntry: DictionaryEntry?
     var openEntry: (DictionaryEntry) -> Void
+    private let bookmarkStore: (any BookmarksStoreProtocol)?
 
     @State private var viewModel: WordDetailViewModel
+    @State private var isBookmarked = false
 
     init(
         entry: DictionaryEntry?,
         library: DictionaryLibrary,
+        bookmarkStore: (any BookmarksStoreProtocol)? = nil,
         openEntry: @escaping (DictionaryEntry) -> Void
     ) {
         self.sourceEntry = entry
         self.openEntry = openEntry
+        self.bookmarkStore = bookmarkStore
         _viewModel = State(initialValue: WordDetailViewModel(library: library))
     }
 
@@ -122,6 +126,17 @@ struct DictionaryDetailView: View {
         }
         .toolbar {
             if viewModel.entry != nil {
+                if bookmarkStore != nil {
+                    Button {
+                        toggleBookmark()
+                    } label: {
+                        Label(
+                            isBookmarked ? "移除書籤" : "加入書籤",
+                            systemImage: isBookmarked ? "bookmark.fill" : "bookmark"
+                        )
+                    }
+                }
+
                 ShareLink(item: viewModel.shareText()) {
                     Label("分享", systemImage: "square.and.arrow.up")
                 }
@@ -132,6 +147,10 @@ struct DictionaryDetailView: View {
                 return
             }
             await viewModel.prepare(entry: sourceEntry)
+            await refreshBookmarkState()
+        }
+        .task(id: viewModel.entry?.id) {
+            await refreshBookmarkState()
         }
     }
 
@@ -142,6 +161,29 @@ struct DictionaryDetailView: View {
             }
             openEntry(linkedEntry)
         }
+    }
+
+    private func toggleBookmark() {
+        guard let entry = viewModel.entry, let bookmarkStore else {
+            return
+        }
+
+        Task {
+            let bookmarked = await bookmarkStore.toggleBookmark(entryID: entry.id)
+            await MainActor.run {
+                isBookmarked = bookmarked
+            }
+        }
+    }
+
+    private func refreshBookmarkState() async {
+        guard let entry = viewModel.entry, let bookmarkStore else {
+            isBookmarked = false
+            return
+        }
+
+        let bookmarked = await bookmarkStore.isBookmarked(entry.id)
+        isBookmarked = bookmarked
     }
 }
 

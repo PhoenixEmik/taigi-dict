@@ -4,6 +4,7 @@ import TaigiDictCore
 public struct TaigiDictAppRootView: View {
     @State private var viewModel: DictionarySearchViewModel
     @State private var initializationViewModel = InitializationViewModel()
+    @State private var bookmarkStore = BookmarkStore()
 
     public init(repository: any DictionaryRepositoryProtocol) {
         _viewModel = State(initialValue: DictionarySearchViewModel(repository: repository))
@@ -27,16 +28,12 @@ public struct TaigiDictAppRootView: View {
 
     private var mainTabView: some View {
         TabView {
-            DictionarySearchScreen(viewModel: viewModel)
+            DictionarySearchScreen(viewModel: viewModel, bookmarkStore: bookmarkStore)
                 .tabItem {
                     Label("辭典", systemImage: "book")
                 }
 
-            PlaceholderScreen(
-                title: "書籤",
-                systemImage: "bookmark",
-                message: "書籤功能會在後續重構接入。"
-            )
+            BookmarksScreen(library: viewModel.library, bookmarkStore: bookmarkStore)
             .tabItem {
                 Label("書籤", systemImage: "bookmark")
             }
@@ -50,23 +47,6 @@ public struct TaigiDictAppRootView: View {
             .tabItem {
                 Label("設定", systemImage: "gearshape")
             }
-        }
-    }
-}
-
-private struct PlaceholderScreen: View {
-    var title: String
-    var systemImage: String
-    var message: String
-
-    var body: some View {
-        NavigationStack {
-            ContentUnavailableView(
-                title,
-                systemImage: systemImage,
-                description: Text(message)
-            )
-            .navigationTitle(title)
         }
     }
 }

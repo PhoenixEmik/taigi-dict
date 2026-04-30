@@ -4,9 +4,14 @@ import TaigiDictCore
 public struct DictionarySearchScreen: View {
     @Bindable private var viewModel: DictionarySearchViewModel
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    private let bookmarkStore: (any BookmarksStoreProtocol)?
 
-    public init(viewModel: DictionarySearchViewModel) {
+    public init(
+        viewModel: DictionarySearchViewModel,
+        bookmarkStore: (any BookmarksStoreProtocol)? = nil
+    ) {
         _viewModel = Bindable(viewModel)
+        self.bookmarkStore = bookmarkStore
     }
 
     public var body: some View {
@@ -17,7 +22,8 @@ public struct DictionarySearchScreen: View {
             } detail: {
                 DictionaryDetailView(
                     entry: viewModel.selectedEntry,
-                    library: viewModel.library
+                    library: viewModel.library,
+                    bookmarkStore: bookmarkStore
                 ) { entry in
                     viewModel.select(entry)
                 }
@@ -30,7 +36,8 @@ public struct DictionarySearchScreen: View {
                     .navigationDestination(item: $viewModel.detailEntry) { entry in
                         DictionaryDetailView(
                             entry: entry,
-                            library: viewModel.library
+                            library: viewModel.library,
+                            bookmarkStore: bookmarkStore
                         ) { linkedEntry in
                             viewModel.select(linkedEntry)
                         }

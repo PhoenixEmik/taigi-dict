@@ -96,6 +96,10 @@ public actor DictionaryLibrary {
         try await repository.entry(id: id)
     }
 
+    public func entries(ids: [Int64]) async throws -> [DictionaryEntry] {
+        try await repository.entries(ids: ids)
+    }
+
     public func supportsLocalMaintenance() async -> Bool {
         await repository.supportsLocalMaintenance()
     }
