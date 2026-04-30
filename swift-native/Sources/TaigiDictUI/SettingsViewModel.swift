@@ -14,6 +14,8 @@ public final class SettingsViewModel {
     public private(set) var isRunningAction = false
     public private(set) var statusMessage: String?
     public private(set) var errorMessage: String?
+    public private(set) var librarySummary: DictionaryLibrarySummary?
+    public private(set) var isClearConfirmationPresented = false
 
     private let library: DictionaryLibrary
 
@@ -24,6 +26,36 @@ public final class SettingsViewModel {
     public func loadCapabilities() async {
         errorMessage = nil
         supportsDataMaintenance = await library.supportsLocalMaintenance()
+        librarySummary = await library.currentSummary()
+
+        if librarySummary == nil {
+            let phase = await library.prepare()
+            switch phase {
+            case .ready(let summary):
+                librarySummary = summary
+            case .failed(let message):
+                errorMessage = message
+            case .idle, .loading:
+                break
+            }
+        }
+    }
+
+    public func requestClearConfirmation() {
+        guard supportsDataMaintenance, !isRunningAction else {
+            return
+        }
+        isClearConfirmationPresented = true
+    }
+
+    public func cancelClearConfirmation() {
+        isClearConfirmationPresented = false
+    }
+
+    @discardableResult
+    public func confirmClear() async -> Bool {
+        isClearConfirmationPresented = false
+        return await run(.clear)
     }
 
     @discardableResult
@@ -32,6 +64,7 @@ public final class SettingsViewModel {
             return false
         }
 
+        isClearConfirmationPresented = false
         isRunningAction = true
         errorMessage = nil
 
@@ -40,9 +73,14 @@ public final class SettingsViewModel {
             case .rebuild:
                 try await library.rebuildInstalledDatabase()
                 statusMessage = "本機辭典資料已重建。"
+                let phase = await library.prepare()
+                if case let .ready(summary) = phase {
+                    librarySummary = summary
+                }
             case .clear:
                 try await library.clearInstalledDatabase()
                 statusMessage = "本機辭典資料已清除。"
+                librarySummary = nil
             }
             isRunningAction = false
             return true

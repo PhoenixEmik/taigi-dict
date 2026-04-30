@@ -30,11 +30,7 @@ public struct SettingsScreen: View {
                         .disabled(viewModel.isRunningAction)
 
                         Button(role: .destructive) {
-                            Task {
-                                if await viewModel.run(.clear) {
-                                    onMaintenanceCompleted()
-                                }
-                            }
+                            viewModel.requestClearConfirmation()
                         } label: {
                             Label("清除本機辭典資料", systemImage: "trash")
                         }
@@ -42,6 +38,20 @@ public struct SettingsScreen: View {
                     } else {
                         Text("目前資料來源不支援本機維護操作。")
                             .foregroundStyle(.secondary)
+                    }
+                }
+
+                if let summary = viewModel.librarySummary {
+                    Section("目前資料庫摘要") {
+                        LabeledContent("詞目數") {
+                            Text("\(summary.entryCount)")
+                        }
+                        LabeledContent("義項數") {
+                            Text("\(summary.senseCount)")
+                        }
+                        LabeledContent("例句數") {
+                            Text("\(summary.exampleCount)")
+                        }
                     }
                 }
 
@@ -77,6 +87,31 @@ public struct SettingsScreen: View {
         }
         .task {
             await viewModel.loadCapabilities()
+        }
+        .confirmationDialog(
+            "確定要清除本機辭典資料？",
+            isPresented: Binding(
+                get: { viewModel.isClearConfirmationPresented },
+                set: { isPresented in
+                    if !isPresented {
+                        viewModel.cancelClearConfirmation()
+                    }
+                }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("清除", role: .destructive) {
+                Task {
+                    if await viewModel.confirmClear() {
+                        onMaintenanceCompleted()
+                    }
+                }
+            }
+            Button("取消", role: .cancel) {
+                viewModel.cancelClearConfirmation()
+            }
+        } message: {
+            Text("清除後會移除本機資料，下次使用前會重新初始化。")
         }
     }
 }

@@ -50,6 +50,22 @@ final class DictionaryLibraryTests: XCTestCase {
         XCTAssertEqual(clearCacheCount, 1)
     }
 
+    func testCurrentSummaryReturnsPreparedSummary() async {
+        let repository = LibraryMaintenanceRepository(
+            bundle: sampleBundle(),
+            supportsMaintenance: true
+        )
+        let library = DictionaryLibrary(repository: repository)
+        let initialSummary = await library.currentSummary()
+
+        XCTAssertNil(initialSummary)
+
+        _ = await library.prepare()
+        let summary = await library.currentSummary()
+
+        XCTAssertEqual(summary, DictionaryLibrarySummary(entryCount: 1, senseCount: 1, exampleCount: 0))
+    }
+
     private func sampleBundle() -> DictionaryBundle {
         DictionaryBundle(
             entryCount: 1,

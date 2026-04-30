@@ -11,6 +11,7 @@ final class SettingsViewModelTests: XCTestCase {
         await viewModel.loadCapabilities()
 
         XCTAssertTrue(viewModel.supportsDataMaintenance)
+        XCTAssertEqual(viewModel.librarySummary, DictionaryLibrarySummary(entryCount: 2, senseCount: 3, exampleCount: 4))
     }
 
     func testRunRebuildReportsSuccessMessage() async {
@@ -36,6 +37,7 @@ final class SettingsViewModelTests: XCTestCase {
         XCTAssertTrue(result)
         XCTAssertEqual(viewModel.statusMessage, "本機辭典資料已清除。")
         XCTAssertNil(viewModel.errorMessage)
+        XCTAssertNil(viewModel.librarySummary)
         XCTAssertEqual(clearInstalledCount, 1)
     }
 
@@ -54,6 +56,35 @@ final class SettingsViewModelTests: XCTestCase {
         XCTAssertNotNil(viewModel.errorMessage)
         XCTAssertNil(viewModel.statusMessage)
     }
+
+    func testClearConfirmationFlowRequiresExplicitConfirm() async {
+        let repository = SettingsRepository(supportsMaintenance: true)
+        let viewModel = SettingsViewModel(library: DictionaryLibrary(repository: repository))
+
+        await viewModel.loadCapabilities()
+        viewModel.requestClearConfirmation()
+        let clearInstalledCount = await repository.clearInstalledCount
+
+        XCTAssertTrue(viewModel.isClearConfirmationPresented)
+        XCTAssertEqual(clearInstalledCount, 0)
+
+        viewModel.cancelClearConfirmation()
+        XCTAssertFalse(viewModel.isClearConfirmationPresented)
+    }
+
+    func testConfirmClearRunsClearAndDismissesConfirmation() async {
+        let repository = SettingsRepository(supportsMaintenance: true)
+        let viewModel = SettingsViewModel(library: DictionaryLibrary(repository: repository))
+
+        await viewModel.loadCapabilities()
+        viewModel.requestClearConfirmation()
+        let result = await viewModel.confirmClear()
+        let clearInstalledCount = await repository.clearInstalledCount
+
+        XCTAssertTrue(result)
+        XCTAssertFalse(viewModel.isClearConfirmationPresented)
+        XCTAssertEqual(clearInstalledCount, 1)
+    }
 }
 
 private actor SettingsRepository: DictionaryRepositoryProtocol {
@@ -69,7 +100,7 @@ private actor SettingsRepository: DictionaryRepositoryProtocol {
     }
 
     func loadBundle() async throws -> DictionaryBundle {
-        DictionaryBundle(entryCount: 0, senseCount: 0, exampleCount: 0, entries: [])
+        DictionaryBundle(entryCount: 2, senseCount: 3, exampleCount: 4, entries: [])
     }
 
     func search(_ rawQuery: String, limit: Int, offset: Int) async throws -> [DictionaryEntry] {

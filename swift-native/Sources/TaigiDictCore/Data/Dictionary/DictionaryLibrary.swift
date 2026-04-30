@@ -31,6 +31,13 @@ public actor DictionaryLibrary {
         phaseStorage
     }
 
+    public func currentSummary() -> DictionaryLibrarySummary? {
+        guard case let .ready(summary) = phaseStorage else {
+            return nil
+        }
+        return summary
+    }
+
     @discardableResult
     public func prepare() async -> DictionaryLibraryPhase {
         switch phaseStorage {
