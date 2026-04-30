@@ -20,7 +20,7 @@ struct DictionarySearchListView: View {
                 }
 
                 if let matched = viewModel.results.first(where: { $0.id == newID }) {
-                    viewModel.selectedEntry = matched
+                    viewModel.select(matched)
                 }
             }
         )

@@ -122,7 +122,7 @@ public final class DictionarySearchViewModel {
         let generation = nextSearchGeneration()
         let query = searchText
         searchTask = Task { @MainActor in
-            await runSearch(query, saveHistory: true, generation: generation)
+            await runSearch(query, saveHistory: false, generation: generation)
         }
     }
 
@@ -155,6 +155,15 @@ public final class DictionarySearchViewModel {
     public func select(_ entry: DictionaryEntry) {
         selectedEntry = entry
         detailEntry = entry
+
+        let historyItem = historyItem(for: entry)
+        guard !historyItem.isEmpty else {
+            return
+        }
+
+        Task { @MainActor in
+            await saveHistoryItem(historyItem)
+        }
     }
 
     private func runSearch(_ query: String, saveHistory: Bool, generation: Int) async {
@@ -245,6 +254,25 @@ public final class DictionarySearchViewModel {
         }
 
         await searchHistoryStore.save(searchHistory)
+    }
+
+    private func historyItem(for entry: DictionaryEntry) -> String {
+        let candidates = [
+            entry.hanji,
+            entry.romanization,
+            entry.hokkienSearch,
+            entry.mandarinSearch,
+            searchText,
+        ]
+
+        for candidate in candidates {
+            let trimmed = candidate.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmed.isEmpty {
+                return trimmed
+            }
+        }
+
+        return ""
     }
 
     private func normalizeHistory(_ values: [String]) -> [String] {

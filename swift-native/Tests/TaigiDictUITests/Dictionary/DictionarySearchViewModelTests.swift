@@ -4,7 +4,7 @@ import TaigiDictCore
 
 @MainActor
 final class DictionarySearchViewModelTests: XCTestCase {
-    func testSubmitSearchUpdatesResultsAndHistory() async {
+    func testSubmitSearchUpdatesResultsWithoutSavingHistory() async {
         let repository = InMemoryRepository(entries: [
             entry(id: 1, hanji: "辭典", romanization: "sû-tián", definition: "工具書"),
         ])
@@ -19,7 +19,7 @@ final class DictionarySearchViewModelTests: XCTestCase {
         try? await Task.sleep(for: .milliseconds(50))
 
         XCTAssertEqual(viewModel.results.map(\.id), [1])
-        XCTAssertEqual(viewModel.searchHistory, ["辭典"])
+        XCTAssertTrue(viewModel.searchHistory.isEmpty)
     }
 
     func testEmptyScheduledSearchClearsResults() async {
@@ -106,7 +106,30 @@ final class DictionarySearchViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.searchHistory, ["辭典", "字典"])
     }
 
-    func testSubmitSearchPersistsHistoryToStore() async {
+    func testSelectPersistsOpenedEntryToHistoryStore() async {
+        let repository = InMemoryRepository(entries: [
+            entry(id: 1, hanji: "辭典", romanization: "sû-tián", definition: "工具書"),
+        ])
+        let historyStore = TestSearchHistoryStore(initialValues: ["字典"])
+        let viewModel = DictionarySearchViewModel(
+            repository: repository,
+            searchHistoryStore: historyStore
+        )
+        await viewModel.load()
+
+        viewModel.searchText = "辭典"
+        viewModel.submitSearch()
+        try? await Task.sleep(for: .milliseconds(50))
+        if let entry = viewModel.results.first {
+            viewModel.select(entry)
+        }
+        try? await Task.sleep(for: .milliseconds(50))
+
+        let persisted = await historyStore.load()
+        XCTAssertEqual(persisted, ["辭典", "字典"])
+    }
+
+    func testSubmitSearchDoesNotPersistHistoryToStoreBeforeSelection() async {
         let repository = InMemoryRepository(entries: [
             entry(id: 1, hanji: "辭典", romanization: "sû-tián", definition: "工具書"),
         ])
@@ -122,7 +145,46 @@ final class DictionarySearchViewModelTests: XCTestCase {
         try? await Task.sleep(for: .milliseconds(50))
 
         let persisted = await historyStore.load()
-        XCTAssertEqual(persisted, ["辭典", "字典"])
+        XCTAssertEqual(persisted, ["字典"])
+    }
+
+    func testSelectMovesExistingHistoryEntryToFront() async {
+        let repository = InMemoryRepository(entries: [
+            entry(id: 1, hanji: "辭典", romanization: "sû-tián", definition: "工具書"),
+        ])
+        let historyStore = TestSearchHistoryStore(initialValues: ["字典", "辭典", "工具"])
+        let viewModel = DictionarySearchViewModel(
+            repository: repository,
+            searchHistoryStore: historyStore
+        )
+        await viewModel.load()
+
+        let openedEntry = entry(id: 1, hanji: "辭典", romanization: "sû-tián", definition: "工具書")
+        viewModel.select(openedEntry)
+        try? await Task.sleep(for: .milliseconds(50))
+
+        XCTAssertEqual(viewModel.searchHistory, ["辭典", "字典", "工具"])
+        let persisted = await historyStore.load()
+        XCTAssertEqual(persisted, ["辭典", "字典", "工具"])
+    }
+
+    func testSelectFallsBackToRomanizationWhenHanjiIsEmpty() async {
+        let repository = InMemoryRepository(entries: [])
+        let historyStore = TestSearchHistoryStore()
+        let viewModel = DictionarySearchViewModel(
+            repository: repository,
+            searchHistoryStore: historyStore
+        )
+        await viewModel.load()
+
+        viewModel.select(
+            entry(id: 2, hanji: "", romanization: "sû-tián", definition: "工具書")
+        )
+        try? await Task.sleep(for: .milliseconds(50))
+
+        XCTAssertEqual(viewModel.searchHistory, ["sû-tián"])
+        let persisted = await historyStore.load()
+        XCTAssertEqual(persisted, ["sû-tián"])
     }
 
     func testClearSearchHistoryAlsoClearsStore() async {
