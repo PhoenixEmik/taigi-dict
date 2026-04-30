@@ -97,6 +97,9 @@ public final class DictionarySearchViewModel {
             return
         }
 
+        isSearching = true
+        errorMessage = nil
+
         searchTask = Task { @MainActor in
             do {
                 try await Task.sleep(for: .milliseconds(300))

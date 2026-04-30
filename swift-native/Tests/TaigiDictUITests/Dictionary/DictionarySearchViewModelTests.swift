@@ -159,6 +159,22 @@ final class DictionarySearchViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.isSearching)
         XCTAssertTrue(viewModel.results.isEmpty)
     }
+
+    func testScheduleSearchShowsSearchingStateBeforeDebounceCompletes() async {
+        let repository = InMemoryRepository(entries: [
+            entry(id: 1, hanji: "辭典", romanization: "sû-tián", definition: "工具書"),
+        ])
+        let viewModel = DictionarySearchViewModel(
+            repository: repository,
+            searchHistoryStore: TestSearchHistoryStore()
+        )
+        await viewModel.load()
+
+        viewModel.searchText = "辭典"
+        viewModel.scheduleSearch()
+
+        XCTAssertTrue(viewModel.isSearching)
+    }
 }
 
 private actor TestChineseConversionProvider: ChineseConversionProviding {

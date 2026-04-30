@@ -53,9 +53,8 @@ struct DictionarySearchListView: View {
                 }
             } else if viewModel.isSearching {
                 Section {
-                    HStack {
-                        ProgressView()
-                        Text(AppLocalizer.text(.searching, locale: appLocale))
+                    ForEach(0..<3, id: \.self) { _ in
+                        SearchResultSkeletonRow()
                     }
                 }
             } else if viewModel.results.isEmpty {
@@ -91,5 +90,28 @@ struct DictionarySearchListView: View {
         .onSubmit(of: .search) {
             viewModel.submitSearch()
         }
+    }
+}
+
+private struct SearchResultSkeletonRow: View {
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            RoundedRectangle(cornerRadius: 5)
+                .fill(.quaternary)
+                .frame(width: 48, height: 16)
+
+            VStack(alignment: .leading, spacing: 8) {
+                RoundedRectangle(cornerRadius: 5)
+                    .fill(.quaternary)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 14)
+
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(.quaternary)
+                    .frame(width: 120, height: 12)
+            }
+        }
+        .padding(.vertical, 6)
+        .accessibilityHidden(true)
     }
 }
