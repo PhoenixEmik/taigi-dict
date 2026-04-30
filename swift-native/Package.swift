@@ -14,6 +14,14 @@ let package = Package(
             name: "TaigiDictCore",
             targets: ["TaigiDictCore"]
         ),
+        .library(
+            name: "TaigiDictUI",
+            targets: ["TaigiDictUI"]
+        ),
+        .executable(
+            name: "TaigiDictPreviewApp",
+            targets: ["TaigiDictPreviewApp"]
+        ),
     ],
     dependencies: [
         // TODO: pin to a release tag or commit after the first successful
@@ -30,9 +38,27 @@ let package = Package(
                 .product(name: "OpenCC", package: "SwiftyOpenCC"),
             ]
         ),
+        .target(
+            name: "TaigiDictUI",
+            dependencies: ["TaigiDictCore"]
+        ),
+        .executableTarget(
+            name: "TaigiDictPreviewApp",
+            dependencies: [
+                "TaigiDictCore",
+                "TaigiDictUI",
+            ]
+        ),
         .testTarget(
             name: "TaigiDictCoreTests",
             dependencies: ["TaigiDictCore"]
+        ),
+        .testTarget(
+            name: "TaigiDictUITests",
+            dependencies: [
+                "TaigiDictCore",
+                "TaigiDictUI",
+            ]
         ),
     ]
 )
