@@ -4,6 +4,7 @@ import TaigiDictCore
 public struct TaigiDictAppRootView: View {
     @State private var viewModel: DictionarySearchViewModel
     @State private var initializationViewModel = InitializationViewModel()
+    @State private var shouldShowInitializationScreen = false
     @State private var bookmarkStore = BookmarkStore()
     @State private var offlineAudioStore: OfflineAudioStore
     @State private var appSettings = AppSettingsSnapshot()
@@ -30,22 +31,26 @@ public struct TaigiDictAppRootView: View {
     }
 
     public var body: some View {
-        Group {
-            if initializationViewModel.isReady {
-                mainTabView
-            } else {
-                InitializationScreen(
-                    phase: initializationViewModel.phase,
-                    progress: initializationViewModel.progress,
-                    errorMessage: initializationViewModel.errorMessage,
-                    failureReason: initializationViewModel.failureReason
-                ) {
-                    initializationViewModel.retry()
-                }
-            }
-        }
+        rootContent
+        .animation(.easeInOut(duration: 0.2), value: shouldShowInitializationScreen)
+        .animation(.easeInOut(duration: 0.2), value: initializationViewModel.isReady)
         .task(id: initializationViewModel.taskID) {
+            shouldShowInitializationScreen = false
+
+            let revealTask = Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(220))
+                guard !Task.isCancelled, !initializationViewModel.isReady else {
+                    return
+                }
+                shouldShowInitializationScreen = true
+            }
+
             await initializationViewModel.prepare(using: viewModel)
+            revealTask.cancel()
+
+            if !initializationViewModel.isReady {
+                shouldShowInitializationScreen = true
+            }
         }
         .task {
             await loadAppSettingsIfNeeded()
@@ -53,6 +58,26 @@ public struct TaigiDictAppRootView: View {
         .environment(\.locale, Locale(identifier: appSettings.interfaceLocale.rawValue))
         .preferredColorScheme(appSettings.themePreference.preferredColorScheme)
         .dynamicTypeSize(appSettings.readingTextScale.dynamicTypeSize)
+    }
+
+    @ViewBuilder
+    private var rootContent: some View {
+        if initializationViewModel.isReady {
+            mainTabView
+        } else if shouldShowInitializationScreen {
+            InitializationScreen(
+                phase: initializationViewModel.phase,
+                progress: initializationViewModel.progress,
+                errorMessage: initializationViewModel.errorMessage,
+                failureReason: initializationViewModel.failureReason
+            ) {
+                initializationViewModel.retry()
+            }
+            .transition(.opacity)
+        } else {
+            Color.clear
+                .ignoresSafeArea()
+        }
     }
 
     private var mainTabView: some View {
