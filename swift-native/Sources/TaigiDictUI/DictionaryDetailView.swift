@@ -300,17 +300,121 @@ private struct RelationshipRows: View {
     var openWord: (String) -> Void
 
     var body: some View {
-        ForEach(words, id: \.self) { word in
-            if openableWords.contains(word) {
-                Button {
-                    openWord(word)
-                } label: {
-                    Label(word, systemImage: "arrowshape.turn.up.right")
-                }
-            } else {
-                Text(word)
+        RelationshipChipLayout(spacing: 8) {
+            ForEach(words, id: \.self) { word in
+                RelationshipChip(
+                    word: word,
+                    isOpenable: openableWords.contains(word),
+                    openWord: openWord
+                )
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 2)
+    }
+}
+
+private struct RelationshipChip: View {
+    var word: String
+    var isOpenable: Bool
+    var openWord: (String) -> Void
+
+    var body: some View {
+        if isOpenable {
+            Button {
+                openWord(word)
+            } label: {
+                Label(word, systemImage: "arrowshape.turn.up.right")
+                    .labelStyle(.titleAndIcon)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+        } else {
+            Text(word)
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(.quaternary, in: Capsule())
+        }
+    }
+}
+
+private struct RelationshipChipLayout: Layout {
+    var spacing: CGFloat = 8
+
+    func sizeThatFits(
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) -> CGSize {
+        let maxWidth = proposal.width ?? .infinity
+        var currentX: CGFloat = 0
+        var currentY: CGFloat = 0
+        var rowHeight: CGFloat = 0
+        var measuredWidth: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(ProposedViewSize(width: finite(maxWidth), height: nil))
+            let itemWidth = maxWidth.isFinite ? min(size.width, maxWidth) : size.width
+
+            if currentX > 0, currentX + spacing + itemWidth > maxWidth {
+                currentY += rowHeight + spacing
+                currentX = 0
+                rowHeight = 0
+            }
+
+            if currentX > 0 {
+                currentX += spacing
+            }
+
+            currentX += itemWidth
+            rowHeight = max(rowHeight, size.height)
+            measuredWidth = max(measuredWidth, currentX)
+        }
+
+        return CGSize(
+            width: maxWidth.isFinite ? maxWidth : measuredWidth,
+            height: currentY + rowHeight
+        )
+    }
+
+    func placeSubviews(
+        in bounds: CGRect,
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) {
+        var currentX = bounds.minX
+        var currentY = bounds.minY
+        var rowHeight: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(ProposedViewSize(width: bounds.width, height: nil))
+            let itemWidth = min(size.width, bounds.width)
+
+            if currentX > bounds.minX, currentX + spacing + itemWidth > bounds.maxX {
+                currentY += rowHeight + spacing
+                currentX = bounds.minX
+                rowHeight = 0
+            }
+
+            if currentX > bounds.minX {
+                currentX += spacing
+            }
+
+            subview.place(
+                at: CGPoint(x: currentX, y: currentY),
+                proposal: ProposedViewSize(width: itemWidth, height: size.height)
+            )
+
+            currentX += itemWidth
+            rowHeight = max(rowHeight, size.height)
+        }
+    }
+
+    private func finite(_ value: CGFloat) -> CGFloat? {
+        value.isFinite ? value : nil
     }
 }
 

@@ -171,7 +171,7 @@ public final class WordDetailViewModel {
                 continue
             }
 
-            if linkedEntry.id != entry.id {
+            if linkedEntry.id != entry.id, hasDisplayableSense(linkedEntry) {
                 let displayWord = await DictionaryDisplayLocalization.translateEntryWord(
                     word,
                     locale: locale,
@@ -183,6 +183,14 @@ public final class WordDetailViewModel {
         }
 
         return (openable, wordMap)
+    }
+
+    private func hasDisplayableSense(_ entry: DictionaryEntry) -> Bool {
+        entry.senses.contains { sense in
+            !sense.partOfSpeech.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                || !sense.definition.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                || !sense.examples.isEmpty
+        }
     }
 }
 

@@ -32,6 +32,29 @@ final class WordDetailViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.openableWords, ["字典"])
     }
 
+    func testPrepareDoesNotOpenLinkedRelationshipWordWithoutSenses() async {
+        let primary = entry(
+            id: 1,
+            hanji: "有義項",
+            romanization: "ū-gī-hāng",
+            wordSynonyms: ["無義項"]
+        )
+        let linkedWithoutSenses = entry(
+            id: 2,
+            hanji: "無義項",
+            romanization: "bô-gī-hāng",
+            hasSenses: false
+        )
+        let repository = InMemoryRepository(entries: [primary, linkedWithoutSenses])
+        let viewModel = WordDetailViewModel(library: DictionaryLibrary(repository: repository))
+
+        await viewModel.prepare(entry: primary)
+
+        XCTAssertFalse(viewModel.openableWords.contains("無義項"))
+        let linkedEntry = await viewModel.linkedEntry(for: "無義項")
+        XCTAssertNil(linkedEntry)
+    }
+
     func testPlayWordAudioUpdatesAudioMessage() async {
         let primary = entry(id: 10, hanji: "辭典", romanization: "sû-tián", definition: "工具書")
         var withAudio = primary
@@ -169,7 +192,8 @@ private func entry(
     definition: String = "",
     variantChars: [String] = [],
     wordSynonyms: [String] = [],
-    aliasTargetEntryID: Int64? = nil
+    aliasTargetEntryID: Int64? = nil,
+    hasSenses: Bool = true
 ) -> DictionaryEntry {
     DictionaryEntry(
         id: id,
@@ -183,8 +207,8 @@ private func entry(
         variantChars: variantChars,
         wordSynonyms: wordSynonyms,
         aliasTargetEntryID: aliasTargetEntryID,
-        senses: [
+        senses: hasSenses ? [
             DictionarySense(partOfSpeech: "名詞", definition: definition),
-        ]
+        ] : []
     )
 }
