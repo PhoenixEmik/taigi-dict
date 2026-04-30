@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "swiftyopencc",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/PhoenixEmik/SwiftyOpenCC.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "53f200cebe40eade3ebda025b0e8980e08cf23fa"
+      }
+    }
+  ],
+  "version" : 2
+}
