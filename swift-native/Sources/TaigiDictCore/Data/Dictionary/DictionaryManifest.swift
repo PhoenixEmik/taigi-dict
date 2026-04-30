@@ -3,6 +3,7 @@ import Foundation
 public struct DictionaryManifest: Codable, Equatable, Sendable {
     public var schemaVersion: Int
     public var builtAt: String
+    public var source: String?
     public var sourceModifiedAt: String?
     public var entryCount: Int
     public var senseCount: Int
@@ -13,6 +14,7 @@ public struct DictionaryManifest: Codable, Equatable, Sendable {
     public init(
         schemaVersion: Int,
         builtAt: String,
+        source: String? = nil,
         sourceModifiedAt: String? = nil,
         entryCount: Int,
         senseCount: Int,
@@ -22,6 +24,7 @@ public struct DictionaryManifest: Codable, Equatable, Sendable {
     ) {
         self.schemaVersion = schemaVersion
         self.builtAt = builtAt
+        self.source = source
         self.sourceModifiedAt = sourceModifiedAt
         self.entryCount = entryCount
         self.senseCount = senseCount
