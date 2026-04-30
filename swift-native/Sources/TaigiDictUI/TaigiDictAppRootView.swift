@@ -5,6 +5,7 @@ public struct TaigiDictAppRootView: View {
     @State private var viewModel: DictionarySearchViewModel
     @State private var initializationViewModel = InitializationViewModel()
     @State private var bookmarkStore = BookmarkStore()
+    @State private var offlineAudioStore: OfflineAudioStore
     @State private var appSettings = AppSettingsSnapshot()
     @State private var hasLoadedAppSettings = false
 
@@ -15,6 +16,7 @@ public struct TaigiDictAppRootView: View {
         settingsStore: any AppSettingsStoring = UserDefaultsAppSettingsStore()
     ) {
         _viewModel = State(initialValue: DictionarySearchViewModel(repository: repository))
+        _offlineAudioStore = State(initialValue: Self.makeOfflineAudioStore())
         self.settingsStore = settingsStore
     }
 
@@ -42,19 +44,28 @@ public struct TaigiDictAppRootView: View {
 
     private var mainTabView: some View {
         TabView {
-            DictionarySearchScreen(viewModel: viewModel, bookmarkStore: bookmarkStore)
+            DictionarySearchScreen(
+                viewModel: viewModel,
+                bookmarkStore: bookmarkStore,
+                offlineAudioStore: offlineAudioStore
+            )
                 .tabItem {
                     Label("辭典", systemImage: "book")
                 }
 
-            BookmarksScreen(library: viewModel.library, bookmarkStore: bookmarkStore)
+            BookmarksScreen(
+                library: viewModel.library,
+                bookmarkStore: bookmarkStore,
+                offlineAudioStore: offlineAudioStore
+            )
             .tabItem {
                 Label("書籤", systemImage: "bookmark")
             }
 
             SettingsScreen(
                 library: viewModel.library,
-                settingsStore: settingsStore
+                settingsStore: settingsStore,
+                offlineAudioStore: offlineAudioStore
             ) {
                 Task { @MainActor in
                     await viewModel.resetAfterMaintenance()
@@ -76,6 +87,20 @@ public struct TaigiDictAppRootView: View {
 
         hasLoadedAppSettings = true
         appSettings = await settingsStore.load()
+    }
+
+    private static func makeOfflineAudioStore() -> OfflineAudioStore {
+        let baseDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? FileManager.default.temporaryDirectory
+
+        let storage = AudioArchiveStorage(
+            rootDirectory: baseDirectory
+                .appendingPathComponent("TaigiDictNative", isDirectory: true)
+                .appendingPathComponent("Audio", isDirectory: true)
+        )
+        try? storage.ensureDirectories()
+
+        return OfflineAudioStore(storage: storage)
     }
 }
 

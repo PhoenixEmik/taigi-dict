@@ -1,6 +1,6 @@
 import Foundation
 
-public actor OfflineAudioStore {
+public actor OfflineAudioStore: OfflineAudioManaging {
     private let downloadService: any ResumableDownloading
     private let storage: any AudioArchiveStoring
     private let zipIndexer: any AudioZipIndexing

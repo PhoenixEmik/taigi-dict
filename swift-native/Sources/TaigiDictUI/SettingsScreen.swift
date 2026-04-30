@@ -9,13 +9,15 @@ public struct SettingsScreen: View {
     public init(
         library: DictionaryLibrary,
         settingsStore: any AppSettingsStoring = UserDefaultsAppSettingsStore(),
+        offlineAudioStore: (any OfflineAudioManaging)? = nil,
         onMaintenanceCompleted: @escaping () -> Void = {},
         onSettingsChanged: @escaping (AppSettingsSnapshot) -> Void = { _ in }
     ) {
         _viewModel = State(
             initialValue: SettingsViewModel(
                 library: library,
-                settingsStore: settingsStore
+                settingsStore: settingsStore,
+                offlineAudioStore: offlineAudioStore
             )
         )
         self.onMaintenanceCompleted = onMaintenanceCompleted
@@ -105,12 +107,40 @@ public struct SettingsScreen: View {
                         Label("參考資料", systemImage: "text.book.closed")
                     }
                 }
+
+                Section("離線音訊資源") {
+                    AudioArchiveResourceRow(
+                        title: "詞目音檔",
+                        snapshot: viewModel.snapshot(for: .word),
+                        isRunningAction: viewModel.isAudioActionRunning(for: .word)
+                    ) { action in
+                        Task {
+                            await viewModel.runAudioAction(action, for: .word)
+                        }
+                    }
+
+                    AudioArchiveResourceRow(
+                        title: "例句音檔",
+                        snapshot: viewModel.snapshot(for: .sentence),
+                        isRunningAction: viewModel.isAudioActionRunning(for: .sentence)
+                    ) { action in
+                        Task {
+                            await viewModel.runAudioAction(action, for: .sentence)
+                        }
+                    }
+                }
             }
             .navigationTitle("設定")
         }
         .task {
             await viewModel.loadCapabilities()
             onSettingsChanged(viewModel.currentSettingsSnapshot)
+        }
+        .onAppear {
+            viewModel.startAudioSnapshotPolling()
+        }
+        .onDisappear {
+            viewModel.stopAudioSnapshotPolling()
         }
         .confirmationDialog(
             "確定要清除本機辭典資料？",
@@ -136,6 +166,93 @@ public struct SettingsScreen: View {
             }
         } message: {
             Text("清除後會移除本機資料，下次使用前會重新初始化。")
+        }
+    }
+}
+
+private struct AudioArchiveResourceRow: View {
+    let title: String
+    let snapshot: DownloadSnapshot
+    let isRunningAction: Bool
+    let runAction: (SettingsViewModel.AudioResourceAction) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(title)
+                Spacer()
+                if isRunningAction {
+                    ProgressView()
+                        .controlSize(.small)
+                }
+            }
+
+            Text(snapshotDescription)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+
+            if let progress = snapshot.progress {
+                ProgressView(value: progress)
+            }
+
+            HStack {
+                ForEach(availableActions, id: \.self) { action in
+                    Button(action.buttonTitle) {
+                        runAction(action)
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(isRunningAction)
+                }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var availableActions: [SettingsViewModel.AudioResourceAction] {
+        switch snapshot.state {
+        case .idle:
+            return [.start]
+        case .downloading:
+            return [.pause, .restart]
+        case .paused:
+            return [.resume, .restart]
+        case .completed:
+            return [.restart]
+        case .failed:
+            return [.restart]
+        }
+    }
+
+    private var snapshotDescription: String {
+        let downloaded = ByteCountFormatter.string(fromByteCount: snapshot.downloadedBytes, countStyle: .file)
+        let total = snapshot.totalBytes.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) } ?? "--"
+
+        switch snapshot.state {
+        case .idle:
+            return "尚未下載"
+        case .downloading:
+            return "下載中 · \(downloaded) / \(total)"
+        case .paused:
+            return "已暫停 · \(downloaded) / \(total)"
+        case .completed:
+            return "已完成 · \(downloaded)"
+        case .failed(let message):
+            return "失敗 · \(message)"
+        }
+    }
+}
+
+private extension SettingsViewModel.AudioResourceAction {
+    var buttonTitle: String {
+        switch self {
+        case .start:
+            return "下載"
+        case .pause:
+            return "暫停"
+        case .resume:
+            return "續傳"
+        case .restart:
+            return "重下載"
         }
     }
 }

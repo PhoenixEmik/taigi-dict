@@ -31,6 +31,50 @@ final class WordDetailViewModelTests: XCTestCase {
 
         XCTAssertEqual(viewModel.openableWords, ["字典"])
     }
+
+    func testPlayWordAudioUpdatesAudioMessage() async {
+        let primary = entry(id: 10, hanji: "辭典", romanization: "sû-tián", definition: "工具書")
+        var withAudio = primary
+        withAudio.audioID = "1(1)"
+
+        let repository = InMemoryRepository(entries: [withAudio])
+        let audioStore = TestOfflineAudioManager()
+        let viewModel = WordDetailViewModel(
+            library: DictionaryLibrary(repository: repository),
+            offlineAudioStore: audioStore
+        )
+
+        _ = await viewModel.prepare(entry: withAudio)
+        await viewModel.playWordAudio()
+
+        XCTAssertEqual(viewModel.audioMessage, "播放中")
+    }
+}
+
+private actor TestOfflineAudioManager: OfflineAudioManaging {
+    private var playingClipID: String?
+
+    func snapshot(for type: AudioArchiveType) async -> DownloadSnapshot {
+        DownloadSnapshot(state: .idle)
+    }
+
+    func startDownload(_ type: AudioArchiveType) async {}
+    func pauseDownload(_ type: AudioArchiveType) async {}
+    func resumeDownload(_ type: AudioArchiveType) async {}
+    func restartDownload(_ type: AudioArchiveType) async {}
+
+    func playClip(_ clipID: String, from type: AudioArchiveType) async throws {
+        let fullID = "\(type.rawValue):\(clipID)"
+        if playingClipID == fullID {
+            playingClipID = nil
+        } else {
+            playingClipID = fullID
+        }
+    }
+
+    func currentlyPlayingClipID() async -> String? {
+        playingClipID
+    }
 }
 
 private actor InMemoryRepository: DictionaryRepositoryProtocol {

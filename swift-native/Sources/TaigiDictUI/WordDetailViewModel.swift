@@ -10,11 +10,17 @@ public final class WordDetailViewModel {
     public private(set) var openableWords: Set<String> = []
     public private(set) var isPreparing = false
     public private(set) var errorMessage: String?
+    public private(set) var audioMessage: String?
 
     private let library: DictionaryLibrary
+    private let offlineAudioStore: (any OfflineAudioManaging)?
 
-    public init(library: DictionaryLibrary) {
+    public init(
+        library: DictionaryLibrary,
+        offlineAudioStore: (any OfflineAudioManaging)? = nil
+    ) {
         self.library = library
+        self.offlineAudioStore = offlineAudioStore
     }
 
     public func prepare(entry sourceEntry: DictionaryEntry) async {
@@ -63,6 +69,43 @@ public final class WordDetailViewModel {
         }
 
         return lines.joined(separator: "\n")
+    }
+
+    public func playWordAudio() async {
+        guard let entry else {
+            return
+        }
+
+        await playAudioClip(entry.audioID, archiveType: .word)
+    }
+
+    public func playExampleAudio(_ example: DictionaryExample) async {
+        await playAudioClip(example.audioID, archiveType: .sentence)
+    }
+
+    private func playAudioClip(_ clipID: String, archiveType: AudioArchiveType) async {
+        let normalized = clipID.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalized.isEmpty else {
+            audioMessage = "此筆資料沒有可播放的音檔。"
+            return
+        }
+
+        guard let offlineAudioStore else {
+            audioMessage = "離線音訊尚未初始化。"
+            return
+        }
+
+        do {
+            try await offlineAudioStore.playClip(normalized, from: archiveType)
+            let expectedClipID = "\(archiveType.rawValue):\(normalized)"
+            if await offlineAudioStore.currentlyPlayingClipID() == expectedClipID {
+                audioMessage = "播放中"
+            } else {
+                audioMessage = "已停止播放"
+            }
+        } catch {
+            audioMessage = "播放失敗：\(error.localizedDescription)"
+        }
     }
 
     private func resolveAliasChain(from sourceEntry: DictionaryEntry) async throws -> DictionaryEntry {

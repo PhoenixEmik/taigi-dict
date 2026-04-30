@@ -22,18 +22,25 @@ public final class SettingsViewModel {
     public private(set) var metadataBuiltAtDisplay: String?
     public private(set) var metadataSourceModifiedAtDisplay: String?
     public private(set) var isClearConfirmationPresented = false
+    public private(set) var wordAudioSnapshot = DownloadSnapshot()
+    public private(set) var sentenceAudioSnapshot = DownloadSnapshot()
+    public private(set) var activeAudioActions = Set<AudioArchiveType>()
 
     private let library: DictionaryLibrary
     private let dateFormatter: any SettingsDateFormatting
     private let settingsStore: any AppSettingsStoring
+    private let offlineAudioStore: (any OfflineAudioManaging)?
+    private var audioPollingTask: Task<Void, Never>?
 
     public init(
         library: DictionaryLibrary,
         settingsStore: any AppSettingsStoring = UserDefaultsAppSettingsStore(),
+        offlineAudioStore: (any OfflineAudioManaging)? = nil,
         dateFormatter: any SettingsDateFormatting = SettingsDateFormatter()
     ) {
         self.library = library
         self.settingsStore = settingsStore
+        self.offlineAudioStore = offlineAudioStore
         self.dateFormatter = dateFormatter
     }
 
@@ -65,6 +72,7 @@ public final class SettingsViewModel {
         readingTextScale = settings.readingTextScale
 
         supportsDataMaintenance = await library.supportsLocalMaintenance()
+        await refreshAudioSnapshots()
         librarySummary = await library.currentSummary()
         libraryMetadata = try? await library.metadata()
         refreshMetadataDisplay()
@@ -82,6 +90,67 @@ public final class SettingsViewModel {
                 break
             }
         }
+    }
+
+    public func startAudioSnapshotPolling() {
+        audioPollingTask?.cancel()
+        audioPollingTask = Task { [weak self] in
+            while !Task.isCancelled {
+                await self?.refreshAudioSnapshots()
+                try? await Task.sleep(for: .seconds(1))
+            }
+        }
+    }
+
+    public func stopAudioSnapshotPolling() {
+        audioPollingTask?.cancel()
+        audioPollingTask = nil
+    }
+
+    public func refreshAudioSnapshots() async {
+        guard let offlineAudioStore else {
+            wordAudioSnapshot = DownloadSnapshot()
+            sentenceAudioSnapshot = DownloadSnapshot()
+            return
+        }
+
+        wordAudioSnapshot = await offlineAudioStore.snapshot(for: .word)
+        sentenceAudioSnapshot = await offlineAudioStore.snapshot(for: .sentence)
+    }
+
+    public func runAudioAction(_ action: AudioResourceAction, for type: AudioArchiveType) async {
+        guard let offlineAudioStore, !activeAudioActions.contains(type) else {
+            return
+        }
+
+        activeAudioActions.insert(type)
+        defer { activeAudioActions.remove(type) }
+
+        switch action {
+        case .start:
+            await offlineAudioStore.startDownload(type)
+        case .pause:
+            await offlineAudioStore.pauseDownload(type)
+        case .resume:
+            await offlineAudioStore.resumeDownload(type)
+        case .restart:
+            await offlineAudioStore.restartDownload(type)
+        }
+
+        await refreshAudioSnapshots()
+    }
+
+    public func snapshot(for type: AudioArchiveType) -> DownloadSnapshot {
+        switch type {
+        case .word:
+            return wordAudioSnapshot
+        case .sentence:
+            return sentenceAudioSnapshot
+        }
+    }
+
+    public func isAudioActionRunning(for type: AudioArchiveType) -> Bool {
+        activeAudioActions.contains(type)
     }
 
     public func setLocale(_ locale: AppLocale) async {
@@ -170,5 +239,14 @@ public final class SettingsViewModel {
     private func refreshMetadataDisplay() {
         metadataBuiltAtDisplay = dateFormatter.displayString(from: libraryMetadata?.builtAt)
         metadataSourceModifiedAtDisplay = dateFormatter.displayString(from: libraryMetadata?.sourceModifiedAt)
+    }
+}
+
+public extension SettingsViewModel {
+    enum AudioResourceAction: Sendable {
+        case start
+        case pause
+        case resume
+        case restart
     }
 }

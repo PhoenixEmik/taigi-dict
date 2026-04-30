@@ -5,6 +5,7 @@ struct DictionaryDetailView: View {
     var sourceEntry: DictionaryEntry?
     var openEntry: (DictionaryEntry) -> Void
     private let bookmarkStore: (any BookmarksStoreProtocol)?
+    private let offlineAudioStore: (any OfflineAudioManaging)?
 
     @State private var viewModel: WordDetailViewModel
     @State private var isBookmarked = false
@@ -13,12 +14,14 @@ struct DictionaryDetailView: View {
         entry: DictionaryEntry?,
         library: DictionaryLibrary,
         bookmarkStore: (any BookmarksStoreProtocol)? = nil,
+        offlineAudioStore: (any OfflineAudioManaging)? = nil,
         openEntry: @escaping (DictionaryEntry) -> Void
     ) {
         self.sourceEntry = entry
         self.openEntry = openEntry
         self.bookmarkStore = bookmarkStore
-        _viewModel = State(initialValue: WordDetailViewModel(library: library))
+        self.offlineAudioStore = offlineAudioStore
+        _viewModel = State(initialValue: WordDetailViewModel(library: library, offlineAudioStore: offlineAudioStore))
     }
 
     var body: some View {
@@ -50,6 +53,17 @@ struct DictionaryDetailView: View {
                             Text([entry.type, entry.category].filter { !$0.isEmpty }.joined(separator: " · "))
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
+                        }
+
+                        if !entry.audioID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            Button {
+                                Task {
+                                    await viewModel.playWordAudio()
+                                }
+                            } label: {
+                                Label("播放詞目音檔", systemImage: "speaker.wave.2.fill")
+                            }
+                            .buttonStyle(.borderless)
                         }
                     }
                     .accessibilityElement(children: .combine)
@@ -97,17 +111,43 @@ struct DictionaryDetailView: View {
                         )
 
                         ForEach(Array(sense.examples.enumerated()), id: \.offset) { _, example in
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(example.hanji)
-                                Text(example.romanization)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                Text(example.mandarin)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack(alignment: .top, spacing: 12) {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(example.hanji)
+                                        Text(example.romanization)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                        Text(example.mandarin)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                    }
+
+                                    Spacer(minLength: 0)
+
+                                    if !example.audioID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                        Button {
+                                            Task {
+                                                await viewModel.playExampleAudio(example)
+                                            }
+                                        } label: {
+                                            Image(systemName: "speaker.wave.2")
+                                        }
+                                        .buttonStyle(.borderless)
+                                        .accessibilityLabel("播放例句音檔")
+                                    }
+                                }
                             }
                             .accessibilityElement(children: .combine)
                         }
+                    }
+                }
+
+                if let audioMessage = viewModel.audioMessage {
+                    Section("音訊") {
+                        Text(audioMessage)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
                 }
 

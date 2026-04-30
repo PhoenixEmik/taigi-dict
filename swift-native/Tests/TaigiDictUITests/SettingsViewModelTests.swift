@@ -135,6 +135,40 @@ final class SettingsViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.isClearConfirmationPresented)
         XCTAssertEqual(clearInstalledCount, 1)
     }
+
+    func testLoadCapabilitiesReadsAudioSnapshots() async {
+        let repository = SettingsRepository(supportsMaintenance: true)
+        let audioStore = TestSettingsOfflineAudioManager(
+            wordSnapshot: DownloadSnapshot(state: .completed, downloadedBytes: 10, totalBytes: 10),
+            sentenceSnapshot: DownloadSnapshot(state: .paused, downloadedBytes: 3, totalBytes: 10)
+        )
+        let viewModel = SettingsViewModel(
+            library: DictionaryLibrary(repository: repository),
+            offlineAudioStore: audioStore
+        )
+
+        await viewModel.loadCapabilities()
+
+        XCTAssertEqual(viewModel.wordAudioSnapshot.state, .completed)
+        XCTAssertEqual(viewModel.sentenceAudioSnapshot.state, .paused)
+    }
+
+    func testRunAudioActionRefreshesSnapshots() async {
+        let repository = SettingsRepository(supportsMaintenance: true)
+        let audioStore = TestSettingsOfflineAudioManager(
+            wordSnapshot: DownloadSnapshot(state: .idle),
+            sentenceSnapshot: DownloadSnapshot(state: .idle)
+        )
+        let viewModel = SettingsViewModel(
+            library: DictionaryLibrary(repository: repository),
+            offlineAudioStore: audioStore
+        )
+
+        await viewModel.runAudioAction(.start, for: .word)
+
+        XCTAssertEqual(viewModel.wordAudioSnapshot.state, .downloading)
+        XCTAssertFalse(viewModel.isAudioActionRunning(for: .word))
+    }
 }
 
 private struct FakeDateFormatter: SettingsDateFormatting {
@@ -226,5 +260,55 @@ private actor TestAppSettingsStore: AppSettingsStoring {
 
     func setReadingTextScale(_ value: Double) async {
         snapshot.readingTextScale = AppSettingsSnapshot.snapReadingTextScale(value)
+    }
+}
+
+private actor TestSettingsOfflineAudioManager: OfflineAudioManaging {
+    private var wordSnapshot: DownloadSnapshot
+    private var sentenceSnapshot: DownloadSnapshot
+
+    init(wordSnapshot: DownloadSnapshot, sentenceSnapshot: DownloadSnapshot) {
+        self.wordSnapshot = wordSnapshot
+        self.sentenceSnapshot = sentenceSnapshot
+    }
+
+    func snapshot(for type: AudioArchiveType) async -> DownloadSnapshot {
+        switch type {
+        case .word:
+            return wordSnapshot
+        case .sentence:
+            return sentenceSnapshot
+        }
+    }
+
+    func startDownload(_ type: AudioArchiveType) async {
+        updateSnapshot(type, state: .downloading)
+    }
+
+    func pauseDownload(_ type: AudioArchiveType) async {
+        updateSnapshot(type, state: .paused)
+    }
+
+    func resumeDownload(_ type: AudioArchiveType) async {
+        updateSnapshot(type, state: .downloading)
+    }
+
+    func restartDownload(_ type: AudioArchiveType) async {
+        updateSnapshot(type, state: .downloading)
+    }
+
+    func playClip(_ clipID: String, from type: AudioArchiveType) async throws {}
+
+    func currentlyPlayingClipID() async -> String? {
+        nil
+    }
+
+    private func updateSnapshot(_ type: AudioArchiveType, state: DownloadSnapshot.State) {
+        switch type {
+        case .word:
+            wordSnapshot.state = state
+        case .sentence:
+            sentenceSnapshot.state = state
+        }
     }
 }

@@ -5,13 +5,16 @@ public struct DictionarySearchScreen: View {
     @Bindable private var viewModel: DictionarySearchViewModel
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     private let bookmarkStore: (any BookmarksStoreProtocol)?
+    private let offlineAudioStore: (any OfflineAudioManaging)?
 
     public init(
         viewModel: DictionarySearchViewModel,
-        bookmarkStore: (any BookmarksStoreProtocol)? = nil
+        bookmarkStore: (any BookmarksStoreProtocol)? = nil,
+        offlineAudioStore: (any OfflineAudioManaging)? = nil
     ) {
         _viewModel = Bindable(viewModel)
         self.bookmarkStore = bookmarkStore
+        self.offlineAudioStore = offlineAudioStore
     }
 
     public var body: some View {
@@ -23,7 +26,8 @@ public struct DictionarySearchScreen: View {
                 DictionaryDetailView(
                     entry: viewModel.selectedEntry,
                     library: viewModel.library,
-                    bookmarkStore: bookmarkStore
+                    bookmarkStore: bookmarkStore,
+                    offlineAudioStore: offlineAudioStore
                 ) { entry in
                     viewModel.select(entry)
                 }
@@ -37,7 +41,8 @@ public struct DictionarySearchScreen: View {
                         DictionaryDetailView(
                             entry: entry,
                             library: viewModel.library,
-                            bookmarkStore: bookmarkStore
+                            bookmarkStore: bookmarkStore,
+                            offlineAudioStore: offlineAudioStore
                         ) { linkedEntry in
                             viewModel.select(linkedEntry)
                         }
