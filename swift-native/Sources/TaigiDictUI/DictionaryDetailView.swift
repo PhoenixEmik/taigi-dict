@@ -63,7 +63,6 @@ struct DictionaryDetailView: View {
                             } label: {
                                 Label("播放詞目音檔", systemImage: "speaker.wave.2.fill")
                             }
-                            .buttonStyle(.borderless)
                         }
                     }
                     .accessibilityElement(children: .combine)
@@ -133,7 +132,6 @@ struct DictionaryDetailView: View {
                                         } label: {
                                             Image(systemName: "speaker.wave.2")
                                         }
-                                        .buttonStyle(.borderless)
                                         .accessibilityLabel("播放例句音檔")
                                     }
                                 }

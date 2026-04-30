@@ -72,8 +72,9 @@ struct AdvancedSettingsScreen: View {
 
             if let statusMessage = viewModel.statusMessage {
                 Section("狀態") {
-                    Text(statusMessage)
-                        .foregroundStyle(.green)
+                    Label(statusMessage, systemImage: "checkmark.circle.fill")
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(.tint)
                 }
             }
 

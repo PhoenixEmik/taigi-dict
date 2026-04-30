@@ -52,11 +52,6 @@ struct DictionarySearchListView: View {
                             DictionaryEntryRowView(entry: entry)
                         }
                         .foregroundStyle(.primary)
-                        .listRowBackground(
-                            showsSelection && viewModel.selectedEntry?.id == entry.id
-                                ? Color.accentColor.opacity(0.12)
-                                : nil
-                        )
                     }
                 }
             }

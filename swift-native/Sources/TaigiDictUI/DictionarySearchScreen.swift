@@ -47,7 +47,9 @@ public struct DictionarySearchScreen: View {
                             viewModel.select(linkedEntry)
                         }
                         .navigationTitle(entry.hanji)
-                        .taigiInlineNavigationTitle()
+                        #if os(iOS)
+                        .navigationBarTitleDisplayMode(.inline)
+                        #endif
                     }
             }
         }
