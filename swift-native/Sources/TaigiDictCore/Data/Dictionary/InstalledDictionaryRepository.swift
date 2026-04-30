@@ -2,6 +2,7 @@ import Foundation
 
 public actor InstalledDictionaryRepository: DictionaryRepositoryProtocol {
     private let sourceDirectory: URL
+    private let fallbackSourceDirectory: URL?
     private let installedDirectory: URL
     private let fileManager: FileManager
     private let decoder: JSONDecoder
@@ -12,12 +13,14 @@ public actor InstalledDictionaryRepository: DictionaryRepositoryProtocol {
     public init(
         sourceDirectory: URL,
         installedDirectory: URL,
+        fallbackSourceDirectory: URL? = nil,
         fileManager: FileManager = .default,
         decoder: JSONDecoder = JSONDecoder(),
         encoder: JSONEncoder = JSONEncoder(),
         importService: DictionaryImportService = DictionaryImportService()
     ) {
         self.sourceDirectory = sourceDirectory
+        self.fallbackSourceDirectory = fallbackSourceDirectory
         self.installedDirectory = installedDirectory
         self.fileManager = fileManager
         self.decoder = decoder
@@ -77,6 +80,7 @@ public actor InstalledDictionaryRepository: DictionaryRepositoryProtocol {
     }
 
     public func rebuildInstalledDatabase() async throws {
+        try restoreSourceFromFallbackIfNeeded()
         let sourceManifestURL = sourceDirectory.appendingPathComponent("dictionary_manifest.json")
         let sourceManifest = try loadManifest(at: sourceManifestURL)
         try await installFromSource(manifest: sourceManifest, onProgress: nil)
@@ -96,6 +100,7 @@ public actor InstalledDictionaryRepository: DictionaryRepositoryProtocol {
     private func prepareInstalledPackage(
         onProgress: (@Sendable (DictionaryPreparationProgress) async -> Void)?
     ) async throws {
+        try restoreSourceFromFallbackIfNeeded()
         let sourceManifestURL = sourceDirectory.appendingPathComponent("dictionary_manifest.json")
 
         if let onProgress {
@@ -184,6 +189,30 @@ public actor InstalledDictionaryRepository: DictionaryRepositoryProtocol {
 
     private func loadManifest(at url: URL) throws -> DictionaryManifest {
         try decoder.decode(DictionaryManifest.self, from: Data(contentsOf: url))
+    }
+
+    private func restoreSourceFromFallbackIfNeeded() throws {
+        let sourceManifestURL = sourceDirectory.appendingPathComponent("dictionary_manifest.json")
+        guard !fileManager.fileExists(atPath: sourceManifestURL.path), let fallbackSourceDirectory else {
+            return
+        }
+
+        let fallbackManifestURL = fallbackSourceDirectory.appendingPathComponent("dictionary_manifest.json")
+        let manifest = try loadManifest(at: fallbackManifestURL)
+        let fallbackEntriesURL = fallbackSourceDirectory.appendingPathComponent(manifest.entriesFileName)
+        guard fileManager.fileExists(atPath: fallbackEntriesURL.path) else {
+            throw DictionaryPackageLoaderError.missingEntries(fallbackEntriesURL)
+        }
+
+        try fileManager.createDirectory(at: sourceDirectory, withIntermediateDirectories: true)
+        try Data(contentsOf: fallbackManifestURL)
+            .write(to: sourceManifestURL, options: .atomic)
+
+        let sourceEntriesURL = sourceDirectory.appendingPathComponent(manifest.entriesFileName)
+        if fileManager.fileExists(atPath: sourceEntriesURL.path) {
+            try fileManager.removeItem(at: sourceEntriesURL)
+        }
+        try fileManager.copyItem(at: fallbackEntriesURL, to: sourceEntriesURL)
     }
 
     private func installFromSource(

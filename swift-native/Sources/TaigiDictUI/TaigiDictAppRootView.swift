@@ -11,13 +11,16 @@ public struct TaigiDictAppRootView: View {
 
     private let settingsStore: any AppSettingsStoring
     private let conversionService: (any ChineseConversionProviding)?
+    private let dictionarySourceStore: (any DictionarySourceResourceManaging)?
 
     public init(
         repository: any DictionaryRepositoryProtocol,
-        settingsStore: any AppSettingsStoring = UserDefaultsAppSettingsStore()
+        settingsStore: any AppSettingsStoring = UserDefaultsAppSettingsStore(),
+        dictionarySourceStore: (any DictionarySourceResourceManaging)? = nil
     ) {
         let conversionService = Self.makeChineseConversionService()
         self.conversionService = conversionService
+        self.dictionarySourceStore = dictionarySourceStore
         _viewModel = State(initialValue: DictionarySearchViewModel(
             repository: repository,
             conversionService: conversionService
@@ -78,6 +81,7 @@ public struct TaigiDictAppRootView: View {
             SettingsScreen(
                 library: viewModel.library,
                 settingsStore: settingsStore,
+                dictionarySourceStore: dictionarySourceStore,
                 offlineAudioStore: offlineAudioStore
             ) {
                 Task { @MainActor in

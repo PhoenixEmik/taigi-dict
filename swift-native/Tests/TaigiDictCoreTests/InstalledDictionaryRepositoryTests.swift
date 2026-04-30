@@ -41,6 +41,33 @@ final class InstalledDictionaryRepositoryTests: XCTestCase {
         )
     }
 
+    func testInstalledRepositoryRestoresMissingSourceFromFallbackBeforeLoading() async throws {
+        let writableSourceDirectory = try makeTemporaryDirectory().appendingPathComponent("Source", isDirectory: true)
+        let fallbackSourceDirectory = try makeTemporaryDirectory()
+        let installedDirectory = try makeTemporaryDirectory().appendingPathComponent("Installed", isDirectory: true)
+        try writePackage(to: fallbackSourceDirectory)
+
+        let repository = InstalledDictionaryRepository(
+            sourceDirectory: writableSourceDirectory,
+            installedDirectory: installedDirectory,
+            fallbackSourceDirectory: fallbackSourceDirectory
+        )
+
+        let bundle = try await repository.loadBundle()
+
+        XCTAssertEqual(bundle.entryCount, 1)
+        XCTAssertTrue(
+            FileManager.default.fileExists(
+                atPath: writableSourceDirectory.appendingPathComponent("dictionary_manifest.json").path
+            )
+        )
+        XCTAssertTrue(
+            FileManager.default.fileExists(
+                atPath: writableSourceDirectory.appendingPathComponent("dictionary_entries.jsonl").path
+            )
+        )
+    }
+
     func testInstalledRepositoryReportsPreparationProgressAcrossSteps() async throws {
         let sourceDirectory = try makeTemporaryDirectory()
         let installedDirectory = try makeTemporaryDirectory().appendingPathComponent("Installed", isDirectory: true)

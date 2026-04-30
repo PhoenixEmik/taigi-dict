@@ -169,6 +169,20 @@ final class SettingsViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.wordAudioSnapshot.state, .downloading)
         XCTAssertFalse(viewModel.isAudioActionRunning(for: .word))
     }
+
+    func testRunDictionarySourceRestoreRefreshesSnapshot() async {
+        let repository = SettingsRepository(supportsMaintenance: true)
+        let sourceStore = TestDictionarySourceResourceManager()
+        let viewModel = SettingsViewModel(
+            library: DictionaryLibrary(repository: repository),
+            dictionarySourceStore: sourceStore
+        )
+
+        await viewModel.runDictionarySourceAction(.restore)
+
+        XCTAssertEqual(viewModel.dictionarySourceSnapshot.state, .completed)
+        XCTAssertFalse(viewModel.isDictionarySourceActionRunning)
+    }
 }
 
 private struct FakeDateFormatter: SettingsDateFormatting {
@@ -310,5 +324,21 @@ private actor TestSettingsOfflineAudioManager: OfflineAudioManaging {
         case .sentence:
             sentenceSnapshot.state = state
         }
+    }
+}
+
+private actor TestDictionarySourceResourceManager: DictionarySourceResourceManaging {
+    private var currentSnapshot = DownloadSnapshot(state: .idle)
+
+    func snapshot() async -> DownloadSnapshot {
+        currentSnapshot
+    }
+
+    func restoreBundledSource() async {
+        currentSnapshot = DownloadSnapshot(state: .completed, downloadedBytes: 100, totalBytes: 100)
+    }
+
+    func downloadSource() async {
+        currentSnapshot = DownloadSnapshot(state: .completed, downloadedBytes: 100, totalBytes: 100)
     }
 }

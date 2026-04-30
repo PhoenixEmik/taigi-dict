@@ -60,6 +60,10 @@ public enum AppLocalizedStringKey: String {
     case settingsAbout
     case settingsLicenses
     case settingsReferences
+    case settingsDictionaryResourcesSection
+    case settingsDictionarySource
+    case dictionarySourceActionRestore
+    case dictionarySourceActionDownload
     case settingsOfflineAudioSection
     case settingsWordAudio
     case settingsSentenceAudio
@@ -247,6 +251,10 @@ enum AppLocalizer {
         case .settingsAbout: return "關於"
         case .settingsLicenses: return "授權資訊"
         case .settingsReferences: return "參考資料"
+        case .settingsDictionaryResourcesSection: return "離線辭典資源"
+        case .settingsDictionarySource: return "辭典來源資料"
+        case .dictionarySourceActionRestore: return "從 App 還原"
+        case .dictionarySourceActionDownload: return "下載最新版"
         case .settingsOfflineAudioSection: return "離線音訊資源"
         case .settingsWordAudio: return "詞目音檔"
         case .settingsSentenceAudio: return "例句音檔"
@@ -392,6 +400,10 @@ enum AppLocalizer {
         case .settingsAbout: return "关于"
         case .settingsLicenses: return "授权资讯"
         case .settingsReferences: return "参考资料"
+        case .settingsDictionaryResourcesSection: return "离线辞典资源"
+        case .settingsDictionarySource: return "辞典来源资料"
+        case .dictionarySourceActionRestore: return "从 App 还原"
+        case .dictionarySourceActionDownload: return "下载最新版"
         case .settingsOfflineAudioSection: return "离线音讯资源"
         case .settingsWordAudio: return "词目音档"
         case .settingsSentenceAudio: return "例句音档"
@@ -537,6 +549,10 @@ enum AppLocalizer {
         case .settingsAbout: return "About"
         case .settingsLicenses: return "License info"
         case .settingsReferences: return "References"
+        case .settingsDictionaryResourcesSection: return "Offline dictionary resources"
+        case .settingsDictionarySource: return "Dictionary source data"
+        case .dictionarySourceActionRestore: return "Restore from app"
+        case .dictionarySourceActionDownload: return "Download latest"
         case .settingsOfflineAudioSection: return "Offline audio resources"
         case .settingsWordAudio: return "Word audio"
         case .settingsSentenceAudio: return "Sentence audio"

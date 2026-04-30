@@ -106,7 +106,7 @@ struct DictionaryDetailView: View {
                 ForEach(Array(entry.senses.enumerated()), id: \.offset) { _, sense in
                     Section(sense.partOfSpeech.isEmpty ? AppLocalizer.text(.definitionFallbackTitle, locale: appLocale) : sense.partOfSpeech) {
                         if !sense.definition.isEmpty {
-                            Text(sense.definition)
+                            LinkedReferenceText(sense.definition, openWord: openLinkedWord)
                         }
 
                         RelationshipSectionContent(
@@ -131,7 +131,7 @@ struct DictionaryDetailView: View {
                                         Text(example.romanization)
                                             .font(.subheadline)
                                             .foregroundStyle(.secondary)
-                                        Text(example.mandarin)
+                                        LinkedReferenceText(example.mandarin, openWord: openLinkedWord)
                                             .font(.subheadline)
                                             .foregroundStyle(.secondary)
                                     }
@@ -263,6 +263,74 @@ private struct RelationshipSection: View {
     private var normalizedWords: [String] {
         words.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
+    }
+}
+
+private struct LinkedReferenceText: View {
+    var text: String
+    var openWord: (String) -> Void
+
+    init(_ text: String, openWord: @escaping (String) -> Void) {
+        self.text = text
+        self.openWord = openWord
+    }
+
+    var body: some View {
+        let segments = DictionaryReferenceParser.segments(from: text)
+        RelationshipChipLayout(spacing: 2) {
+            ForEach(Array(segments.enumerated()), id: \.offset) { _, segment in
+                switch segment {
+                case .text(let value):
+                    Text(value)
+                case .reference(let word):
+                    Button {
+                        openWord(word)
+                    } label: {
+                        Text("【\(word)】")
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.tint)
+                    .accessibilityLabel(word)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+enum DictionaryReferenceTextSegment: Equatable {
+    case text(String)
+    case reference(String)
+}
+
+enum DictionaryReferenceParser {
+    static func segments(from text: String) -> [DictionaryReferenceTextSegment] {
+        var segments: [DictionaryReferenceTextSegment] = []
+        var remaining = text[...]
+
+        while let openRange = remaining.range(of: "【"),
+              let closeRange = remaining[openRange.upperBound...].range(of: "】") {
+            let prefix = remaining[..<openRange.lowerBound]
+            if !prefix.isEmpty {
+                segments.append(.text(String(prefix)))
+            }
+
+            let word = remaining[openRange.upperBound..<closeRange.lowerBound]
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            if word.isEmpty {
+                segments.append(.text("【】"))
+            } else {
+                segments.append(.reference(word))
+            }
+
+            remaining = remaining[closeRange.upperBound...]
+        }
+
+        if !remaining.isEmpty {
+            segments.append(.text(String(remaining)))
+        }
+
+        return segments.isEmpty ? [.text(text)] : segments
     }
 }
 

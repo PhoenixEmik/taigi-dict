@@ -68,6 +68,16 @@ final class InitializationViewModelTests: XCTestCase {
 
         XCTAssertEqual(initializationViewModel.databaseGeneration, 1)
     }
+
+    func testPrepareMapsStepProgressToMonotonicGlobalProgress() async {
+        let searchViewModel = DictionarySearchViewModel(repository: SteppedProgressRepository())
+        let initializationViewModel = InitializationViewModel()
+
+        await initializationViewModel.prepare(using: searchViewModel)
+
+        XCTAssertEqual(initializationViewModel.phase, .ready)
+        XCTAssertEqual(initializationViewModel.progress, 1)
+    }
 }
 
 private actor InMemoryRepository: DictionaryRepositoryProtocol {
@@ -113,6 +123,56 @@ private actor FailingRepository: DictionaryRepositoryProtocol {
         throw NSError(domain: "InitializationViewModelTests", code: 1, userInfo: [
             NSLocalizedDescriptionKey: "injected failure",
         ])
+    }
+
+    func search(_ rawQuery: String, limit: Int, offset: Int) async throws -> [DictionaryEntry] {
+        []
+    }
+
+    func findLinkedEntry(_ rawWord: String) async throws -> DictionaryEntry? {
+        nil
+    }
+
+    func entries(ids: [Int64]) async throws -> [DictionaryEntry] {
+        []
+    }
+
+    func entry(id: Int64) async throws -> DictionaryEntry? {
+        nil
+    }
+
+    func clearBundleCache() async {}
+}
+
+private actor SteppedProgressRepository: DictionaryRepositoryProtocol {
+    func loadBundle() async throws -> DictionaryBundle {
+        DictionaryBundle(entryCount: 0, senseCount: 0, exampleCount: 0, entries: [])
+    }
+
+    func loadBundle(
+        onProgress: (@Sendable (DictionaryPreparationProgress) async -> Void)?
+    ) async throws -> DictionaryBundle {
+        if let onProgress {
+            await onProgress(DictionaryPreparationProgress(
+                step: .checkingPackage,
+                fraction: 1,
+                completedUnits: 1,
+                totalUnits: 1
+            ))
+            await onProgress(DictionaryPreparationProgress(
+                step: .importingDatabase,
+                fraction: 0,
+                completedUnits: 0,
+                totalUnits: 10
+            ))
+            await onProgress(DictionaryPreparationProgress(
+                step: .loadingBundle,
+                fraction: 1,
+                completedUnits: 1,
+                totalUnits: 1
+            ))
+        }
+        return try await loadBundle()
     }
 
     func search(_ rawQuery: String, limit: Int, offset: Int) async throws -> [DictionaryEntry] {

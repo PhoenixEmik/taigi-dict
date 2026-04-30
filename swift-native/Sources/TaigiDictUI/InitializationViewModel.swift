@@ -32,6 +32,7 @@ public final class InitializationViewModel {
     public private(set) var failureReason: FailureReason?
     public private(set) var databaseGeneration = 0
     public private(set) var taskID = UUID()
+    private var maximumProgress = 0.0
 
     public var isReady: Bool {
         phase == .ready
@@ -58,6 +59,7 @@ public final class InitializationViewModel {
         processedUnits = 0
         totalUnits = 1
         progress = 0
+        maximumProgress = 0
         errorMessage = nil
         failureReason = nil
 
@@ -69,7 +71,9 @@ public final class InitializationViewModel {
             await MainActor.run {
                 self.totalUnits = max(update.totalUnits, 1)
                 self.processedUnits = min(update.completedUnits, self.totalUnits)
-                self.progress = min(max(update.fraction, 0), 1)
+                let nextProgress = self.globalProgress(for: update)
+                self.maximumProgress = max(self.maximumProgress, nextProgress)
+                self.progress = self.maximumProgress
             }
         }
 
@@ -98,10 +102,25 @@ public final class InitializationViewModel {
     public func retry() {
         phase = .idle
         progress = nil
+        maximumProgress = 0
         processedUnits = 0
         totalUnits = 0
         errorMessage = nil
         failureReason = nil
         taskID = UUID()
+    }
+
+    private func globalProgress(for update: DictionaryPreparationProgress) -> Double {
+        let range: ClosedRange<Double>
+        switch update.step {
+        case .checkingPackage:
+            range = 0.0...0.08
+        case .importingDatabase:
+            range = 0.08...0.92
+        case .loadingBundle:
+            range = 0.92...1.0
+        }
+
+        return range.lowerBound + update.fraction * (range.upperBound - range.lowerBound)
     }
 }

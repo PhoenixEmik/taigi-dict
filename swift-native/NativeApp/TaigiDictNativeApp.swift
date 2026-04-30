@@ -8,28 +8,41 @@ struct TaigiDictNativeApp: App {
         WindowGroup {
             TaigiDictAppRootView(
                 repository: InstalledDictionaryRepository(
-                    sourceDirectory: Self.dictionaryDirectory,
-                    installedDirectory: Self.installedDictionaryDirectory
+                    sourceDirectory: Self.localDictionarySourceDirectory,
+                    installedDirectory: Self.installedDictionaryDirectory,
+                    fallbackSourceDirectory: Self.bundledDictionaryDirectory
+                ),
+                dictionarySourceStore: DictionarySourceResourceStore(
+                    bundledDirectory: Self.bundledDictionaryDirectory,
+                    localDirectory: Self.localDictionarySourceDirectory
                 )
             )
         }
     }
 
-    private static var dictionaryDirectory: URL {
+    private static var bundledDictionaryDirectory: URL {
         guard let url = Bundle.main.url(forResource: "Dictionary", withExtension: nil) else {
             preconditionFailure("Bundled dictionary package is missing.")
         }
         return url
     }
 
+    private static var localDictionarySourceDirectory: URL {
+        applicationSupportDirectory
+            .appendingPathComponent("TaigiDict/DictionarySource", isDirectory: true)
+    }
+
     private static var installedDictionaryDirectory: URL {
-        let applicationSupportDirectory = FileManager.default.urls(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask
-        ).first!
-        return applicationSupportDirectory.appendingPathComponent(
+        applicationSupportDirectory.appendingPathComponent(
             "TaigiDict/Dictionary",
             isDirectory: true
         )
+    }
+
+    private static var applicationSupportDirectory: URL {
+        FileManager.default.urls(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask
+        ).first!
     }
 }
