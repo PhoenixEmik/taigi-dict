@@ -5,8 +5,24 @@ struct DictionarySearchListView: View {
     @Bindable var viewModel: DictionarySearchViewModel
     var showsSelection: Bool
 
+    private var selectedEntryID: Binding<Int64?> {
+        Binding(
+            get: { viewModel.selectedEntry?.id },
+            set: { newID in
+                guard let newID else {
+                    viewModel.selectedEntry = nil
+                    return
+                }
+
+                if let matched = viewModel.results.first(where: { $0.id == newID }) {
+                    viewModel.selectedEntry = matched
+                }
+            }
+        )
+    }
+
     var body: some View {
-        List {
+        List(selection: showsSelection ? selectedEntryID : .constant(nil)) {
             if viewModel.isLoading {
                 Section {
                     HStack {
@@ -46,12 +62,17 @@ struct DictionarySearchListView: View {
             } else {
                 Section("搜尋結果") {
                     ForEach(viewModel.results) { entry in
-                        Button {
-                            viewModel.select(entry)
-                        } label: {
+                        if showsSelection {
                             DictionaryEntryRowView(entry: entry)
+                                .tag(entry.id)
+                        } else {
+                            Button {
+                                viewModel.select(entry)
+                            } label: {
+                                DictionaryEntryRowView(entry: entry)
+                            }
+                            .foregroundStyle(.primary)
                         }
-                        .foregroundStyle(.primary)
                     }
                 }
             }
