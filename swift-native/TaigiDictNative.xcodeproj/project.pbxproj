@@ -3,19 +3,19 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		8A0000010000000000000001 /* TaigiDictNativeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0000010000000000000002 /* TaigiDictNativeApp.swift */; };
-		8A0000010000000000000003 /* Dictionary in Resources */ = {isa = PBXBuildFile; fileRef = 8A0000010000000000000004 /* Dictionary */; };
+		8A0000010000000000000003 /* Generated/Dictionary in Resources */ = {isa = PBXBuildFile; fileRef = 8A0000010000000000000004 /* Generated/Dictionary */; };
 		8A0000010000000000000005 /* TaigiDictCore in Frameworks */ = {isa = PBXBuildFile; productRef = 8A0000010000000000000006 /* TaigiDictCore */; };
 		8A0000010000000000000007 /* TaigiDictUI in Frameworks */ = {isa = PBXBuildFile; productRef = 8A0000010000000000000008 /* TaigiDictUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		8A0000010000000000000002 /* TaigiDictNativeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaigiDictNativeApp.swift; sourceTree = "<group>"; };
-		8A0000010000000000000004 /* Dictionary */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Generated/Dictionary; sourceTree = SOURCE_ROOT; };
+		8A0000010000000000000004 /* Generated/Dictionary */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Generated/Dictionary; sourceTree = SOURCE_ROOT; };
 		8A0000010000000000000009 /* TaigiDictNative.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TaigiDictNative.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -52,7 +52,7 @@
 		8A000001000000000000000D /* Generated */ = {
 			isa = PBXGroup;
 			children = (
-				8A0000010000000000000004 /* Dictionary */,
+				8A0000010000000000000004 /* Generated/Dictionary */,
 			);
 			path = Generated;
 			sourceTree = "<group>";
@@ -132,7 +132,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8A0000010000000000000003 /* Dictionary in Resources */,
+				8A0000010000000000000003 /* Generated/Dictionary in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,7 +271,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 755TNLRN92;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Taigi Dict";
@@ -287,7 +287,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.2.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.taigidict.native;
+				PRODUCT_BUNDLE_IDENTIFIER = org.taigidict.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -304,7 +304,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 755TNLRN92;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Taigi Dict";
@@ -320,7 +320,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.2.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.taigidict.native;
+				PRODUCT_BUNDLE_IDENTIFIER = org.taigidict.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -334,15 +334,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		8A0000010000000000000014 /* Build configuration list for PBXProject "TaigiDictNative" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8A0000010000000000000016 /* Debug */,
-				8A0000010000000000000017 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		8A0000010000000000000010 /* Build configuration list for PBXNativeTarget "TaigiDictNative" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -352,12 +343,21 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		8A0000010000000000000014 /* Build configuration list for PBXProject "TaigiDictNative" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8A0000010000000000000016 /* Debug */,
+				8A0000010000000000000017 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
 		8A0000010000000000000015 /* XCLocalSwiftPackageReference "." */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ".";
+			relativePath = .;
 		};
 /* End XCLocalSwiftPackageReference section */
 
