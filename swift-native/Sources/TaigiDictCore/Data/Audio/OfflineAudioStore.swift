@@ -8,6 +8,7 @@ public actor OfflineAudioStore: OfflineAudioManaging {
 
     private var snapshots: [AudioArchiveType: DownloadSnapshot] = [:]
     private var indexes: [AudioArchiveType: [String: String]] = [:]
+    private var completedValidationFailures: [AudioArchiveType: DownloadSnapshot] = [:]
 
     public init(
         downloadService: any ResumableDownloading = ResumableDownloadService(),
@@ -22,13 +23,8 @@ public actor OfflineAudioStore: OfflineAudioManaging {
     }
 
     public func snapshot(for type: AudioArchiveType) async -> DownloadSnapshot {
-        if let snapshot = snapshots[type] {
-            return snapshot
-        }
-
-        let value = await downloadService.snapshot(for: type.rawValue)
-        snapshots[type] = value
-        return value
+        await refreshSnapshotAndIndex(type)
+        return snapshots[type] ?? DownloadSnapshot()
     }
 
     public func startDownload(_ type: AudioArchiveType) async {
@@ -51,6 +47,7 @@ public actor OfflineAudioStore: OfflineAudioManaging {
         let archiveURL = storage.archiveURL(for: type)
         await downloadService.restartDownload(id: type.rawValue, from: type.remoteURL, to: archiveURL)
         indexes[type] = nil
+        completedValidationFailures[type] = nil
         try? storage.clearClipCache(for: type)
         await refreshSnapshotAndIndex(type)
     }
@@ -89,6 +86,9 @@ public actor OfflineAudioStore: OfflineAudioManaging {
 
     private func refreshSnapshot(_ type: AudioArchiveType) async {
         snapshots[type] = await downloadService.snapshot(for: type.rawValue)
+        if snapshots[type]?.state != .completed {
+            completedValidationFailures[type] = nil
+        }
     }
 
     private func refreshSnapshotAndIndex(_ type: AudioArchiveType) async {
@@ -97,25 +97,36 @@ public actor OfflineAudioStore: OfflineAudioManaging {
         guard case .completed = snapshots[type]?.state else {
             return
         }
+        if let failure = completedValidationFailures[type] {
+            snapshots[type] = failure
+            return
+        }
+        guard indexes[type] == nil else {
+            return
+        }
 
         do {
             let index = try zipIndexer.buildIndex(for: storage.archiveURL(for: type))
             guard index[type.validationClipID] != nil else {
-                snapshots[type] = DownloadSnapshot(
+                let failure = DownloadSnapshot(
                     state: .failed("missing validation clip \(type.validationClipID)"),
                     downloadedBytes: snapshots[type]?.downloadedBytes ?? 0,
                     totalBytes: snapshots[type]?.totalBytes
                 )
+                completedValidationFailures[type] = failure
+                snapshots[type] = failure
                 return
             }
 
             indexes[type] = index
         } catch {
-            snapshots[type] = DownloadSnapshot(
+            let failure = DownloadSnapshot(
                 state: .failed(error.localizedDescription),
                 downloadedBytes: snapshots[type]?.downloadedBytes ?? 0,
                 totalBytes: snapshots[type]?.totalBytes
             )
+            completedValidationFailures[type] = failure
+            snapshots[type] = failure
         }
     }
 
