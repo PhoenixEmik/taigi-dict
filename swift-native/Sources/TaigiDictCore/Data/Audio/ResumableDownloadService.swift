@@ -112,16 +112,23 @@ public actor ResumableDownloadService: ResumableDownloading {
             }
 
             let (bytes, response) = try await session.bytes(for: request)
-            let appendedTotal = resolveTotalBytes(response: response, currentSize: existingBytes)
+            let resumedResponse = isResumedResponse(response)
+            let shouldAppend = existingBytes > 0 && resumedResponse
+            if existingBytes > 0 && !shouldAppend {
+                try? fileManager.removeItem(at: job.localURL)
+            }
+
+            let baselineBytes: Int64 = shouldAppend ? existingBytes : 0
+            let totalBytes = resolveTotalBytes(response: response, currentSize: baselineBytes)
 
             var snapshot = snapshots[id] ?? DownloadSnapshot()
             snapshot.state = .downloading
-            snapshot.downloadedBytes = existingBytes
-            snapshot.totalBytes = appendedTotal
+            snapshot.downloadedBytes = baselineBytes
+            snapshot.totalBytes = totalBytes
             snapshots[id] = snapshot
 
             let handle: FileHandle
-            if fileManager.fileExists(atPath: job.localURL.path) {
+            if shouldAppend, fileManager.fileExists(atPath: job.localURL.path) {
                 handle = try FileHandle(forWritingTo: job.localURL)
                 try handle.seekToEnd()
             } else {
@@ -164,6 +171,18 @@ public actor ResumableDownloadService: ResumableDownloading {
                 jobs[id] = failedJob
             }
         }
+    }
+
+    private func isResumedResponse(_ response: URLResponse) -> Bool {
+        guard let httpResponse = response as? HTTPURLResponse else {
+            return false
+        }
+
+        if httpResponse.statusCode == 206 {
+            return true
+        }
+
+        return httpResponse.value(forHTTPHeaderField: "Content-Range") != nil
     }
 
     private func ensureParentDirectory(for fileURL: URL) throws {
