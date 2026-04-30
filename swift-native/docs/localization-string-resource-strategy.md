@@ -38,6 +38,11 @@ Use one localization key set for all Swift-native screens and make migration to 
 2. Run `./Scripts/export_xcstrings_skeleton.swift` from `swift-native`.
 3. Commit both source and generated catalog changes together.
 
+## Consistency check workflow
+1. Run `./Scripts/export_xcstrings_skeleton.swift --check` from `swift-native`.
+2. Treat non-zero exit as a release/CI blocker.
+3. If check fails, re-run export and review any missing or extra keys.
+
 ## Validation checklist
 - No hardcoded user-facing strings in `TaigiDictUI` screens for dictionary, bookmarks, initialization, and settings flows.
 - New keys have Traditional Chinese, Simplified Chinese, and English entries.

@@ -9,6 +9,11 @@ struct ParsedLocalizations {
     let en: [String: String]
 }
 
+struct CheckResult {
+    let success: Bool
+    let messages: [String]
+}
+
 enum ExportError: Error, CustomStringConvertible {
     case readFailed(String)
     case writeFailed(String)
@@ -44,6 +49,19 @@ func main() throws {
     }
 
     let parsed = try parseLocalizations(from: source)
+    let arguments = Set(CommandLine.arguments.dropFirst())
+    let checkOnly = arguments.contains("--check")
+
+    if checkOnly {
+        let result = try checkCatalogConsistency(parsed: parsed, catalogPath: outputPath)
+        for message in result.messages {
+            print(message)
+        }
+        if !result.success {
+            exit(2)
+        }
+        return
+    }
 
     var stringsNode: [String: Any] = [:]
     for key in parsed.keys {
@@ -104,6 +122,72 @@ func main() throws {
     if !missingInAnyLocale.isEmpty {
         print("Warning: \(missingInAnyLocale.count) keys were missing in one or more locale tables.")
     }
+}
+
+func checkCatalogConsistency(parsed: ParsedLocalizations, catalogPath: URL) throws -> CheckResult {
+    guard let data = try? Data(contentsOf: catalogPath) else {
+        throw ExportError.readFailed("Failed to read xcstrings file at \(catalogPath.path)")
+    }
+
+    guard
+        let rootObject = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+        let stringsObject = rootObject["strings"] as? [String: Any]
+    else {
+        throw ExportError.invalidSource("Invalid xcstrings structure: missing root strings node")
+    }
+
+    let keySet = Set(parsed.keys)
+    let catalogKeySet = Set(stringsObject.keys)
+
+    let missingInCatalog = keySet.subtracting(catalogKeySet).sorted()
+    let extraInCatalog = catalogKeySet.subtracting(keySet).sorted()
+
+    var messages: [String] = []
+    var hasError = false
+
+    if missingInCatalog.isEmpty {
+        messages.append("Check: no missing keys in catalog.")
+    } else {
+        hasError = true
+        messages.append("Check failed: missing \(missingInCatalog.count) keys in catalog.")
+        messages.append(contentsOf: missingInCatalog.map { "  - \($0)" })
+    }
+
+    if extraInCatalog.isEmpty {
+        messages.append("Check: no extra keys in catalog.")
+    } else {
+        hasError = true
+        messages.append("Check failed: found \(extraInCatalog.count) extra keys in catalog.")
+        messages.append(contentsOf: extraInCatalog.map { "  - \($0)" })
+    }
+
+    let requiredLocales = ["en", "zh-Hant", "zh-Hans"]
+    for key in parsed.keys {
+        guard let row = stringsObject[key] as? [String: Any],
+              let localizations = row["localizations"] as? [String: Any]
+        else {
+            continue
+        }
+
+        for locale in requiredLocales {
+            guard
+                let localeNode = localizations[locale] as? [String: Any],
+                let stringUnit = localeNode["stringUnit"] as? [String: Any],
+                let value = stringUnit["value"] as? String,
+                !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            else {
+                hasError = true
+                messages.append("Check failed: key \(key) missing non-empty value for locale \(locale).")
+                continue
+            }
+        }
+    }
+
+    if !hasError {
+        messages.append("Check passed: \(parsed.keys.count) keys with complete locale values.")
+    }
+
+    return CheckResult(success: !hasError, messages: messages)
 }
 
 func parseLocalizations(from source: String) throws -> ParsedLocalizations {
