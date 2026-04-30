@@ -15,16 +15,46 @@ public final class DictionarySearchViewModel {
     public var searchHistory: [String] = []
     public var libraryPhase: DictionaryLibraryPhase = .idle
     public var errorMessage: String?
+    public private(set) var appLocale: AppLocale
 
     public let library: DictionaryLibrary
+    private let conversionService: (any ChineseConversionProviding)?
     private var searchTask: Task<Void, Never>?
 
-    public init(library: DictionaryLibrary) {
+    public init(
+        library: DictionaryLibrary,
+        appLocale: AppLocale = .traditionalChinese,
+        conversionService: (any ChineseConversionProviding)? = nil
+    ) {
         self.library = library
+        self.appLocale = appLocale
+        self.conversionService = conversionService
     }
 
-    public convenience init(repository: any DictionaryRepositoryProtocol) {
-        self.init(library: DictionaryLibrary(repository: repository))
+    public convenience init(
+        repository: any DictionaryRepositoryProtocol,
+        appLocale: AppLocale = .traditionalChinese,
+        conversionService: (any ChineseConversionProviding)? = nil
+    ) {
+        self.init(
+            library: DictionaryLibrary(repository: repository),
+            appLocale: appLocale,
+            conversionService: conversionService
+        )
+    }
+
+    public func setAppLocale(_ locale: AppLocale) {
+        guard appLocale != locale else {
+            return
+        }
+
+        appLocale = locale
+        if !normalizedQuery.isEmpty {
+            searchTask?.cancel()
+            searchTask = Task { @MainActor in
+                await runSearch(searchText, saveHistory: false)
+            }
+        }
     }
 
     public func load() async {
@@ -117,10 +147,27 @@ public final class DictionarySearchViewModel {
         errorMessage = nil
 
         do {
-            let found = try await library.search(query, limit: DictionarySearchService.defaultLimit)
-            results = found
-            selectedEntry = found.first
-            if saveHistory, !found.isEmpty {
+            let locale = appLocale
+            let converter = conversionService
+            let normalizedQuery = await DictionaryDisplayLocalization.normalizeLookupWord(
+                query,
+                locale: locale,
+                converter: converter
+            )
+            let found = try await library.search(
+                normalizedQuery,
+                limit: DictionarySearchService.defaultLimit
+            )
+            let displayResults = await found.asyncMap { entry in
+                await DictionaryDisplayLocalization.translateEntry(
+                    entry,
+                    locale: locale,
+                    converter: converter
+                )
+            }
+            results = displayResults
+            selectedEntry = displayResults.first
+            if saveHistory, !displayResults.isEmpty {
                 saveHistoryItem(query)
             }
         } catch {
@@ -142,5 +189,16 @@ public final class DictionarySearchViewModel {
         if searchHistory.count > 10 {
             searchHistory = Array(searchHistory.prefix(10))
         }
+    }
+}
+
+private extension Array {
+    func asyncMap<T>(_ transform: @escaping (Element) async -> T) async -> [T] {
+        var values: [T] = []
+        values.reserveCapacity(count)
+        for element in self {
+            values.append(await transform(element))
+        }
+        return values
     }
 }

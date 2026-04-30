@@ -6,15 +6,18 @@ public struct BookmarksScreen: View {
     private let library: DictionaryLibrary
     private let bookmarkStore: any BookmarksStoreProtocol
     private let offlineAudioStore: (any OfflineAudioManaging)?
+    private let conversionService: (any ChineseConversionProviding)?
 
     public init(
         library: DictionaryLibrary,
         bookmarkStore: any BookmarksStoreProtocol,
-        offlineAudioStore: (any OfflineAudioManaging)? = nil
+        offlineAudioStore: (any OfflineAudioManaging)? = nil,
+        conversionService: (any ChineseConversionProviding)? = nil
     ) {
         self.library = library
         self.bookmarkStore = bookmarkStore
         self.offlineAudioStore = offlineAudioStore
+        self.conversionService = conversionService
         _viewModel = State(initialValue: BookmarksViewModel(library: library, bookmarkStore: bookmarkStore))
     }
 
@@ -68,7 +71,8 @@ public struct BookmarksScreen: View {
                     entry: entry,
                     library: library,
                     bookmarkStore: bookmarkStore,
-                    offlineAudioStore: offlineAudioStore
+                    offlineAudioStore: offlineAudioStore,
+                    conversionService: conversionService
                 ) { _ in }
                 .navigationTitle(entry.hanji)
                 .taigiInlineNavigationTitle()

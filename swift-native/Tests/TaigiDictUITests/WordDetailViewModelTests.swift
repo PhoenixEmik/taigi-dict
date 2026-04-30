@@ -49,6 +49,53 @@ final class WordDetailViewModelTests: XCTestCase {
 
         XCTAssertEqual(viewModel.audioMessage, "播放中")
     }
+
+    func testPrepareSimplifiedLocaleTranslatesDisplayAndLinkedLookup() async {
+        let primary = entry(
+            id: 1,
+            hanji: "辭典",
+            romanization: "sû-tián",
+            definition: "工具書",
+            wordSynonyms: ["字典"]
+        )
+        let linked = entry(id: 2, hanji: "字典", romanization: "jī-tián")
+        let repository = InMemoryRepository(entries: [primary, linked])
+        let conversion = TestChineseConversionProvider(
+            normalizedQueryMap: ["字典": "字典"],
+            displayMap: ["辭典": "辞典", "工具書": "工具书", "字典": "字典", "名詞": "名词"]
+        )
+        let viewModel = WordDetailViewModel(
+            library: DictionaryLibrary(repository: repository),
+            conversionService: conversion
+        )
+
+        await viewModel.prepare(entry: primary, locale: .simplifiedChinese)
+
+        XCTAssertEqual(viewModel.entry?.hanji, "辞典")
+        XCTAssertEqual(viewModel.shareText(), "辞典\nsû-tián\n工具书")
+        XCTAssertTrue(viewModel.openableWords.contains("字典"))
+
+        let linkedEntry = await viewModel.linkedEntry(for: "字典", locale: .simplifiedChinese)
+        XCTAssertEqual(linkedEntry?.id, 2)
+    }
+}
+
+private actor TestChineseConversionProvider: ChineseConversionProviding {
+    private let normalizedQueryMap: [String: String]
+    private let displayMap: [String: String]
+
+    init(normalizedQueryMap: [String: String], displayMap: [String: String]) {
+        self.normalizedQueryMap = normalizedQueryMap
+        self.displayMap = displayMap
+    }
+
+    func normalizeSearchInput(_ text: String, locale: AppLocale) async -> String {
+        normalizedQueryMap[text] ?? text
+    }
+
+    func translateForDisplay(_ text: String, locale: AppLocale) async -> String {
+        displayMap[text] ?? text
+    }
 }
 
 private actor TestOfflineAudioManager: OfflineAudioManaging {

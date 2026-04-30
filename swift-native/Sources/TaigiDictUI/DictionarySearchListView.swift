@@ -4,6 +4,11 @@ import TaigiDictCore
 struct DictionarySearchListView: View {
     @Bindable var viewModel: DictionarySearchViewModel
     var showsSelection: Bool
+    @Environment(\.locale) private var locale
+
+    private var appLocale: AppLocale {
+        AppLocalizer.appLocale(from: locale)
+    }
 
     private var selectedEntryID: Binding<Int64?> {
         Binding(
@@ -27,19 +32,19 @@ struct DictionarySearchListView: View {
                 Section {
                     HStack {
                         ProgressView()
-                        Text("載入辭典資料中")
+                        Text(AppLocalizer.text(.loadingDictionary, locale: appLocale))
                     }
                 }
             } else if let errorMessage = viewModel.errorMessage {
                 Section {
                     ContentUnavailableView(
-                        "載入失敗",
+                        AppLocalizer.text(.loadingFailedTitle, locale: appLocale),
                         systemImage: "exclamationmark.triangle",
                         description: Text(errorMessage)
                     )
                 }
             } else if viewModel.normalizedQuery.isEmpty {
-                SearchStartContentView(history: viewModel.searchHistory) { query in
+                SearchStartContentView(history: viewModel.searchHistory, locale: appLocale) { query in
                     viewModel.applyHistoryQuery(query)
                 } clearHistory: {
                     viewModel.clearSearchHistory()
@@ -48,19 +53,19 @@ struct DictionarySearchListView: View {
                 Section {
                     HStack {
                         ProgressView()
-                        Text("搜尋中")
+                        Text(AppLocalizer.text(.searching, locale: appLocale))
                     }
                 }
             } else if viewModel.results.isEmpty {
                 Section {
                     ContentUnavailableView(
-                        "查無結果",
+                        AppLocalizer.text(.noResultTitle, locale: appLocale),
                         systemImage: "magnifyingglass",
-                        description: Text("試試改用漢字、羅馬字或華語詞義。")
+                        description: Text(AppLocalizer.text(.noResultDescription, locale: appLocale))
                     )
                 }
             } else {
-                Section("搜尋結果") {
+                Section(AppLocalizer.text(.searchResultsSection, locale: appLocale)) {
                     ForEach(viewModel.results) { entry in
                         if showsSelection {
                             DictionaryEntryRowView(entry: entry)
@@ -77,7 +82,7 @@ struct DictionarySearchListView: View {
                 }
             }
         }
-        .searchable(text: $viewModel.searchText, prompt: "輸入台語漢字、白話字或華語詞義")
+        .searchable(text: $viewModel.searchText, prompt: AppLocalizer.text(.searchPrompt, locale: appLocale))
         .onChange(of: viewModel.searchText) { _, _ in
             viewModel.scheduleSearch()
         }

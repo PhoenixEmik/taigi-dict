@@ -14,27 +14,41 @@ public final class WordDetailViewModel {
 
     private let library: DictionaryLibrary
     private let offlineAudioStore: (any OfflineAudioManaging)?
+    private let conversionService: (any ChineseConversionProviding)?
+    private var localizedOpenableWordMap: [String: String] = [:]
 
     public init(
         library: DictionaryLibrary,
-        offlineAudioStore: (any OfflineAudioManaging)? = nil
+        offlineAudioStore: (any OfflineAudioManaging)? = nil,
+        conversionService: (any ChineseConversionProviding)? = nil
     ) {
         self.library = library
         self.offlineAudioStore = offlineAudioStore
+        self.conversionService = conversionService
     }
 
-    public func prepare(entry sourceEntry: DictionaryEntry) async {
+    public func prepare(
+        entry sourceEntry: DictionaryEntry,
+        locale: AppLocale = .traditionalChinese
+    ) async {
         isPreparing = true
         errorMessage = nil
         entry = nil
         resolvedEntryID = nil
         openableWords = []
+        localizedOpenableWordMap = [:]
 
         do {
             let resolvedEntry = try await resolveAliasChain(from: sourceEntry)
-            entry = resolvedEntry
+            entry = await DictionaryDisplayLocalization.translateEntry(
+                resolvedEntry,
+                locale: locale,
+                converter: conversionService
+            )
             resolvedEntryID = resolvedEntry.id
-            openableWords = try await resolveOpenableWords(from: resolvedEntry)
+            let openableWordsResult = try await resolveOpenableWords(from: resolvedEntry, locale: locale)
+            openableWords = openableWordsResult.words
+            localizedOpenableWordMap = openableWordsResult.wordMap
         } catch {
             entry = sourceEntry
             resolvedEntryID = sourceEntry.id
@@ -44,12 +58,21 @@ public final class WordDetailViewModel {
         isPreparing = false
     }
 
-    public func linkedEntry(for word: String) async -> DictionaryEntry? {
+    public func linkedEntry(
+        for word: String,
+        locale: AppLocale = .traditionalChinese
+    ) async -> DictionaryEntry? {
         guard openableWords.contains(word) else {
             return nil
         }
 
-        return try? await library.findLinkedEntry(word)
+        let sourceWord = localizedOpenableWordMap[word] ?? word
+        let normalizedWord = await DictionaryDisplayLocalization.normalizeLookupWord(
+            sourceWord,
+            locale: locale,
+            converter: conversionService
+        )
+        return try? await library.findLinkedEntry(normalizedWord)
     }
 
     public func shareText() -> String {
@@ -127,7 +150,10 @@ public final class WordDetailViewModel {
         return currentEntry
     }
 
-    private func resolveOpenableWords(from entry: DictionaryEntry) async throws -> Set<String> {
+    private func resolveOpenableWords(
+        from entry: DictionaryEntry,
+        locale: AppLocale
+    ) async throws -> (words: Set<String>, wordMap: [String: String]) {
         var words = OrderedUniqueStrings()
         words.append(contentsOf: entry.variantChars)
         words.append(contentsOf: entry.wordSynonyms)
@@ -139,17 +165,24 @@ public final class WordDetailViewModel {
         }
 
         var openable = Set<String>()
+        var wordMap: [String: String] = [:]
         for word in words.values {
             guard let linkedEntry = try await library.findLinkedEntry(word) else {
                 continue
             }
 
             if linkedEntry.id != entry.id {
-                openable.insert(word)
+                let displayWord = await DictionaryDisplayLocalization.translateEntryWord(
+                    word,
+                    locale: locale,
+                    converter: conversionService
+                )
+                openable.insert(displayWord)
+                wordMap[displayWord] = word
             }
         }
 
-        return openable
+        return (openable, wordMap)
     }
 }
 

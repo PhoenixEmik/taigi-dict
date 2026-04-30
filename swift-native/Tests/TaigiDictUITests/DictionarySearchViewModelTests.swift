@@ -59,6 +59,47 @@ final class DictionarySearchViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.detailEntry)
         XCTAssertNil(viewModel.errorMessage)
     }
+
+    func testSubmitSearchNormalizesSimplifiedInputAndTranslatesDisplay() async {
+        let repository = InMemoryRepository(entries: [
+            entry(id: 1, hanji: "辭典", romanization: "sû-tián", definition: "工具書"),
+        ])
+        let conversion = TestChineseConversionProvider(
+            normalizedQueryMap: ["辞典": "辭典"],
+            displayMap: ["辭典": "辞典", "工具書": "工具书", "名詞": "名词"]
+        )
+        let viewModel = DictionarySearchViewModel(
+            repository: repository,
+            appLocale: .simplifiedChinese,
+            conversionService: conversion
+        )
+        await viewModel.load()
+
+        viewModel.searchText = "辞典"
+        viewModel.submitSearch()
+        try? await Task.sleep(for: .milliseconds(50))
+
+        XCTAssertEqual(viewModel.results.map(\.hanji), ["辞典"])
+        XCTAssertEqual(viewModel.results.first?.briefSummary, "工具书")
+    }
+}
+
+private actor TestChineseConversionProvider: ChineseConversionProviding {
+    private let normalizedQueryMap: [String: String]
+    private let displayMap: [String: String]
+
+    init(normalizedQueryMap: [String: String], displayMap: [String: String]) {
+        self.normalizedQueryMap = normalizedQueryMap
+        self.displayMap = displayMap
+    }
+
+    func normalizeSearchInput(_ text: String, locale: AppLocale) async -> String {
+        normalizedQueryMap[text] ?? text
+    }
+
+    func translateForDisplay(_ text: String, locale: AppLocale) async -> String {
+        displayMap[text] ?? text
+    }
 }
 
 private actor InMemoryRepository: DictionaryRepositoryProtocol {

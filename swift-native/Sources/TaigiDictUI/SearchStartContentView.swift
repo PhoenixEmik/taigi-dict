@@ -1,16 +1,18 @@
 import SwiftUI
+import TaigiDictCore
 
 struct SearchStartContentView: View {
     var history: [String]
+    var locale: AppLocale
     var applyHistory: (String) -> Void
     var clearHistory: () -> Void
 
     var body: some View {
         Section {
             ContentUnavailableView(
-                "開始搜尋",
+                AppLocalizer.text(.searchStartTitle, locale: locale),
                 systemImage: "text.magnifyingglass",
-                description: Text("輸入台語漢字、白話字，或華語釋義後才顯示詞條。")
+                description: Text(AppLocalizer.text(.searchStartDescription, locale: locale))
             )
         }
 
@@ -24,10 +26,10 @@ struct SearchStartContentView: View {
                     }
                 }
                 Button(role: .destructive, action: clearHistory) {
-                    Label("清除搜尋紀錄", systemImage: "trash")
+                    Label(AppLocalizer.text(.clearSearchHistory, locale: locale), systemImage: "trash")
                 }
             } header: {
-                Text("搜尋紀錄")
+                Text(AppLocalizer.text(.searchHistoryTitle, locale: locale))
             }
         }
     }

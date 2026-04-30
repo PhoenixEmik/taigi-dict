@@ -4,8 +4,10 @@ import TaigiDictCore
 struct DictionaryDetailView: View {
     var sourceEntry: DictionaryEntry?
     var openEntry: (DictionaryEntry) -> Void
+    @Environment(\.locale) private var locale
     private let bookmarkStore: (any BookmarksStoreProtocol)?
     private let offlineAudioStore: (any OfflineAudioManaging)?
+    private let conversionService: (any ChineseConversionProviding)?
 
     @State private var viewModel: WordDetailViewModel
     @State private var isBookmarked = false
@@ -15,13 +17,25 @@ struct DictionaryDetailView: View {
         library: DictionaryLibrary,
         bookmarkStore: (any BookmarksStoreProtocol)? = nil,
         offlineAudioStore: (any OfflineAudioManaging)? = nil,
+        conversionService: (any ChineseConversionProviding)? = nil,
         openEntry: @escaping (DictionaryEntry) -> Void
     ) {
         self.sourceEntry = entry
         self.openEntry = openEntry
         self.bookmarkStore = bookmarkStore
         self.offlineAudioStore = offlineAudioStore
-        _viewModel = State(initialValue: WordDetailViewModel(library: library, offlineAudioStore: offlineAudioStore))
+        self.conversionService = conversionService
+        _viewModel = State(
+            initialValue: WordDetailViewModel(
+                library: library,
+                offlineAudioStore: offlineAudioStore,
+                conversionService: conversionService
+            )
+        )
+    }
+
+    private var appLocale: AppLocale {
+        AppLocalizer.appLocale(from: locale)
     }
 
     var body: some View {
@@ -30,13 +44,13 @@ struct DictionaryDetailView: View {
                 Section {
                     HStack {
                         ProgressView()
-                        Text("準備詞條內容")
+                        Text(AppLocalizer.text(.detailLoading, locale: appLocale))
                     }
                 }
             } else if let errorMessage = viewModel.errorMessage {
                 Section {
                     ContentUnavailableView(
-                        "詞條載入失敗",
+                        AppLocalizer.text(.detailLoadFailedTitle, locale: appLocale),
                         systemImage: "exclamationmark.triangle",
                         description: Text(errorMessage)
                     )
@@ -61,7 +75,7 @@ struct DictionaryDetailView: View {
                                     await viewModel.playWordAudio()
                                 }
                             } label: {
-                                Label("播放詞目音檔", systemImage: "speaker.wave.2.fill")
+                                Label(AppLocalizer.text(.playWordAudio, locale: appLocale), systemImage: "speaker.wave.2.fill")
                             }
                         }
                     }
@@ -69,41 +83,41 @@ struct DictionaryDetailView: View {
                 }
 
                 RelationshipSection(
-                    title: "異用字",
+                    title: AppLocalizer.text(.relationshipsVariant, locale: appLocale),
                     words: entry.variantChars,
                     openableWords: viewModel.openableWords,
                     openWord: openLinkedWord
                 )
 
                 RelationshipSection(
-                    title: "近義詞",
+                    title: AppLocalizer.text(.relationshipsSynonym, locale: appLocale),
                     words: entry.wordSynonyms,
                     openableWords: viewModel.openableWords,
                     openWord: openLinkedWord
                 )
 
                 RelationshipSection(
-                    title: "反義詞",
+                    title: AppLocalizer.text(.relationshipsAntonym, locale: appLocale),
                     words: entry.wordAntonyms,
                     openableWords: viewModel.openableWords,
                     openWord: openLinkedWord
                 )
 
                 ForEach(Array(entry.senses.enumerated()), id: \.offset) { _, sense in
-                    Section(sense.partOfSpeech.isEmpty ? "解說" : sense.partOfSpeech) {
+                    Section(sense.partOfSpeech.isEmpty ? AppLocalizer.text(.definitionFallbackTitle, locale: appLocale) : sense.partOfSpeech) {
                         if !sense.definition.isEmpty {
                             Text(sense.definition)
                         }
 
                         RelationshipSectionContent(
-                            title: "近義",
+                            title: AppLocalizer.text(.definitionSynonym, locale: appLocale),
                             words: sense.definitionSynonyms,
                             openableWords: viewModel.openableWords,
                             openWord: openLinkedWord
                         )
 
                         RelationshipSectionContent(
-                            title: "反義",
+                            title: AppLocalizer.text(.definitionAntonym, locale: appLocale),
                             words: sense.definitionAntonyms,
                             openableWords: viewModel.openableWords,
                             openWord: openLinkedWord
@@ -132,7 +146,7 @@ struct DictionaryDetailView: View {
                                         } label: {
                                             Image(systemName: "speaker.wave.2")
                                         }
-                                        .accessibilityLabel("播放例句音檔")
+                                        .accessibilityLabel(AppLocalizer.text(.playExampleAudio, locale: appLocale))
                                     }
                                 }
                             }
@@ -142,7 +156,7 @@ struct DictionaryDetailView: View {
                 }
 
                 if let audioMessage = viewModel.audioMessage {
-                    Section("音訊") {
+                    Section(AppLocalizer.text(.audioSectionTitle, locale: appLocale)) {
                         Text(audioMessage)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
@@ -156,9 +170,9 @@ struct DictionaryDetailView: View {
                 DetailStringListSection(title: "詞彙比較", values: entry.vocabularyComparisons)
             } else {
                 ContentUnavailableView(
-                    "開始搜尋",
+                    AppLocalizer.text(.searchStartDetailTitle, locale: appLocale),
                     systemImage: "text.magnifyingglass",
-                    description: Text("選擇搜尋結果後，詞條內容會顯示在這裡。")
+                    description: Text(AppLocalizer.text(.searchStartDetailDescription, locale: appLocale))
                 )
             }
         }
@@ -169,14 +183,16 @@ struct DictionaryDetailView: View {
                         toggleBookmark()
                     } label: {
                         Label(
-                            isBookmarked ? "移除書籤" : "加入書籤",
+                            isBookmarked
+                                ? AppLocalizer.text(.bookmarksRemove, locale: appLocale)
+                                : AppLocalizer.text(.bookmarksAdd, locale: appLocale),
                             systemImage: isBookmarked ? "bookmark.fill" : "bookmark"
                         )
                     }
                 }
 
                 ShareLink(item: viewModel.shareText()) {
-                    Label("分享", systemImage: "square.and.arrow.up")
+                    Label(AppLocalizer.text(.share, locale: appLocale), systemImage: "square.and.arrow.up")
                 }
             }
         }
@@ -184,7 +200,7 @@ struct DictionaryDetailView: View {
             guard let sourceEntry else {
                 return
             }
-            await viewModel.prepare(entry: sourceEntry)
+            await viewModel.prepare(entry: sourceEntry, locale: appLocale)
             await refreshBookmarkState()
         }
         .task(id: viewModel.entry?.id) {
@@ -194,7 +210,7 @@ struct DictionaryDetailView: View {
 
     private func openLinkedWord(_ word: String) {
         Task {
-            guard let linkedEntry = await viewModel.linkedEntry(for: word) else {
+            guard let linkedEntry = await viewModel.linkedEntry(for: word, locale: appLocale) else {
                 return
             }
             openEntry(linkedEntry)

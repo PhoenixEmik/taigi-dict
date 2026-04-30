@@ -10,12 +10,18 @@ public struct TaigiDictAppRootView: View {
     @State private var hasLoadedAppSettings = false
 
     private let settingsStore: any AppSettingsStoring
+    private let conversionService: (any ChineseConversionProviding)?
 
     public init(
         repository: any DictionaryRepositoryProtocol,
         settingsStore: any AppSettingsStoring = UserDefaultsAppSettingsStore()
     ) {
-        _viewModel = State(initialValue: DictionarySearchViewModel(repository: repository))
+        let conversionService = Self.makeChineseConversionService()
+        self.conversionService = conversionService
+        _viewModel = State(initialValue: DictionarySearchViewModel(
+            repository: repository,
+            conversionService: conversionService
+        ))
         _offlineAudioStore = State(initialValue: Self.makeOfflineAudioStore())
         self.settingsStore = settingsStore
     }
@@ -47,7 +53,8 @@ public struct TaigiDictAppRootView: View {
             DictionarySearchScreen(
                 viewModel: viewModel,
                 bookmarkStore: bookmarkStore,
-                offlineAudioStore: offlineAudioStore
+                offlineAudioStore: offlineAudioStore,
+                conversionService: conversionService
             )
                 .tabItem {
                     Label("辭典", systemImage: "book")
@@ -56,7 +63,8 @@ public struct TaigiDictAppRootView: View {
             BookmarksScreen(
                 library: viewModel.library,
                 bookmarkStore: bookmarkStore,
-                offlineAudioStore: offlineAudioStore
+                offlineAudioStore: offlineAudioStore,
+                conversionService: conversionService
             )
             .tabItem {
                 Label("書籤", systemImage: "bookmark")
@@ -73,6 +81,7 @@ public struct TaigiDictAppRootView: View {
                 }
             } onSettingsChanged: { settings in
                 appSettings = settings
+                viewModel.setAppLocale(settings.interfaceLocale)
             }
             .tabItem {
                 Label("設定", systemImage: "gearshape")
@@ -87,6 +96,11 @@ public struct TaigiDictAppRootView: View {
 
         hasLoadedAppSettings = true
         appSettings = await settingsStore.load()
+        viewModel.setAppLocale(appSettings.interfaceLocale)
+    }
+
+    private static func makeChineseConversionService() -> (any ChineseConversionProviding)? {
+        try? ChineseConversionService()
     }
 
     private static func makeOfflineAudioStore() -> OfflineAudioStore {
