@@ -179,36 +179,50 @@ private struct AudioArchiveResourceRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(title)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                    Text(snapshotDescription)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+
                 Spacer()
+
                 if isRunningAction {
                     ProgressView()
                         .controlSize(.small)
                 }
-            }
 
-            Text(snapshotDescription)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                Menu {
+                    ForEach(availableActions, id: \.self) { action in
+                        Button(action.buttonTitle, systemImage: action.systemImage) {
+                            runAction(action)
+                        }
+                    }
+                } label: {
+                    Label("操作", systemImage: "ellipsis.circle")
+                }
+                .disabled(isRunningAction || availableActions.isEmpty)
+            }
 
             if let progress = snapshot.progress {
                 ProgressView(value: progress)
-            }
-
-            HStack {
-                ForEach(availableActions, id: \.self) { action in
-                    Button(action.buttonTitle) {
-                        runAction(action)
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(isRunningAction)
-                }
             }
         }
         .padding(.vertical, 4)
     }
 
     private var availableActions: [SettingsViewModel.AudioResourceAction] {
+        AudioResourcePresentation.actions(for: snapshot)
+    }
+
+    private var snapshotDescription: String {
+        AudioResourcePresentation.description(for: snapshot)
+    }
+}
+
+enum AudioResourcePresentation {
+    static func actions(for snapshot: DownloadSnapshot) -> [SettingsViewModel.AudioResourceAction] {
         switch snapshot.state {
         case .idle:
             return [.start]
@@ -223,7 +237,7 @@ private struct AudioArchiveResourceRow: View {
         }
     }
 
-    private var snapshotDescription: String {
+    static func description(for snapshot: DownloadSnapshot) -> String {
         let downloaded = ByteCountFormatter.string(fromByteCount: snapshot.downloadedBytes, countStyle: .file)
         let total = snapshot.totalBytes.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) } ?? "--"
 
@@ -253,6 +267,19 @@ private extension SettingsViewModel.AudioResourceAction {
             return "續傳"
         case .restart:
             return "重下載"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .start:
+            return "arrow.down.circle"
+        case .pause:
+            return "pause.circle"
+        case .resume:
+            return "play.circle"
+        case .restart:
+            return "arrow.clockwise.circle"
         }
     }
 }
