@@ -84,3 +84,86 @@ public struct DictionaryEntry: Identifiable, Hashable, Sendable {
         return romanization
     }
 }
+
+extension DictionaryEntry: Decodable {
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case type
+        case hanji
+        case romanization
+        case category
+        case audio
+        case hokkienSearch
+        case mandarinSearch
+        case variantChars
+        case wordSynonyms
+        case wordAntonyms
+        case alternativePronunciations
+        case contractedPronunciations
+        case colloquialPronunciations
+        case phoneticDifferences
+        case vocabularyComparisons
+        case aliasTargetEntryID = "aliasTargetEntryId"
+        case senses
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            id: try container.decode(Int64.self, forKey: .id),
+            type: try container.decodeIfPresent(String.self, forKey: .type) ?? "",
+            hanji: try container.decodeIfPresent(String.self, forKey: .hanji) ?? "",
+            romanization: try container.decodeIfPresent(String.self, forKey: .romanization) ?? "",
+            category: try container.decodeIfPresent(String.self, forKey: .category) ?? "",
+            audioID: try container.decodeIfPresent(String.self, forKey: .audio) ?? "",
+            hokkienSearch: try container.decodeIfPresent(String.self, forKey: .hokkienSearch) ?? "",
+            mandarinSearch: try container.decodeIfPresent(String.self, forKey: .mandarinSearch) ?? "",
+            variantChars: try container.decodeTrimmedStringListIfPresent(forKey: .variantChars),
+            wordSynonyms: try container.decodeTrimmedStringListIfPresent(forKey: .wordSynonyms),
+            wordAntonyms: try container.decodeTrimmedStringListIfPresent(forKey: .wordAntonyms),
+            alternativePronunciations: try container.decodeTrimmedStringListIfPresent(forKey: .alternativePronunciations),
+            contractedPronunciations: try container.decodeTrimmedStringListIfPresent(forKey: .contractedPronunciations),
+            colloquialPronunciations: try container.decodeTrimmedStringListIfPresent(forKey: .colloquialPronunciations),
+            phoneticDifferences: try container.decodeTrimmedStringListIfPresent(forKey: .phoneticDifferences),
+            vocabularyComparisons: try container.decodeTrimmedStringListIfPresent(forKey: .vocabularyComparisons),
+            aliasTargetEntryID: try container.decodeIfPresent(Int64.self, forKey: .aliasTargetEntryID),
+            senses: try container.decodeIfPresent([DictionarySense].self, forKey: .senses) ?? []
+        )
+    }
+}
+
+extension KeyedDecodingContainer {
+    func decodeTrimmedStringListIfPresent(forKey key: Key) throws -> [String] {
+        guard contains(key) else {
+            return []
+        }
+
+        let values = try decode([LossyStringValue].self, forKey: key)
+        return values
+            .map(\.value)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+    }
+}
+
+private struct LossyStringValue: Decodable {
+    var value: String
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+
+        if container.decodeNil() {
+            value = ""
+        } else if let string = try? container.decode(String.self) {
+            value = string
+        } else if let int = try? container.decode(Int.self) {
+            value = String(int)
+        } else if let double = try? container.decode(Double.self) {
+            value = String(double)
+        } else if let bool = try? container.decode(Bool.self) {
+            value = String(bool)
+        } else {
+            value = ""
+        }
+    }
+}

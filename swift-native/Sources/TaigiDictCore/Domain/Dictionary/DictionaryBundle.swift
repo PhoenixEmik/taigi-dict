@@ -25,3 +25,23 @@ public struct DictionaryBundle: Sendable {
         databasePath != nil
     }
 }
+
+extension DictionaryBundle: Decodable {
+    private enum CodingKeys: String, CodingKey {
+        case entryCount
+        case senseCount
+        case exampleCount
+        case entries
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let entries = try container.decode([DictionaryEntry].self, forKey: .entries)
+        self.init(
+            entryCount: try container.decode(Int.self, forKey: .entryCount),
+            senseCount: try container.decode(Int.self, forKey: .senseCount),
+            exampleCount: try container.decode(Int.self, forKey: .exampleCount),
+            entries: entries
+        )
+    }
+}

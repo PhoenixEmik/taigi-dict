@@ -18,3 +18,22 @@ public struct DictionaryExample: Hashable, Sendable {
         self.audioID = audioID
     }
 }
+
+extension DictionaryExample: Decodable {
+    private enum CodingKeys: String, CodingKey {
+        case hanji
+        case romanization
+        case mandarin
+        case audio
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            hanji: try container.decodeIfPresent(String.self, forKey: .hanji) ?? "",
+            romanization: try container.decodeIfPresent(String.self, forKey: .romanization) ?? "",
+            mandarin: try container.decodeIfPresent(String.self, forKey: .mandarin) ?? "",
+            audioID: try container.decodeIfPresent(String.self, forKey: .audio) ?? ""
+        )
+    }
+}

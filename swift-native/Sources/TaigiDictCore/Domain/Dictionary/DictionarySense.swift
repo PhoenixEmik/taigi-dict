@@ -21,3 +21,24 @@ public struct DictionarySense: Hashable, Sendable {
         self.examples = examples
     }
 }
+
+extension DictionarySense: Decodable {
+    private enum CodingKeys: String, CodingKey {
+        case partOfSpeech
+        case definition
+        case definitionSynonyms
+        case definitionAntonyms
+        case examples
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            partOfSpeech: try container.decodeIfPresent(String.self, forKey: .partOfSpeech) ?? "",
+            definition: try container.decodeIfPresent(String.self, forKey: .definition) ?? "",
+            definitionSynonyms: try container.decodeTrimmedStringListIfPresent(forKey: .definitionSynonyms),
+            definitionAntonyms: try container.decodeTrimmedStringListIfPresent(forKey: .definitionAntonyms),
+            examples: try container.decodeIfPresent([DictionaryExample].self, forKey: .examples) ?? []
+        )
+    }
+}
