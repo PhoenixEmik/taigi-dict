@@ -16,7 +16,7 @@ public final class DictionarySearchViewModel {
     public var libraryPhase: DictionaryLibraryPhase = .idle
     public var errorMessage: String?
 
-    private let library: DictionaryLibrary
+    public let library: DictionaryLibrary
     private var searchTask: Task<Void, Never>?
 
     public init(library: DictionaryLibrary) {
