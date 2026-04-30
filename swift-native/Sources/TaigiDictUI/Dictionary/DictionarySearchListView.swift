@@ -53,10 +53,11 @@ struct DictionarySearchListView: View {
                 }
             } else if viewModel.isSearching {
                 Section {
-                    ForEach(0..<3, id: \.self) { _ in
+                    ForEach(0..<2, id: \.self) { _ in
                         SearchResultSkeletonRow()
                     }
                 }
+                .transition(.opacity)
             } else if viewModel.results.isEmpty {
                 Section {
                     ContentUnavailableView(
@@ -65,6 +66,7 @@ struct DictionarySearchListView: View {
                         description: Text(AppLocalizer.text(.noResultDescription, locale: appLocale))
                     )
                 }
+                .transition(.opacity)
             } else {
                 Section(AppLocalizer.text(.searchResultsSection, locale: appLocale)) {
                     ForEach(viewModel.results) { entry in
@@ -81,8 +83,11 @@ struct DictionarySearchListView: View {
                         }
                     }
                 }
+                .transition(.opacity)
             }
         }
+        .animation(.easeOut(duration: 0.12), value: viewModel.isSearching)
+        .animation(.easeOut(duration: 0.12), value: viewModel.results.isEmpty)
         .searchable(text: $viewModel.searchText, prompt: AppLocalizer.text(.searchPrompt, locale: appLocale))
         .onChange(of: viewModel.searchText) { _, _ in
             viewModel.scheduleSearch()
