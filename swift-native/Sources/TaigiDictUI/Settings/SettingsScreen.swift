@@ -112,22 +112,6 @@ public struct SettingsScreen: View {
                     }
                 }
 
-                if viewModel.supportsDictionarySourceResources {
-                    Section(AppLocalizer.text(.settingsDictionaryResourcesSection, locale: appLocale)) {
-                        DictionarySourceResourceRow(
-                            title: AppLocalizer.text(.settingsDictionarySource, locale: appLocale),
-                            locale: appLocale,
-                            snapshot: viewModel.dictionarySourceSnapshot,
-                            isRunningAction: viewModel.isDictionarySourceActionRunning
-                        ) { action in
-                            Task {
-                                await viewModel.runDictionarySourceAction(action)
-                                onMaintenanceCompleted()
-                            }
-                        }
-                    }
-                }
-
                 Section(AppLocalizer.text(.settingsOfflineAudioSection, locale: appLocale)) {
                     AudioArchiveResourceRow(
                         title: AppLocalizer.text(.settingsWordAudio, locale: appLocale),
@@ -189,61 +173,6 @@ public struct SettingsScreen: View {
         } message: {
             Text(AppLocalizer.text(.settingsClearConfirmBody, locale: appLocale))
         }
-    }
-}
-
-private struct DictionarySourceResourceRow: View {
-    let title: String
-    let locale: AppLocale
-    let snapshot: DownloadSnapshot
-    let isRunningAction: Bool
-    let runAction: (SettingsViewModel.DictionarySourceAction) -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                    Text(snapshotDescription)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                if isRunningAction {
-                    ProgressView()
-                        .controlSize(.small)
-                }
-
-                Menu {
-                    Button(
-                        AppLocalizer.text(.dictionarySourceActionRestore, locale: locale),
-                        systemImage: "arrow.counterclockwise.circle"
-                    ) {
-                        runAction(.restore)
-                    }
-                    Button(
-                        AppLocalizer.text(.dictionarySourceActionDownload, locale: locale),
-                        systemImage: "arrow.down.circle"
-                    ) {
-                        runAction(.download)
-                    }
-                } label: {
-                    Label(AppLocalizer.text(.settingsActionsMenu, locale: locale), systemImage: "ellipsis.circle")
-                }
-                .disabled(isRunningAction)
-            }
-
-            if let progress = snapshot.progress {
-                ProgressView(value: progress)
-            }
-        }
-        .padding(.vertical, 4)
-    }
-
-    private var snapshotDescription: String {
-        AudioResourcePresentation.description(for: snapshot, locale: locale)
     }
 }
 
