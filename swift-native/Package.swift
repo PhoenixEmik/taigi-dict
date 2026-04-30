@@ -48,7 +48,10 @@ let package = Package(
         ),
         .target(
             name: "TaigiDictUI",
-            dependencies: ["TaigiDictCore"]
+            dependencies: ["TaigiDictCore"],
+            resources: [
+                .process("Resources"),
+            ]
         ),
         .executableTarget(
             name: "TaigiDictPreviewApp",

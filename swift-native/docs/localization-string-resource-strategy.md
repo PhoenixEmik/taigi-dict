@@ -33,6 +33,11 @@ Use one localization key set for all Swift-native screens and make migration to 
 5. Keep current in-code fallback tables during transition.
 6. Remove fallback tables only after CI validates complete key coverage.
 
+## Auto-export workflow
+1. Update `AppLocalizedStringKey` and the three locale tables in `AppLocalizer.swift`.
+2. Run `./Scripts/export_xcstrings_skeleton.swift` from `swift-native`.
+3. Commit both source and generated catalog changes together.
+
 ## Validation checklist
 - No hardcoded user-facing strings in `TaigiDictUI` screens for dictionary, bookmarks, initialization, and settings flows.
 - New keys have Traditional Chinese, Simplified Chinese, and English entries.

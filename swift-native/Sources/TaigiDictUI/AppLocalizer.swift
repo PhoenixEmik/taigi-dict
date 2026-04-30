@@ -1,8 +1,7 @@
 import Foundation
-import SwiftUI
 import TaigiDictCore
 
-public enum AppLocalizedStringKey {
+public enum AppLocalizedStringKey: String {
     case tabDictionary
     case tabBookmarks
     case tabSettings
@@ -147,6 +146,10 @@ public enum AppLocalizedStringKey {
 
 enum AppLocalizer {
     static func text(_ key: AppLocalizedStringKey, locale: AppLocale) -> String {
+        if let resourceValue = resourceText(key, locale: locale) {
+            return resourceValue
+        }
+
         switch locale {
         case .traditionalChinese:
             return traditionalChinese(key)
@@ -155,6 +158,22 @@ enum AppLocalizer {
         case .english:
             return english(key)
         }
+    }
+
+    private static func resourceText(_ key: AppLocalizedStringKey, locale: AppLocale) -> String? {
+        let resolved = String(
+            localized: String.LocalizationValue(key.rawValue),
+            table: "Localizable",
+            bundle: .module,
+            locale: Locale(identifier: locale.rawValue)
+        )
+
+        // String catalog lookup returns the key when not found; fallback to in-code tables in that case.
+        guard resolved != key.rawValue else {
+            return nil
+        }
+
+        return resolved
     }
 
     static func appLocale(from locale: Locale) -> AppLocale {
