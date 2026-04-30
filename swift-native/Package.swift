@@ -32,6 +32,10 @@ let package = Package(
             url: "https://github.com/groue/GRDB.swift.git",
             exact: "7.10.0"
         ),
+        .package(
+            url: "https://github.com/weichsel/ZIPFoundation.git",
+            exact: "0.9.20"
+        ),
     ],
     targets: [
         .target(
@@ -39,6 +43,7 @@ let package = Package(
             dependencies: [
                 .product(name: "OpenCC", package: "SwiftyOpenCC"),
                 .product(name: "GRDB", package: "GRDB.swift"),
+                .product(name: "ZIPFoundation", package: "ZIPFoundation"),
             ]
         ),
         .target(
@@ -54,7 +59,10 @@ let package = Package(
         ),
         .testTarget(
             name: "TaigiDictCoreTests",
-            dependencies: ["TaigiDictCore"]
+            dependencies: [
+                "TaigiDictCore",
+                .product(name: "ZIPFoundation", package: "ZIPFoundation"),
+            ]
         ),
         .testTarget(
             name: "TaigiDictUITests",
