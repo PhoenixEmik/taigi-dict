@@ -3,12 +3,31 @@ import TaigiDictCore
 
 public struct TaigiDictAppRootView: View {
     @State private var viewModel: DictionarySearchViewModel
+    @State private var initializationTaskID = UUID()
+    @State private var didAttemptInitialization = false
 
     public init(repository: any DictionaryRepositoryProtocol) {
         _viewModel = State(initialValue: DictionarySearchViewModel(repository: repository))
     }
 
     public var body: some View {
+        Group {
+            switch viewModel.libraryPhase {
+            case .ready:
+                mainTabView
+            case .failed(let message) where didAttemptInitialization:
+                initializationFailedView(message: message)
+            case .idle, .loading, .failed:
+                initializationLoadingView
+            }
+        }
+        .task(id: initializationTaskID) {
+            await viewModel.load()
+            didAttemptInitialization = true
+        }
+    }
+
+    private var mainTabView: some View {
         TabView {
             DictionarySearchScreen(viewModel: viewModel)
                 .tabItem {
@@ -33,8 +52,29 @@ public struct TaigiDictAppRootView: View {
                 Label("設定", systemImage: "gearshape")
             }
         }
-        .task {
-            await viewModel.load()
+    }
+
+    private var initializationLoadingView: some View {
+        ContentUnavailableView {
+            Label("載入中", systemImage: "book")
+        } description: {
+            VStack(spacing: 12) {
+                ProgressView()
+                Text("正在初始化辭典資料")
+            }
+        }
+    }
+
+    private func initializationFailedView(message: String) -> some View {
+        ContentUnavailableView {
+            Label("初始化失敗", systemImage: "exclamationmark.triangle")
+        } description: {
+            Text(message)
+        } actions: {
+            Button("重試") {
+                didAttemptInitialization = false
+                initializationTaskID = UUID()
+            }
         }
     }
 }
