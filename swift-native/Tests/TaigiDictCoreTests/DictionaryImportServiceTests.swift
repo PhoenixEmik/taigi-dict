@@ -90,4 +90,41 @@ final class DictionaryImportServiceTests: XCTestCase {
             )
         }
     }
+
+    func testImportDatabaseStreamsAndWritesLargeDataset() throws {
+        let entryCount = 450
+        let manifest = DictionaryManifest(
+            schemaVersion: 1,
+            builtAt: "2026-04-30T00:00:00Z",
+            sourceModifiedAt: "2026-04-29T00:00:00Z",
+            entryCount: entryCount,
+            senseCount: entryCount,
+            exampleCount: 0
+        )
+        let entries = (1...entryCount).map { index in
+            """
+            {"id":\(index),"type":"名詞","hanji":"詞\(index)","romanization":"su\(index)","category":"","audio":"","hokkienSearch":"詞\(index) su\(index)","mandarinSearch":"詞條\(index)","senses":[{"partOfSpeech":"","definition":"第\(index)筆","examples":[]}]}
+            """
+        }.joined(separator: "\n")
+
+        let databaseURL = try makeDatabaseURL()
+        let bundle = try DictionaryImportService().importDatabase(
+            manifest: manifest,
+            entriesData: Data(entries.utf8),
+            databaseURL: databaseURL
+        )
+
+        XCTAssertEqual(bundle.entryCount, entryCount)
+        XCTAssertEqual(bundle.senseCount, entryCount)
+        XCTAssertEqual(bundle.exampleCount, 0)
+        XCTAssertTrue(bundle.entries.isEmpty)
+        XCTAssertEqual(bundle.databasePath, databaseURL.path)
+    }
+
+    private func makeDatabaseURL() throws -> URL {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        return directory.appendingPathComponent("dictionary.sqlite")
+    }
 }

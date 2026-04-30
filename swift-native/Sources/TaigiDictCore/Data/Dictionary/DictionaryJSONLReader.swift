@@ -13,11 +13,20 @@ public struct DictionaryJSONLReader: Sendable {
     }
 
     public func readEntries(from data: Data) throws -> [DictionaryEntry] {
+        var entries: [DictionaryEntry] = []
+        try enumerateEntries(from: data) { entry in
+            entries.append(entry)
+        }
+        return entries
+    }
+
+    public func enumerateEntries(
+        from data: Data,
+        onEntry: (DictionaryEntry) throws -> Void
+    ) throws {
         guard let content = String(data: data, encoding: .utf8) else {
             throw DictionaryJSONLReaderError.invalidUTF8
         }
-
-        var entries: [DictionaryEntry] = []
 
         for (offset, rawLine) in content.split(whereSeparator: \.isNewline).enumerated() {
             let line = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -30,7 +39,9 @@ public struct DictionaryJSONLReader: Sendable {
             }
 
             do {
-                entries.append(try decoder.decode(DictionaryEntry.self, from: lineData))
+                try onEntry(try decoder.decode(DictionaryEntry.self, from: lineData))
+            } catch let error as DictionaryJSONLReaderError {
+                throw error
             } catch {
                 throw DictionaryJSONLReaderError.invalidLine(
                     line: offset + 1,
@@ -38,7 +49,5 @@ public struct DictionaryJSONLReader: Sendable {
                 )
             }
         }
-
-        return entries
     }
 }
