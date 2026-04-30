@@ -29,8 +29,14 @@ public actor InstalledDictionaryRepository: DictionaryRepositoryProtocol {
     }
 
     public func loadBundle() async throws -> DictionaryBundle {
-        try await prepareInstalledPackage()
-        return try await repository.loadBundle()
+        try await loadBundle(onProgress: nil)
+    }
+
+    public func loadBundle(
+        onProgress: (@Sendable (DictionaryPreparationProgress) async -> Void)?
+    ) async throws -> DictionaryBundle {
+        try await prepareInstalledPackage(onProgress: onProgress)
+        return try await repository.loadBundle(onProgress: onProgress)
     }
 
     public func search(
@@ -38,27 +44,27 @@ public actor InstalledDictionaryRepository: DictionaryRepositoryProtocol {
         limit: Int = DictionarySearchService.defaultLimit,
         offset: Int = 0
     ) async throws -> [DictionaryEntry] {
-        try await prepareInstalledPackage()
+        try await prepareInstalledPackage(onProgress: nil)
         return try await repository.search(rawQuery, limit: limit, offset: offset)
     }
 
     public func findLinkedEntry(_ rawWord: String) async throws -> DictionaryEntry? {
-        try await prepareInstalledPackage()
+        try await prepareInstalledPackage(onProgress: nil)
         return try await repository.findLinkedEntry(rawWord)
     }
 
     public func entries(ids: [Int64]) async throws -> [DictionaryEntry] {
-        try await prepareInstalledPackage()
+        try await prepareInstalledPackage(onProgress: nil)
         return try await repository.entries(ids: ids)
     }
 
     public func entry(id: Int64) async throws -> DictionaryEntry? {
-        try await prepareInstalledPackage()
+        try await prepareInstalledPackage(onProgress: nil)
         return try await repository.entry(id: id)
     }
 
     public func metadata() async throws -> [String: String]? {
-        try await prepareInstalledPackage()
+        try await prepareInstalledPackage(onProgress: nil)
         return try await repository.metadata()
     }
 
@@ -73,7 +79,7 @@ public actor InstalledDictionaryRepository: DictionaryRepositoryProtocol {
     public func rebuildInstalledDatabase() async throws {
         let sourceManifestURL = sourceDirectory.appendingPathComponent("dictionary_manifest.json")
         let sourceManifest = try loadManifest(at: sourceManifestURL)
-        try installFromSource(manifest: sourceManifest)
+        try await installFromSource(manifest: sourceManifest, onProgress: nil)
         await repository.clearBundleCache()
     }
 
@@ -87,8 +93,21 @@ public actor InstalledDictionaryRepository: DictionaryRepositoryProtocol {
         await repository.clearBundleCache()
     }
 
-    private func prepareInstalledPackage() async throws {
+    private func prepareInstalledPackage(
+        onProgress: (@Sendable (DictionaryPreparationProgress) async -> Void)?
+    ) async throws {
         let sourceManifestURL = sourceDirectory.appendingPathComponent("dictionary_manifest.json")
+
+        if let onProgress {
+            await onProgress(
+                DictionaryPreparationProgress(
+                    step: .checkingPackage,
+                    fraction: 0,
+                    completedUnits: 0,
+                    totalUnits: 1
+                )
+            )
+        }
 
         if fileManager.fileExists(atPath: sourceManifestURL.path) {
             let sourceManifest = try loadManifest(at: sourceManifestURL)
@@ -98,16 +117,48 @@ public actor InstalledDictionaryRepository: DictionaryRepositoryProtocol {
             }
 
             if try installedPackageMatchesSource(sourceManifest) {
+                if let onProgress {
+                    await onProgress(
+                        DictionaryPreparationProgress(
+                            step: .checkingPackage,
+                            fraction: 1,
+                            completedUnits: 1,
+                            totalUnits: 1
+                        )
+                    )
+                }
                 return
             }
 
-            try installFromSource(manifest: sourceManifest)
+            if let onProgress {
+                await onProgress(
+                    DictionaryPreparationProgress(
+                        step: .importingDatabase,
+                        fraction: 0,
+                        completedUnits: 0,
+                        totalUnits: max(sourceManifest.entryCount, 1)
+                    )
+                )
+            }
+
+            try await installFromSource(manifest: sourceManifest, onProgress: onProgress)
             await repository.clearBundleCache()
             return
         }
 
         guard try installedPackageExists() else {
             throw DictionaryPackageLoaderError.missingManifest(sourceManifestURL)
+        }
+
+        if let onProgress {
+            await onProgress(
+                DictionaryPreparationProgress(
+                    step: .checkingPackage,
+                    fraction: 1,
+                    completedUnits: 1,
+                    totalUnits: 1
+                )
+            )
         }
     }
 
@@ -135,7 +186,10 @@ public actor InstalledDictionaryRepository: DictionaryRepositoryProtocol {
         try decoder.decode(DictionaryManifest.self, from: Data(contentsOf: url))
     }
 
-    private func installFromSource(manifest: DictionaryManifest) throws {
+    private func installFromSource(
+        manifest: DictionaryManifest,
+        onProgress: (@Sendable (DictionaryPreparationProgress) async -> Void)?
+    ) async throws {
         let sourceEntriesURL = sourceDirectory.appendingPathComponent(manifest.entriesFileName)
         guard fileManager.fileExists(atPath: sourceEntriesURL.path) else {
             throw DictionaryPackageLoaderError.missingEntries(sourceEntriesURL)
@@ -146,9 +200,36 @@ public actor InstalledDictionaryRepository: DictionaryRepositoryProtocol {
         _ = try importService.importDatabase(
             manifest: manifest,
             entriesData: entriesData,
-            databaseURL: databaseURL
+            databaseURL: databaseURL,
+            onProgress: { progress in
+                guard let onProgress else {
+                    return
+                }
+
+                Self.emitProgressSync(
+                    DictionaryPreparationProgress(
+                        step: .importingDatabase,
+                        fraction: progress.fraction,
+                        completedUnits: progress.processedEntries,
+                        totalUnits: progress.totalEntries
+                    ),
+                    onProgress: onProgress
+                )
+            }
         )
         try encoder.encode(manifest).write(to: installedManifestURL, options: .atomic)
+    }
+
+    private static func emitProgressSync(
+        _ progress: DictionaryPreparationProgress,
+        onProgress: @escaping @Sendable (DictionaryPreparationProgress) async -> Void
+    ) {
+        let semaphore = DispatchSemaphore(value: 0)
+        Task {
+            await onProgress(progress)
+            semaphore.signal()
+        }
+        semaphore.wait()
     }
 
     private var installedManifestURL: URL {

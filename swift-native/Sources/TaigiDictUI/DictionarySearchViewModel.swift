@@ -63,8 +63,14 @@ public final class DictionarySearchViewModel {
     }
 
     public func load() async {
+        await load(onProgress: nil)
+    }
+
+    public func load(
+        onProgress: (@Sendable (DictionaryPreparationProgress) async -> Void)?
+    ) async {
         isLoading = true
-        libraryPhase = await library.prepare()
+        libraryPhase = await library.prepare(onProgress: onProgress)
         isLoading = false
         searchHistory = normalizeHistory(await searchHistoryStore.load())
 

@@ -8,6 +8,23 @@ public enum DictionaryImportError: Error, Equatable {
     case exampleCountMismatch(expected: Int, actual: Int)
 }
 
+public struct DictionaryImportProgress: Equatable, Sendable {
+    public var processedEntries: Int
+    public var totalEntries: Int
+
+    public init(processedEntries: Int, totalEntries: Int) {
+        self.processedEntries = max(processedEntries, 0)
+        self.totalEntries = max(totalEntries, 1)
+    }
+
+    public var fraction: Double {
+        guard totalEntries > 0 else {
+            return 0
+        }
+        return min(max(Double(processedEntries) / Double(totalEntries), 0), 1)
+    }
+}
+
 public struct DictionaryImportService: Sendable {
     public static let supportedSchemaVersion = 1
     private static let defaultInsertBatchSize = 200
@@ -46,13 +63,15 @@ public struct DictionaryImportService: Sendable {
     public func importDatabase(
         manifest: DictionaryManifest,
         entriesData: Data,
-        databaseURL: URL
+        databaseURL: URL,
+        onProgress: ((DictionaryImportProgress) -> Void)? = nil
     ) throws -> DictionaryBundle {
         try validateSchemaVersion(manifest)
         let stats = try writeDatabaseStreaming(
             manifest: manifest,
             entriesData: entriesData,
-            databaseURL: databaseURL
+            databaseURL: databaseURL,
+            onProgress: onProgress
         )
         return DictionaryBundle(
             entryCount: stats.entryCount,
@@ -66,7 +85,8 @@ public struct DictionaryImportService: Sendable {
     private func writeDatabaseStreaming(
         manifest: DictionaryManifest,
         entriesData: Data,
-        databaseURL: URL
+        databaseURL: URL,
+        onProgress: ((DictionaryImportProgress) -> Void)?
     ) throws -> ImportStats {
         let parentDirectory = databaseURL.deletingLastPathComponent()
         try FileManager.default.createDirectory(at: parentDirectory, withIntermediateDirectories: true)
@@ -78,6 +98,8 @@ public struct DictionaryImportService: Sendable {
         try DictionaryDatabase.migrate(dbQueue)
 
         var stats = ImportStats()
+        onProgress?(DictionaryImportProgress(processedEntries: 0, totalEntries: manifest.entryCount))
+
         try dbQueue.writeWithoutTransaction { db in
             try db.execute(sql: "BEGIN IMMEDIATE")
             var insertsInTransaction = 0
@@ -90,6 +112,10 @@ public struct DictionaryImportService: Sendable {
 
                     if insertsInTransaction >= Self.defaultInsertBatchSize {
                         try db.execute(sql: "COMMIT")
+                        onProgress?(DictionaryImportProgress(
+                            processedEntries: stats.entryCount,
+                            totalEntries: manifest.entryCount
+                        ))
                         try db.execute(sql: "BEGIN IMMEDIATE")
                         insertsInTransaction = 0
                     }
@@ -98,6 +124,10 @@ public struct DictionaryImportService: Sendable {
                 try validateCounts(manifest: manifest, stats: stats)
                 try insertMetadata(for: stats, manifest: manifest, into: db)
                 try db.execute(sql: "COMMIT")
+                onProgress?(DictionaryImportProgress(
+                    processedEntries: stats.entryCount,
+                    totalEntries: manifest.entryCount
+                ))
             } catch {
                 try? db.execute(sql: "ROLLBACK")
                 throw error

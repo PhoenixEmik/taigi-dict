@@ -61,9 +61,23 @@ public final class InitializationViewModel {
         errorMessage = nil
         failureReason = nil
 
-        await searchViewModel.load()
-        processedUnits = 1
-        progress = 1
+        await searchViewModel.load { [weak self] update in
+            guard let self else {
+                return
+            }
+
+            await MainActor.run {
+                self.totalUnits = max(update.totalUnits, 1)
+                self.processedUnits = min(update.completedUnits, self.totalUnits)
+                self.progress = min(max(update.fraction, 0), 1)
+            }
+        }
+
+        if processedUnits == 0 {
+            processedUnits = 1
+            totalUnits = 1
+            progress = 1
+        }
 
         switch searchViewModel.libraryPhase {
         case .ready:

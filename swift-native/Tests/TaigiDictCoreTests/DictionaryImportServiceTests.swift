@@ -121,6 +121,39 @@ final class DictionaryImportServiceTests: XCTestCase {
         XCTAssertEqual(bundle.databasePath, databaseURL.path)
     }
 
+    func testImportDatabaseReportsProgressFromStartToEnd() throws {
+        let entryCount = 8
+        let manifest = DictionaryManifest(
+            schemaVersion: 1,
+            builtAt: "2026-04-30T00:00:00Z",
+            entryCount: entryCount,
+            senseCount: entryCount,
+            exampleCount: 0
+        )
+        let entries = (1...entryCount).map { index in
+            """
+            {"id":\(index),"type":"名詞","hanji":"詞\(index)","romanization":"su\(index)","category":"","audio":"","hokkienSearch":"詞\(index) su\(index)","mandarinSearch":"詞條\(index)","senses":[{"partOfSpeech":"","definition":"第\(index)筆","examples":[]}]}
+            """
+        }.joined(separator: "\n")
+
+        var updates: [DictionaryImportProgress] = []
+        let databaseURL = try makeDatabaseURL()
+
+        _ = try DictionaryImportService().importDatabase(
+            manifest: manifest,
+            entriesData: Data(entries.utf8),
+            databaseURL: databaseURL,
+            onProgress: { updates.append($0) }
+        )
+
+        XCTAssertFalse(updates.isEmpty)
+        XCTAssertEqual(updates.first?.processedEntries, 0)
+        XCTAssertEqual(updates.first?.totalEntries, entryCount)
+        XCTAssertEqual(updates.last?.processedEntries, entryCount)
+        XCTAssertEqual(updates.last?.totalEntries, entryCount)
+        XCTAssertEqual(updates.last?.fraction, 1)
+    }
+
     private func makeDatabaseURL() throws -> URL {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)

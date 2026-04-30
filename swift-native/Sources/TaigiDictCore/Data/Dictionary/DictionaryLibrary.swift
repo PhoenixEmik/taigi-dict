@@ -60,6 +60,13 @@ public actor DictionaryLibrary {
 
     @discardableResult
     public func prepare() async -> DictionaryLibraryPhase {
+        await prepare(onProgress: nil)
+    }
+
+    @discardableResult
+    public func prepare(
+        onProgress: (@Sendable (DictionaryPreparationProgress) async -> Void)?
+    ) async -> DictionaryLibraryPhase {
         switch phaseStorage {
         case .ready:
             return phaseStorage
@@ -71,7 +78,7 @@ public actor DictionaryLibrary {
 
         phaseStorage = .loading
         do {
-            let bundle = try await repository.loadBundle()
+            let bundle = try await repository.loadBundle(onProgress: onProgress)
             let summary = DictionaryLibrarySummary(
                 entryCount: bundle.entryCount,
                 senseCount: bundle.senseCount,

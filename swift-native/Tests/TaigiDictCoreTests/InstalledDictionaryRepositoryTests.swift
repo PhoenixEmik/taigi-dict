@@ -41,6 +41,28 @@ final class InstalledDictionaryRepositoryTests: XCTestCase {
         )
     }
 
+    func testInstalledRepositoryReportsPreparationProgressAcrossSteps() async throws {
+        let sourceDirectory = try makeTemporaryDirectory()
+        let installedDirectory = try makeTemporaryDirectory().appendingPathComponent("Installed", isDirectory: true)
+        try writePackage(to: sourceDirectory)
+
+        let repository = InstalledDictionaryRepository(
+            sourceDirectory: sourceDirectory,
+            installedDirectory: installedDirectory
+        )
+        let collector = PreparationProgressCollector()
+
+        _ = try await repository.loadBundle { update in
+            await collector.append(update)
+        }
+
+        let updates = await collector.values()
+        XCTAssertFalse(updates.isEmpty)
+        XCTAssertTrue(updates.contains(where: { $0.step == .checkingPackage }))
+        XCTAssertTrue(updates.contains(where: { $0.step == .importingDatabase }))
+        XCTAssertTrue(updates.contains(where: { $0.step == .loadingBundle && $0.fraction == 1 }))
+    }
+
     func testInstalledRepositoryFallsBackToInstalledPackageAfterSourceRemoval() async throws {
         let sourceDirectory = try makeTemporaryDirectory()
         let installedDirectory = try makeTemporaryDirectory().appendingPathComponent("Installed", isDirectory: true)
@@ -197,6 +219,18 @@ private struct TestEntry {
     var hanji: String
     var romanization: String
     var definition: String
+}
+
+private actor PreparationProgressCollector {
+    private var updates: [DictionaryPreparationProgress] = []
+
+    func append(_ update: DictionaryPreparationProgress) {
+        updates.append(update)
+    }
+
+    func values() -> [DictionaryPreparationProgress] {
+        updates
+    }
 }
 
 private extension SHA256.Digest {
